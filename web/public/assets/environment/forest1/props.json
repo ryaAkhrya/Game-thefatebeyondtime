@@ -1,0 +1,548 @@
+{
+ "frames": {
+  "tree_a": {
+   "frame": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 136
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 136
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 136
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9411764705882353
+   },
+   "foot": [
+    22,
+    12
+   ]
+  },
+  "tree_b": {
+   "frame": {
+    "x": 114,
+    "y": 0,
+    "w": 112,
+    "h": 136
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 112,
+    "h": 136
+   },
+   "sourceSize": {
+    "w": 112,
+    "h": 136
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9411764705882353
+   },
+   "foot": [
+    22,
+    12
+   ]
+  },
+  "tree_pine": {
+   "frame": {
+    "x": 228,
+    "y": 0,
+    "w": 80,
+    "h": 140
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 80,
+    "h": 140
+   },
+   "sourceSize": {
+    "w": 80,
+    "h": 140
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9428571428571428
+   },
+   "foot": [
+    18,
+    12
+   ]
+  },
+  "tree_dead": {
+   "frame": {
+    "x": 310,
+    "y": 0,
+    "w": 80,
+    "h": 110
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 80,
+    "h": 110
+   },
+   "sourceSize": {
+    "w": 80,
+    "h": 110
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9272727272727272
+   },
+   "foot": [
+    18,
+    12
+   ]
+  },
+  "rock_l": {
+   "frame": {
+    "x": 392,
+    "y": 0,
+    "w": 72,
+    "h": 54
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 72,
+    "h": 54
+   },
+   "sourceSize": {
+    "w": 72,
+    "h": 54
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8333333333333334
+   },
+   "foot": [
+    48,
+    20
+   ]
+  },
+  "rock_s": {
+   "frame": {
+    "x": 466,
+    "y": 0,
+    "w": 42,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 42,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 42,
+    "h": 34
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.7352941176470589
+   },
+   "foot": [
+    24,
+    12
+   ]
+  },
+  "bush": {
+   "frame": {
+    "x": 0,
+    "y": 142,
+    "w": 64,
+    "h": 50
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 64,
+    "h": 50
+   },
+   "sourceSize": {
+    "w": 64,
+    "h": 50
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.88
+   },
+   "foot": [
+    30,
+    14
+   ]
+  },
+  "thicket_closed": {
+   "frame": {
+    "x": 66,
+    "y": 142,
+    "w": 88,
+    "h": 58
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 88,
+    "h": 58
+   },
+   "sourceSize": {
+    "w": 88,
+    "h": 58
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.896551724137931
+   },
+   "foot": [
+    0,
+    0
+   ]
+  },
+  "thicket_open": {
+   "frame": {
+    "x": 156,
+    "y": 142,
+    "w": 88,
+    "h": 58
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 88,
+    "h": 58
+   },
+   "sourceSize": {
+    "w": 88,
+    "h": 58
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.896551724137931
+   },
+   "foot": [
+    0,
+    0
+   ]
+  },
+  "stump": {
+   "frame": {
+    "x": 246,
+    "y": 142,
+    "w": 48,
+    "h": 44
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 44
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 44
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8636363636363636
+   },
+   "foot": [
+    24,
+    12
+   ]
+  },
+  "log": {
+   "frame": {
+    "x": 296,
+    "y": 142,
+    "w": 104,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 104,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 104,
+    "h": 40
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.85
+   },
+   "foot": [
+    78,
+    14
+   ]
+  },
+  "sign": {
+   "frame": {
+    "x": 402,
+    "y": 142,
+    "w": 48,
+    "h": 60
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 48,
+    "h": 60
+   },
+   "sourceSize": {
+    "w": 48,
+    "h": 60
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9
+   },
+   "foot": [
+    14,
+    8
+   ]
+  },
+  "chest_closed": {
+   "frame": {
+    "x": 452,
+    "y": 142,
+    "w": 40,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 40
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.85
+   },
+   "foot": [
+    26,
+    12
+   ]
+  },
+  "chest_open": {
+   "frame": {
+    "x": 0,
+    "y": 204,
+    "w": 40,
+    "h": 40
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 40
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 40
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.85
+   },
+   "foot": [
+    26,
+    12
+   ]
+  },
+  "sword": {
+   "frame": {
+    "x": 42,
+    "y": 204,
+    "w": 32,
+    "h": 72
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 72
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 72
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.8888888888888888
+   },
+   "foot": [
+    10,
+    6
+   ]
+  },
+  "marker_stone": {
+   "frame": {
+    "x": 76,
+    "y": 204,
+    "w": 40,
+    "h": 62
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 62
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 62
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9032258064516129
+   },
+   "foot": [
+    20,
+    10
+   ]
+  },
+  "fern": {
+   "frame": {
+    "x": 118,
+    "y": 204,
+    "w": 40,
+    "h": 34
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 40,
+    "h": 34
+   },
+   "sourceSize": {
+    "w": 40,
+    "h": 34
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9117647058823529
+   },
+   "foot": [
+    0,
+    0
+   ]
+  },
+  "flowers": {
+   "frame": {
+    "x": 160,
+    "y": 204,
+    "w": 36,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 36,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 36,
+    "h": 24
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9583333333333334
+   },
+   "foot": [
+    0,
+    0
+   ]
+  },
+  "mushrooms": {
+   "frame": {
+    "x": 198,
+    "y": 204,
+    "w": 32,
+    "h": 24
+   },
+   "rotated": false,
+   "trimmed": false,
+   "spriteSourceSize": {
+    "x": 0,
+    "y": 0,
+    "w": 32,
+    "h": 24
+   },
+   "sourceSize": {
+    "w": 32,
+    "h": 24
+   },
+   "pivot": {
+    "x": 0.5,
+    "y": 0.9166666666666666
+   },
+   "foot": [
+    0,
+    0
+   ]
+  }
+ },
+ "meta": {
+  "app": "web/scripts/gen-forest-art.mjs",
+  "version": "1",
+  "image": "props.png",
+  "format": "RGBA8888",
+  "size": {
+   "w": 512,
+   "h": 278
+  },
+  "scale": "1",
+  "status": "DRAFT"
+ }
+}

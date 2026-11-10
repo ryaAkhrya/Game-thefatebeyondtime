@@ -1,0 +1,177 @@
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { describe, expect, it } from 'vitest';
+import { ASSET_MANIFEST, type AtlasAsset } from '../../src/game/data/assetManifest';
+import { AssetRegistry } from '../../src/game/systems/AssetRegistry';
+import { BOSS_ALIAS_OF_CHARACTER, BOSS_IDS, CHARACTER_IDS, MONSTER_IDS } from '../../src/game/data/ids';
+import { readPng } from './helpers/png';
+
+const ROOT = resolve(__dirname, '../../..');
+const PUBLIC = resolve(__dirname, '../../public');
+
+function pngInfo(path: string): { width: number; height: number; colorType: number } {
+  const b = readFileSync(path);
+  expect(b.subarray(0, 8).toString('hex')).toBe('89504e470d0a1a0a');
+  return { width: b.readUInt32BE(16), height: b.readUInt32BE(20), colorType: b[25]! };
+}
+
+const battle = ASSET_MANIFEST.filter((a) => a.kind !== 'exploration_atlas');
+const explore = ASSET_MANIFEST.filter((a) => a.kind === 'exploration_atlas');
+
+describe('AssetRegistry', () => {
+  const registry = new AssetRegistry();
+
+  it('memetakan aset aktif: battle v3.3 (belum diimpor) dan eksplorasi Yaric/Nambo (diimpor)', () => {
+    expect(registry.list().map((a) => a.id).sort()).toEqual(['C01_YARIC_BATTLE', 'C01_YARIC_EXPLORE', 'C08_NAMBO_EXPLORE', 'M01_HOLLOWLING_BATTLE', 'VFX_C01_GROUND_SLAM']);
+  });
+
+  it('tidak ada yang PRODUCTION_READY; hanya atlas eksplorasi yang diimpor ke build', () => {
+    for (const a of registry.list()) {
+      expect(a.status).not.toBe('PRODUCTION_READY');
+      expect(registry.isProductionReady(a.id)).toBe(false);
+    }
+    expect(battle.every((a) => a.version === 'v3.3' && !a.imported)).toBe(true);
+    expect(registry.loadable().map((a) => a.id).sort()).toEqual(['C01_YARIC_EXPLORE', 'C08_NAMBO_EXPLORE']);
+  });
+
+  it('memakai versi TERBARU yang ada: eksplorasi Yaric v3.2 (v3.3 tidak punya eksplorasi), Nambo masih DRAFT', () => {
+    expect(registry.get('C01_YARIC_EXPLORE')?.version).toBe('v3.2');
+    expect(registry.get('C01_YARIC_EXPLORE')?.status).toBe('NEEDS_REVIEW');
+    expect(registry.get('C08_NAMBO_EXPLORE')?.status).toBe('DRAFT');
+    expect(existsSync(resolve(ROOT, 'assets/characters/C01_Yaric/v3_3/C01_EXPLORATION_PIXEL_PASS_V3_3.png'))).toBe(false); // memang tidak ada
+  });
+
+  it('menolak entri yang menunjuk aset battle versi lama (v3.2) dan draft eksplorasi v3.1', () => {
+    const base = ASSET_MANIFEST[0]!;
+    const bad32: AtlasAsset = { ...base, id: 'X', sourceImage: 'assets/characters/C01_Yaric/v3_2/C01_ATLAS_PIXEL_PASS_V3_2.png', sourceJson: 'assets/characters/C01_Yaric/v3_2/C01_ATLAS_PIXEL_PASS_V3_2.json' };
+    expect(() => new AssetRegistry([bad32])).toThrow(/digantikan/);
+    const bad31: AtlasAsset = { ...base, id: 'Y', sourceImage: 'assets/characters/C01_Yaric/C01_EXPLORATION_ATLAS_DRAFT.png', sourceJson: 'assets/characters/C01_Yaric/C01_EXPLORATION_ATLAS_DRAFT.json' };
+    expect(() => new AssetRegistry([bad31])).toThrow(/digantikan/);
+  });
+
+  it('menolak ID ganda dan imported tanpa publicPath', () => {
+    expect(() => new AssetRegistry([ASSET_MANIFEST[0]!, ASSET_MANIFEST[0]!])).toThrow(/ganda/);
+    expect(() => new AssetRegistry([{ ...ASSET_MANIFEST[0]!, imported: true, publicPath: null }])).toThrow(/publicPath/);
+  });
+});
+
+describe.each(battle.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas battle %s vs file asli', (_id, a) => {
+  it('file PNG dan JSON ada', () => {
+    expect(existsSync(resolve(ROOT, a.sourceImage))).toBe(true);
+    expect(existsSync(resolve(ROOT, a.sourceJson))).toBe(true);
+  });
+
+  it('dimensi PNG = atlas_size; punya kanal alpha', () => {
+    const png = pngInfo(resolve(ROOT, a.sourceImage));
+    expect([png.width, png.height]).toEqual([...a.atlasSize]);
+    expect([6, 4]).toContain(png.colorType);
+    const json = JSON.parse(readFileSync(resolve(ROOT, a.sourceJson), 'utf8'));
+    expect(json.atlas_size).toEqual([...a.atlasSize]);
+    expect(json.frame_size).toEqual([...a.frameSize]);
+    expect(json.status).toBe('NEEDS_REVIEW');
+  });
+
+  it('grid frame berurutan dan event frame cocok', () => {
+    const json = JSON.parse(readFileSync(resolve(ROOT, a.sourceJson), 'utf8'));
+    const frames = Object.entries(json.frames) as Array<[string, { index_0_based: number; rect: number[] }]>;
+    expect(frames).toHaveLength(a.frameCount);
+    expect(a.frameCount * a.frameSize[0]).toBe(a.atlasSize[0]);
+    frames.forEach(([, f], i) => {
+      expect(f.index_0_based).toBe(i);
+      expect(f.rect).toEqual([i * a.frameSize[0], 0, a.frameSize[0], a.frameSize[1]]);
+    });
+    if (a.eventFrame) {
+      expect(json.event.index_0_based).toBe(a.eventFrame.index);
+      expect(frames[a.eventFrame.index]![0]).toBe(a.eventFrame.name);
+    }
+  });
+});
+
+describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksplorasi %s (salinan web)', (_id, a) => {
+  const cols = a.atlasSize[0] / a.frameSize[0];
+  const rows = a.atlasSize[1] / a.frameSize[1];
+
+  it('sumber dan salinan web ada; dimensi cocok manifest dan JSON', () => {
+    expect(existsSync(resolve(ROOT, a.sourceImage))).toBe(true);
+    const src = pngInfo(resolve(ROOT, a.sourceImage));
+    expect([src.width, src.height]).toEqual([...a.atlasSize]);
+    const pub = resolve(PUBLIC, a.publicPath!.replace(/^assets\//, 'assets/'));
+    expect(existsSync(pub)).toBe(true);
+    const copy = readPng(pub);
+    expect([copy.width, copy.height]).toEqual([...a.atlasSize]);
+    const json = JSON.parse(readFileSync(resolve(ROOT, a.sourceJson), 'utf8'));
+    expect(json.atlas_size ?? [copy.width, copy.height]).toEqual([...a.atlasSize]);
+    expect(json.frame_size ?? json.authored_grid).toEqual([...a.frameSize]);
+  });
+
+  it('grid: jumlah frame, rect sejajar sel, 4 arah x N frame; animasi idle/walk 4 arah ada', () => {
+    const json = JSON.parse(readFileSync(resolve(ROOT, a.sourceJson), 'utf8'));
+    const frames = Object.entries(json.frames) as Array<[string, { rect: number[] }]>;
+    expect(frames).toHaveLength(a.frameCount);
+    expect(cols * rows).toBe(a.frameCount);
+    for (const [name, f] of frames) {
+      expect(f.rect[2], name).toBe(a.frameSize[0]);
+      expect(f.rect[3], name).toBe(a.frameSize[1]);
+      expect(f.rect[0]! % a.frameSize[0], name).toBe(0);
+      expect(f.rect[1]! % a.frameSize[1], name).toBe(0);
+    }
+    // baris: depan, kiri, kanan, belakang (urutan DIR_ROW di WorldScene)
+    const rowOf = (n: string): number => frames.find(([k]) => k === n)![1].rect[1]! / a.frameSize[1];
+    expect([rowOf(`front_0`), rowOf(`left_0`), rowOf(`right_0`), rowOf(`back_0`)]).toEqual([0, 1, 2, 3]);
+    for (const d of ['front', 'left', 'right', 'back']) {
+      expect(json.animations[`${d}_idle`], d).toBeDefined();
+      expect(json.animations[`${d}_walk`], d).toBeDefined();
+    }
+  });
+
+  it('transparan; tidak ada piksel menyentuh tepi sel; tidak ada piksel liar di bawah kaki (y >= 44 pada frame samping kosong)', () => {
+    const png = readPng(resolve(PUBLIC, a.publicPath!));
+    expect(png.data[3]).toBe(0);
+    const [fw, fh] = a.frameSize as unknown as [number, number];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        let opaque = 0;
+        let edge = 0;
+        let lowStray = 0;
+        for (let y = 0; y < fh; y++) {
+          for (let x = 0; x < fw; x++) {
+            const alpha = png.data[((r * fh + y) * png.width + c * fw + x) * 4 + 3]!;
+            if (alpha === 0) continue;
+            opaque++;
+            if (x === 0 || y === 0 || x === fw - 1 || (y === fh - 1 && a.id === 'C01_YARIC_EXPLORE')) edge++;
+            if (a.id === 'C01_YARIC_EXPLORE' && (r === 1 || r === 2) && y >= 44) lowStray++;
+          }
+        }
+        expect(opaque, `frame ${r},${c}`).toBeGreaterThan(300);
+        expect(edge, `tepi frame ${r},${c}`).toBe(0);
+        expect(lowStray, `piksel liar frame ${r},${c}`).toBe(0);
+      }
+    }
+  });
+
+  it('Yaric: baris kiri dan kanan berbeda (arah hadap benar, bukan salinan)', () => {
+    if (a.id !== 'C01_YARIC_EXPLORE') return;
+    const png = readPng(resolve(PUBLIC, a.publicPath!));
+    const [fw, fh] = a.frameSize as unknown as [number, number];
+    let same = 0;
+    let total = 0;
+    for (let y = 0; y < fh; y++)
+      for (let x = 0; x < fw; x++) {
+        const l = ((1 * fh + y) * png.width + x) * 4;
+        const rr = ((2 * fh + y) * png.width + x) * 4;
+        if (png.data[l + 3]! > 0 || png.data[rr + 3]! > 0) {
+          total++;
+          if (png.data[l] === png.data[rr] && png.data[l + 1] === png.data[rr + 1] && png.data[l + 2] === png.data[rr + 2] && png.data[l + 3] === png.data[rr + 3]) same++;
+        }
+      }
+    expect(same / total).toBeLessThan(0.3);
+  });
+});
+
+describe('typed IDs', () => {
+  it('18 entitas unik: 9 C + 6 M + 3 boss (B04 = C04)', () => {
+    expect(CHARACTER_IDS.length + MONSTER_IDS.length + BOSS_IDS.length).toBe(18);
+    expect(BOSS_ALIAS_OF_CHARACTER.B04).toBe('C04');
+    expect((BOSS_IDS as readonly string[]).includes('B04')).toBe(false);
+  });
+});

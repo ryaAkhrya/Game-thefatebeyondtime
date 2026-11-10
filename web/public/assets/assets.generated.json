@@ -1,0 +1,187 @@
+{
+  "generatedBy": "web/scripts/prepare-assets.mjs",
+  "items": [
+    {
+      "id": "C01_EXPLORE",
+      "source": "assets/characters/C01_Yaric/v3_2/C01_EXPLORATION_PIXEL_PASS_V3_2.png",
+      "out": "assets/characters/C01_explore.png",
+      "status": "NEEDS_REVIEW",
+      "note": "piksel liar dihapus pada frame left_*/right_* (y>=44): 104 px"
+    },
+    {
+      "id": "C08_EXPLORE",
+      "source": "assets/characters/C08_Nambo/C08_EXPLORATION_ATLAS_DRAFT.png",
+      "out": "assets/characters/C08_explore.png",
+      "status": "DRAFT",
+      "note": "salinan apa adanya; sprite prototipe DRAFT kualitas rendah"
+    },
+    {
+      "id": "C01_ANGRY",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_ANGRY.png",
+      "out": "assets/portraits/C01_ANGRY.png",
+      "status": "DRAFT",
+      "size": [
+        110,
+        128
+      ],
+      "sourceSize": [
+        537,
+        623
+      ]
+    },
+    {
+      "id": "C01_CONFUSED",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+      "out": "assets/portraits/C01_CONFUSED.png",
+      "status": "DRAFT",
+      "size": [
+        110,
+        128
+      ],
+      "sourceSize": [
+        522,
+        605
+      ]
+    },
+    {
+      "id": "C01_DETERMINED",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_DETERMINED.png",
+      "out": "assets/portraits/C01_DETERMINED.png",
+      "status": "DRAFT",
+      "size": [
+        110,
+        128
+      ],
+      "sourceSize": [
+        536,
+        624
+      ]
+    },
+    {
+      "id": "C01_EMBARRASSED",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_EMBARRASSED.png",
+      "out": "assets/portraits/C01_EMBARRASSED.png",
+      "status": "DRAFT",
+      "size": [
+        114,
+        128
+      ],
+      "sourceSize": [
+        557,
+        624
+      ]
+    },
+    {
+      "id": "C01_HAPPY",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_HAPPY.png",
+      "out": "assets/portraits/C01_HAPPY.png",
+      "status": "DRAFT",
+      "size": [
+        110,
+        128
+      ],
+      "sourceSize": [
+        536,
+        624
+      ]
+    },
+    {
+      "id": "C01_NEUTRAL",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C01_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        110,
+        128
+      ],
+      "sourceSize": [
+        523,
+        610
+      ]
+    },
+    {
+      "id": "C01_SAD",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_SAD.png",
+      "out": "assets/portraits/C01_SAD.png",
+      "status": "DRAFT",
+      "size": [
+        117,
+        128
+      ],
+      "sourceSize": [
+        553,
+        607
+      ]
+    },
+    {
+      "id": "C01_SURPRISED",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits/C01_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        116,
+        128
+      ],
+      "sourceSize": [
+        559,
+        618
+      ]
+    },
+    {
+      "id": "C08_CONCERNED",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_CONCERNED.png",
+      "out": "assets/portraits/C08_CONCERNED.png",
+      "status": "DRAFT",
+      "size": [
+        91,
+        128
+      ],
+      "sourceSize": [
+        442,
+        620
+      ]
+    },
+    {
+      "id": "C08_HAPPY",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_HAPPY.png",
+      "out": "assets/portraits/C08_HAPPY.png",
+      "status": "DRAFT",
+      "size": [
+        93,
+        128
+      ],
+      "sourceSize": [
+        442,
+        611
+      ]
+    },
+    {
+      "id": "C08_NEUTRAL",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C08_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        93,
+        128
+      ],
+      "sourceSize": [
+        443,
+        612
+      ]
+    },
+    {
+      "id": "C08_SURPRISED",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits/C08_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        92,
+        128
+      ],
+      "sourceSize": [
+        446,
+        622
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+# UI patch v3.3 — visual drafts only
+
+- Canon battle layout: enemies left, two-member party right. Hollowling faces right; Yaric faces left. The second party field icon is explicitly a slot marker; roster status is in the HUD. The target box selects Hollowling. Battle action and Ground Slam composites show the oversized greatsword trajectory and terrain impact.
+- Player-facing labels use Indonesian. Title exposes Panduan Kontrol and disabled Lanjut. Pause links to Inventaris, Jurus, and Simpan / Muat. Save overwrite confirmation and storage error have explicit focus and return paths.
+- Settings show nine GDD controls: Volume Utama, Musik, Efek Suara, Bisukan, Kecepatan Teks, Layar Penuh, Skala Tampilan, Goyang Layar, and Kurangi Kilatan (ON by default). Values are visual examples, not an implemented options system.
+- Deep Plum #3B2A4A and Bitter Lime #C7D96A are LOCKED. Type family and all neutral/accent colors beyond these remain TBD. A split/almost-connected device is strong on Title, restrained elsewhere. Current images use a temporary monospace font.
+- All layouts use internal 320×180; nearest-neighbor 1366×768 and 1920×1080 screenshots under docs/quality/v3_3 are VISUAL_REVIEW_ONLY. Keyboard focus has lime outline; interactive behavior, text readability, input/controller, responsive scaling, persistence, sound, and accessibility require runtime testing.
+- The five-frame ground slam composite is storyboard timing evidence. It is not a fully synchronized engine animation or gameplay capture. The terrain damage event is v3.3 VFX frame index 5 (zero-based). Reduced Flashes ON removes strobe only; Screen Shake OFF removes camera motion only. Target reaction, slab impact and damage number remain.

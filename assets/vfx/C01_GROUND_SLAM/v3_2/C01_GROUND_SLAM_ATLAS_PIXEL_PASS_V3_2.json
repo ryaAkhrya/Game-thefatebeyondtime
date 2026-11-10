@@ -1,0 +1,140 @@
+{
+  "entity_id": "C01_GROUND_SLAM",
+  "status": "NEEDS_REVIEW",
+  "authoring": "new generated pixel poses individually extracted and re-authored to fixed native frame grid; not a downscale of original concept sheet",
+  "source_sheet": "exec-bb8dc47d-f1e3-412d-a6db-cec9ab2f2e09.png",
+  "frame_size": [
+    96,
+    64
+  ],
+  "atlas_size": [
+    768,
+    64
+  ],
+  "frames": {
+    "telegraph_0": {
+      "rect": [
+        0,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 5805
+    },
+    "telegraph_1": {
+      "rect": [
+        96,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 5667
+    },
+    "lift": {
+      "rect": [
+        192,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 4851
+    },
+    "rise": {
+      "rect": [
+        288,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 3706
+    },
+    "impact": {
+      "rect": [
+        384,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 4097
+    },
+    "drop": {
+      "rect": [
+        480,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 3362
+    },
+    "settle": {
+      "rect": [
+        576,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 4437
+    },
+    "clear": {
+      "rect": [
+        672,
+        0,
+        96,
+        64
+      ],
+      "pivot": [
+        48,
+        63
+      ],
+      "alpha_zero_pixels": 4919
+    }
+  },
+  "animations": {
+    "ground_slam": {
+      "frames": [
+        "telegraph_0",
+        "telegraph_1",
+        "lift",
+        "rise",
+        "impact",
+        "drop",
+        "settle",
+        "clear"
+      ],
+      "fps": 8,
+      "event_frame": 4,
+      "event": "damage_and_ground_raise",
+      "reduced_effects": "same telegraph and hit frame; omit flash/debris"
+    }
+  },
+  "collision_anchor": "ground center",
+  "frame_status": "8-step sequence; edge cleanup and in-engine timing review pending"
+}

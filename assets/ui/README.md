@@ -1,0 +1,1 @@
+Four code-authored 320×180 pixel mockups, enlarged 3× without smoothing. DRAFT only. Layout/content examples, not finished tile art or game code. Portrait box is illustrative, not a pasted character asset. Palette Deep Plum #3B2A4A and Bitter Lime #C7D96A.

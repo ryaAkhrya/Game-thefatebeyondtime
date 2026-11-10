@@ -1,0 +1,16 @@
+# Dependency, build, cache, artefak development (semua di drive D:)
+node_modules/
+web/dist/
+.dev-cache/
+*.log
+*.tsbuildinfo
+.vite/
+coverage/
+
+# Temporary / OS
+Thumbs.db
+.DS_Store
+*.tmp
+
+# Data personal modern: tidak boleh masuk build publik / repo publik
+web/public/assets/personal-private/

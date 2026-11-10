@@ -1,0 +1,90 @@
+{
+  "entity_id": "B03",
+  "status": "DRAFT",
+  "authored_grid": [
+    96,
+    96
+  ],
+  "atlas_size": [
+    384,
+    96
+  ],
+  "transparent": true,
+  "frames": {
+    "idle": {
+      "rect": [
+        0,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        92
+      ]
+    },
+    "attack": {
+      "rect": [
+        96,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        92
+      ]
+    },
+    "hit": {
+      "rect": [
+        192,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        92
+      ]
+    },
+    "defeated": {
+      "rect": [
+        288,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        92
+      ]
+    }
+  },
+  "animations": {
+    "idle": {
+      "frames": [
+        "idle"
+      ],
+      "fps": 1
+    },
+    "attack": {
+      "frames": [
+        "attack"
+      ],
+      "fps": 1
+    },
+    "hit": {
+      "frames": [
+        "hit"
+      ],
+      "fps": 1
+    },
+    "defeated": {
+      "frames": [
+        "defeated"
+      ],
+      "fps": 1
+    }
+  },
+  "review": "Grid-authored pose prototype; each state is a key pose, NOT a polished multi-frame animation. Approval/iteration needed."
+}

@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="color-scheme" content="dark" />
+    <title>THE FATE: BEYOND TIME</title>
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <div id="game-root" tabindex="-1"></div>
+
+    <!-- Pesan desktop-only. Ditampilkan oleh DisplayController pada viewport kecil / perangkat sentuh. -->
+    <div id="desktop-guard" role="alert" hidden>
+      <p class="guard-title">THE FATE: BEYOND TIME</p>
+      <p>Game ini dirancang untuk PC/laptop dengan keyboard.</p>
+      <p class="guard-sub">Buka di browser desktop dengan jendela yang lebih besar (minimal 800 x 450).</p>
+    </div>
+
+    <noscript><p style="color:#ece3d6;padding:16px">Game ini memerlukan JavaScript.</p></noscript>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

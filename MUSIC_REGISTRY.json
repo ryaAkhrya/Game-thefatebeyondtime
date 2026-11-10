@@ -1,0 +1,132 @@
+[
+  {
+    "file": "BGM_TITLE.ogg",
+    "scene_trigger": "Title after user input; fade on New Game",
+    "mood_instruments": "quiet invitation; soft synth, piano-like lead",
+    "tempo_duration": "76–92 / 45–70 s",
+    "loop": "yes",
+    "priority": "P1",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_FOREST_01.ogg",
+    "scene_trigger": "Chapter I forest; stop entering battle",
+    "mood_instruments": "curiosity, uncertainty; plucked tone, low strings",
+    "tempo_duration": "82–100 / 60–90 s",
+    "loop": "yes",
+    "priority": "P1",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_AVELORIA_DAY.ogg",
+    "scene_trigger": "Town/castle safe areas; pause on major crisis",
+    "mood_instruments": "inhabited warmth; compact woodwind, soft pulse",
+    "tempo_duration": "88–106 / 60–90 s",
+    "loop": "yes",
+    "priority": "P1",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_BATTLE.ogg",
+    "scene_trigger": "Normal encounters after input; stop on result",
+    "mood_instruments": "clear tempo, brief motif; chip percussion and bass",
+    "tempo_duration": "124–146 / 50–75 s",
+    "loop": "yes",
+    "priority": "P1",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_BOSS.ogg",
+    "scene_trigger": "B01–B03 encounters",
+    "mood_instruments": "pressure without clutter; pulse, low strings",
+    "tempo_duration": "116–140 / 65–100 s",
+    "loop": "yes",
+    "priority": "P2",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_LIORA.ogg",
+    "scene_trigger": "Liora village; fade on forest exit",
+    "mood_instruments": "history and hospitality; winds and plucked lead",
+    "tempo_duration": "72–92 / 60–90 s",
+    "loop": "yes",
+    "priority": "P2",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_FOREST_02.ogg",
+    "scene_trigger": "Chapter II second forest",
+    "mood_instruments": "mischief under uneasy discovery; pizzicato/chip",
+    "tempo_duration": "90–110 / 60–90 s",
+    "loop": "yes",
+    "priority": "P2",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_CRISIS.ogg",
+    "scene_trigger": "Chapter III evacuation, fade as quest shifts",
+    "mood_instruments": "focused urgency; low ostinato, spare bell",
+    "tempo_duration": "94–120 / 55–80 s",
+    "loop": "yes",
+    "priority": "P2",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_TEMPLE.ogg",
+    "scene_trigger": "Temple puzzle; stop for Chronolith",
+    "mood_instruments": "age and mechanism; hollow mallet, pulse",
+    "tempo_duration": "76–98 / 60–90 s",
+    "loop": "yes",
+    "priority": "P2",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_FINAL_BOSS.ogg",
+    "scene_trigger": "Varlgrim fight; intentional brief silence after meteor",
+    "mood_instruments": "tragic resolve; constrained percussion/strings",
+    "tempo_duration": "100–128 / 80–110 s",
+    "loop": "yes",
+    "priority": "P2",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_MODERN.ogg",
+    "scene_trigger": "Interlude after Chapter IV",
+    "mood_instruments": "ordinary closeness; gentle keys, less fantasy timbre",
+    "tempo_duration": "70–94 / 50–75 s",
+    "loop": "yes",
+    "priority": "P3",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_EPILOGUE.ogg",
+    "scene_trigger": "Aveloria cliff memory after modern; fade into credits",
+    "mood_instruments": "restrained affection; reprise of earlier motif",
+    "tempo_duration": "68–86 / 70–100 s",
+    "loop": "optional",
+    "priority": "P3",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  },
+  {
+    "file": "BGM_CREDITS.ogg",
+    "scene_trigger": "Credits after To Be Continued",
+    "mood_instruments": "light closure, room for private P.S. silence",
+    "tempo_duration": "70–92 / 60–100 s",
+    "loop": "optional",
+    "priority": "P3",
+    "status": "AWAITING_COMPOSER",
+    "fallback": "SILENCE"
+  }
+]

@@ -1,0 +1,142 @@
+{
+  "entity_id": "M01",
+  "status": "NEEDS_REVIEW",
+  "authoring": "new generated pixel poses individually extracted and re-authored to fixed native frame grid; not a downscale of original concept sheet",
+  "source_sheet": "exec-cb1ccaf7-c34b-4379-a9c6-21acdb2a1ea9.png",
+  "frame_size": [
+    96,
+    96
+  ],
+  "atlas_size": [
+    672,
+    96
+  ],
+  "frames": {
+    "idle_a": {
+      "rect": [
+        0,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "alpha_zero_pixels": 5732
+    },
+    "idle_b": {
+      "rect": [
+        96,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "alpha_zero_pixels": 6250
+    },
+    "anticipation": {
+      "rect": [
+        192,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "alpha_zero_pixels": 5796
+    },
+    "attack": {
+      "rect": [
+        288,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "alpha_zero_pixels": 7287
+    },
+    "impact": {
+      "rect": [
+        384,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "alpha_zero_pixels": 6268
+    },
+    "hit": {
+      "rect": [
+        480,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "alpha_zero_pixels": 5594
+    },
+    "defeated": {
+      "rect": [
+        576,
+        0,
+        96,
+        96
+      ],
+      "pivot": [
+        48,
+        48
+      ],
+      "alpha_zero_pixels": 6539
+    }
+  },
+  "animations": {
+    "idle": {
+      "frames": [
+        "idle_a",
+        "idle_b"
+      ],
+      "fps": 3
+    },
+    "attack": {
+      "frames": [
+        "anticipation",
+        "attack",
+        "impact"
+      ],
+      "fps": 8,
+      "event_frame": 2,
+      "event": "apply_damage"
+    },
+    "hit": {
+      "frames": [
+        "hit"
+      ],
+      "fps": 1,
+      "note": "one key pose; additional recovery transition still needed"
+    },
+    "defeated": {
+      "frames": [
+        "defeated"
+      ],
+      "fps": 1,
+      "note": "one key pose; additional transition still needed"
+    }
+  },
+  "collision_anchor": "floating center",
+  "frame_status": "attack has multi-step progression; hit and defeated transition incomplete"
+}

@@ -1,0 +1,287 @@
+{
+  "entity_id": "C01",
+  "status": "NEEDS_REVIEW",
+  "source_sheet": "exec-3ed12bcf-9826-4d71-b25e-669185633311.png",
+  "authoring": "new 4-direction walking pixel poses, re-authored to fixed grid",
+  "frame_size": [
+    32,
+    48
+  ],
+  "atlas_size": [
+    128,
+    192
+  ],
+  "frames": {
+    "front_0": {
+      "rect": [
+        0,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 811
+    },
+    "front_1": {
+      "rect": [
+        32,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 844
+    },
+    "front_2": {
+      "rect": [
+        64,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 837
+    },
+    "front_3": {
+      "rect": [
+        96,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 868
+    },
+    "left_0": {
+      "rect": [
+        0,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 1101
+    },
+    "left_1": {
+      "rect": [
+        32,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 988
+    },
+    "left_2": {
+      "rect": [
+        64,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 1053
+    },
+    "left_3": {
+      "rect": [
+        96,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 1007
+    },
+    "right_0": {
+      "rect": [
+        0,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 1146
+    },
+    "right_1": {
+      "rect": [
+        32,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 1074
+    },
+    "right_2": {
+      "rect": [
+        64,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 1122
+    },
+    "right_3": {
+      "rect": [
+        96,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 1074
+    },
+    "back_0": {
+      "rect": [
+        0,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 773
+    },
+    "back_1": {
+      "rect": [
+        32,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 808
+    },
+    "back_2": {
+      "rect": [
+        64,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 792
+    },
+    "back_3": {
+      "rect": [
+        96,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        47
+      ],
+      "alpha_zero_pixels": 770
+    }
+  },
+  "animations": {
+    "front_idle": {
+      "frames": [
+        "front_0"
+      ],
+      "fps": 1
+    },
+    "front_walk": {
+      "frames": [
+        "front_0",
+        "front_1",
+        "front_2",
+        "front_3"
+      ],
+      "fps": 7
+    },
+    "left_idle": {
+      "frames": [
+        "left_0"
+      ],
+      "fps": 1
+    },
+    "left_walk": {
+      "frames": [
+        "left_0",
+        "left_1",
+        "left_2",
+        "left_3"
+      ],
+      "fps": 7
+    },
+    "right_idle": {
+      "frames": [
+        "right_0"
+      ],
+      "fps": 1
+    },
+    "right_walk": {
+      "frames": [
+        "right_0",
+        "right_1",
+        "right_2",
+        "right_3"
+      ],
+      "fps": 7
+    },
+    "back_idle": {
+      "frames": [
+        "back_0"
+      ],
+      "fps": 1
+    },
+    "back_walk": {
+      "frames": [
+        "back_0",
+        "back_1",
+        "back_2",
+        "back_3"
+      ],
+      "fps": 7
+    }
+  },
+  "review": "Native-size readable, but red fringe and walk timing remain under manual art review"
+}
