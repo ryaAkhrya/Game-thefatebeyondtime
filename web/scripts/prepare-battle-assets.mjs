@@ -17,3 +17,10 @@ for (const [folder, name] of sources) {
   for (const ext of ['png', 'json']) copyFileSync(base + '.' + ext, resolve(target, name + '.' + ext));
   console.log(`Copied ${name} (NEEDS_REVIEW, unchanged)`);
 }
+// B01 has four DRAFT key poses and no v3.3 replacement. Preserve its original metadata too.
+const bossName = 'B01_BATTLE_ATLAS_DRAFT';
+const bossBase = resolve(web, '../assets/bosses/B01_Mournfang', bossName);
+const bossMeta = JSON.parse(readFileSync(bossBase + '.json', 'utf8'));
+if (bossMeta.status !== 'DRAFT' || Object.keys(bossMeta.frames).length !== 4) throw new Error('Invalid B01 pose metadata');
+for (const ext of ['png', 'json']) copyFileSync(bossBase + '.' + ext, resolve(target, bossName + '.' + ext));
+console.log('Copied B01 original four poses (DRAFT, NEEDS_REVIEW, unchanged)');

@@ -16,12 +16,12 @@ export class BattlePanel {
   private readonly hint: Phaser.GameObjects.Text;
   private menu?: MenuList;
   mode: 'main' | 'skill' | 'item' | 'result' | 'busy' = 'main';
-  constructor(private readonly scene: Phaser.Scene, private readonly onAction: (action: Command | 'continue' | 'retry' | 'title') => void) {
+  constructor(private readonly scene: Phaser.Scene, private readonly onAction: (action: Command | 'continue' | 'retry' | 'title') => void, private readonly enemyName = 'Hollowling') {
     scene.add.rectangle(6, 5, 308, 27, COLORS.ink).setOrigin(0).setStrokeStyle(1, COLORS.plumLine).setDepth(20);
     scene.add.rectangle(6, 131, 308, 48, COLORS.deepPlum).setOrigin(0).setStrokeStyle(1, COLORS.bitterLime).setDepth(20);
     const text = (x: number, y: number, value: string, color: number = COLORS.paper) => makeText(scene, x, y, value, { color }).setDepth(21);
-    text(12, 8, 'Hollowling'); text(230, 8, 'Yaric');
-    this.enemy = text(12, 21, ''); this.hp = text(180, 21, ''); this.mp = text(252, 21, '');
+    text(12, 8, enemyName); text(230, 8, 'Yaric');
+    this.enemy = text(12, 21, ''); this.hp = text(168, 21, ''); this.mp = text(252, 21, '');
     this.turn = text(140, 8, '', COLORS.bitterLime);
     this.message = makeText(scene, 112, 135, '', { wrapWidth: 192, lineSpacing: 1 }).setDepth(21);
     this.hint = makeText(scene, 112, 170, '', { size: 6, color: COLORS.paperDim }).setDepth(21);
@@ -32,7 +32,7 @@ export class BattlePanel {
     const s = engine.snapshot(), p = s.actors.find(a => a.side === 'player')!, e = s.actors.find(a => a.side === 'enemy')!;
     this.hp.setText(`HP ${p.hp}/${p.stats.HP}`); this.mp.setText(`MP${p.mp}/${p.stats.MP}`);
     this.enemy.setText(`HP ${e.hp}/${e.stats.HP}`);
-    this.turn.setText(s.outcome ? '' : engine.current.side === 'player' ? 'ANDA' : 'MUSUH');
+    this.turn.setText(s.outcome ? '' : e.intent === 'sweep' ? 'SAPUAN!' : e.intent === 'recover' ? 'GOYAH' : engine.current.side === 'player' ? 'ANDA' : 'MUSUH');
   }
   show(engine: BattleEngine, mode: 'main' | 'skill' | 'item' = 'main'): void {
     this.mode = mode;
@@ -46,7 +46,7 @@ export class BattlePanel {
     const items = choices.map(c => ({ ...c, disabled: !!(c.command && engine.unavailable(c.command)), disabledHint: c.command ? engine.unavailable(c.command) ?? undefined : undefined }));
     const describe = (item: MenuItem): void => {
       const descriptions: Record<string, string> = {
-        attack: 'Tebasan greatsword ke Hollowling.', skill: 'Gunakan jurus dengan MP.', item: 'Gunakan Potion bila HP berkurang.',
+        attack: `Tebasan greatsword ke ${this.enemyName}.`, skill: 'Gunakan jurus dengan MP.', item: 'Gunakan Potion bila HP berkurang.',
         defend: 'Kurangi kerusakan separuh hingga giliran berikutnya.', run: 'Mencoba meninggalkan pertarungan.',
         ground_slam: '4 MP. Hantaman tanah, kerusakan fisik lebih besar.', potion: 'Pulihkan hingga 36 HP Yaric.', back: 'Kembali ke perintah.',
       };
@@ -67,8 +67,8 @@ export class BattlePanel {
   busy(): void { this.mode = 'busy'; this.menu?.destroy(); this.menu = undefined; this.hint.setText('Tunggu sampai aksi selesai.'); }
   result(victory: boolean, reward?: RewardReceipt | null): void {
     this.mode = 'result';
-    this.say(victory ? 'MENANG\nHollowling dikalahkan.' : 'KALAH\nCoba lagi dari sebelum pertarungan.');
-    if (victory && reward) this.say(`MENANG  +${reward.exp} EXP\n+${reward.gold} emas  Lv ${reward.beforeLevel} > ${reward.afterLevel}\n+${reward.skillPoints} poin jurus`);
+    this.say(victory ? `MENANG\n${this.enemyName} dikalahkan.` : 'KALAH\nCoba lagi dari sebelum pertarungan.');
+    if (victory && reward) this.say(`MENANG  +${reward.exp} EXP\n+${reward.gold} emas  Lv ${reward.beforeLevel} > ${reward.afterLevel}\n${reward.items?.potion ? `+${reward.items.potion} Potion  ` : ''}+${reward.skillPoints} poin jurus`);
     this.hint.setText(victory ? 'Enter: lanjutkan eksplorasi' : 'Item dan MP kembali ke checkpoint.');
     this.makeMenu([
       { id: victory ? 'continue' : 'retry', label: victory ? 'Lanjutkan' : 'Coba Lagi' },

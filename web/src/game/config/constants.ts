@@ -15,7 +15,7 @@ export const UI_HEIGHT = GAME_HEIGHT / UI_ZOOM;
 export const TILE = 32;
 
 export const GAME_TITLE = 'THE FATE: BEYOND TIME';
-export const BUILD_LABEL = 'v0.1.0 - Phase 3';
+export const BUILD_LABEL = 'v0.1.0 - Phase 4';
 
 /** Namespace storage. Settings dan save SENGAJA terpisah (reset settings tidak boleh menyentuh save). */
 export const STORAGE_PREFIX = 'tfbt.';

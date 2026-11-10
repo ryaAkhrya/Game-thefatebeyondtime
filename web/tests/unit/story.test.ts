@@ -232,7 +232,7 @@ describe('C1-03 — jalur hutan berulang', () => {
     expect(post.map(a => a.type)).toEqual(['dialogue', 'setFlag', 'objective']);
     run(s.state, post);
     expect(s.story.onStart()).toEqual([]);
-    expect(s.story.objective()).toContain('Demo selesai');
+    expect(s.story.objective()).toBe('Lanjutkan lewat ujung jalan utara.');
   });
 });
 

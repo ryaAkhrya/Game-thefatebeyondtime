@@ -8,8 +8,10 @@ export interface BattleActor {
   id: string; name: string; side: 'player' | 'enemy'; stats: Stats;
   hp: number; mp: number; defending: boolean; statuses: StatusEffect[];
   skills?: string[];
+  /** Boss intention survives the full player response turn; presentation only reads it. */
+  intent?: 'strike' | 'windup' | 'sweep' | 'recover';
 }
-export type Command = 'attack' | 'ground_slam' | 'potion' | 'defend' | 'run' | 'stunned';
+export type Command = 'attack' | 'ground_slam' | 'potion' | 'defend' | 'run' | 'stunned' | 'boss_windup' | 'boss_sweep' | 'boss_recover';
 export type Outcome = 'victory' | 'defeat' | 'escaped' | null;
 export interface PendingAction { token: number; actorId: string; command: Command; impacted: boolean }
 export interface BattleState {
@@ -23,7 +25,7 @@ export const YARIC_STATS: Stats = { HP: 96, MP: 12, ATK: 20, DEF: 8, MAG: 5, MDE
 export const HOLLOWLING_STATS: Stats = { HP: 112, MP: 0, ATK: 19, DEF: 6, MAG: 3, MDEF: 5, SPD: 7 };
 
 export function actor(id: string, side: BattleActor['side'], stats: Stats): BattleActor {
-  return { id, name: id === 'C01' ? 'Yaric' : 'Hollowling', side, stats: { ...stats }, hp: stats.HP, mp: stats.MP, defending: false, statuses: [], skills: id === 'C01' ? ['ground_slam'] : [] };
+  return { id, name: id === 'C01' ? 'Yaric' : id === 'B01' ? 'Mournfang' : 'Hollowling', side, stats: { ...stats }, hp: stats.HP, mp: stats.MP, defending: false, statuses: [], skills: id === 'C01' ? ['ground_slam'] : [], ...(id === 'B01' ? { intent: 'strike' as const } : {}) };
 }
 
 /** SPD descending; equal speeds use stable lexical actor ID (no locale-dependent sorting). */
@@ -37,8 +39,16 @@ export function damage(attacker: BattleActor, target: BattleActor, power = 1): n
   return Math.max(1, Math.floor(Math.max(1, atk * power - def * 0.5) * (target.defending ? 0.5 : 1)));
 }
 
-/** Explicit tutorial AI: one physical strike each enemy turn. No criticals or surprise specials. */
-export function enemyAI(): Command { return 'attack'; }
+/** Deterministic tutorial strike or Mournfang's visible intent; no criticals or surprise specials. */
+export function enemyAI(enemy?: Pick<BattleActor, 'intent'>): Command {
+  return enemy?.intent === 'windup' ? 'boss_windup' : enemy?.intent === 'sweep' ? 'boss_sweep' : enemy?.intent === 'recover' ? 'boss_recover' : 'attack';
+}
+
+export function intentHint(enemy: Pick<BattleActor, 'intent'>): string {
+  if (enemy.intent === 'sweep') return 'Sapuan berat berikutnya. Bertahan atau Ground Slam!';
+  if (enemy.intent === 'recover') return 'Mournfang goyah. Ada waktu untuk menyerang atau memulihkan HP.';
+  return '';
+}
 
 /** Durations count completed OWNER turns. Poison ticks before decrement; Stun replaces one action. */
 export function finishStatuses(a: BattleActor): number {
@@ -70,11 +80,12 @@ export class BattleEngine {
     if (s.outcome || s.pending) return 'Tunggu sampai aksi selesai.';
     const a = this.currentActor();
     if (command === 'stunned') return 'Pilih perintah yang tersedia.';
-    if (a.side === 'enemy' && command !== 'attack') return 'Musuh hanya dapat menyerang.';
+    if (a.side === 'enemy' && command !== enemyAI(a)) return 'Aksi tidak sesuai pola musuh.';
+    if (a.side === 'player' && command.startsWith('boss_')) return 'Aksi ini hanya untuk musuh.';
     if (command === 'ground_slam' && !a.skills?.includes('ground_slam')) return 'Ground Slam belum terbuka.';
     if (command === 'ground_slam' && a.mp < GROUND_SLAM.cost) return 'MP tidak cukup. Perlu 4 MP.';
     if (command === 'potion') return itemUseReason(s.items, 'potion', a, a.stats.HP);
-    if (command === 'run' && !s.allowRun) return 'Jalan dihalangi. Hadapi Hollowling dulu.';
+    if (command === 'run' && !s.allowRun) return `Jalan dihalangi. Hadapi ${this.target(a).name} dulu.`;
     return null;
   }
   /** The caller supplies the visible turn token. Old events cannot submit on a later turn. */
@@ -96,14 +107,19 @@ export class BattleEngine {
     const a = this.currentActor();
     let amount = 0, targetId = a.id, text = '';
     switch (p.command) {
-      case 'attack': case 'ground_slam': {
+      case 'attack': case 'ground_slam': case 'boss_sweep': {
         const t = this.target(a);
         if (p.command === 'ground_slam') a.mp -= GROUND_SLAM.cost;
-        amount = Math.min(t.hp, damage(a, t, p.command === 'ground_slam' ? GROUND_SLAM.power : 1));
+        amount = Math.min(t.hp, damage(a, t, p.command === 'ground_slam' ? GROUND_SLAM.power : p.command === 'boss_sweep' ? 1.8 : 1));
         t.hp -= amount; targetId = t.id;
-        text = `${a.name}: ${p.command === 'ground_slam' ? 'Ground Slam' : 'tebasan'}. ${t.name} menerima ${amount} kerusakan.`;
+        text = `${a.name}: ${p.command === 'ground_slam' ? 'Ground Slam' : p.command === 'boss_sweep' ? 'sapuan berat' : 'tebasan'}. ${t.name} menerima ${amount} kerusakan.`;
+        if (p.command === 'ground_slam' && t.intent === 'sweep' && t.hp > 0) {
+          t.intent = 'recover'; text = `Ground Slam: ${amount}. Sapuan Mournfang gagal!`;
+        }
         break;
       }
+      case 'boss_windup': text = 'Mournfang merendahkan tanduk. Sapuan berat pada giliran berikutnya!'; break;
+      case 'boss_recover': text = 'Mournfang menarik napas, berusaha menegakkan tubuhnya.'; break;
       case 'potion': {
         const effect = useConsumable(s.items, 'potion', a, a.stats.HP)!;
         s.items = effect.items; a.hp = effect.vitals.hp; amount = effect.healed;
@@ -125,6 +141,8 @@ export class BattleEngine {
     const s = this.data, p = s.pending;
     if (!p || p.token !== token || !p.impacted) return false;
     if (!s.outcome) {
+      const a = this.currentActor();
+      if (a.intent && p.command !== 'stunned') a.intent = p.command === 'attack' ? 'windup' : p.command === 'boss_windup' ? 'sweep' : p.command === 'boss_sweep' ? 'recover' : 'strike';
       const loss = finishStatuses(this.currentActor());
       if (loss) s.log.push(`${this.currentActor().name} menerima ${loss} kerusakan racun.`);
       this.checkOutcome();

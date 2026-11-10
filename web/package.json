@@ -2,7 +2,7 @@
   "name": "the-fate-beyond-time-web",
   "version": "0.1.0",
   "private": true,
-  "description": "The Fate: Beyond Time - JRPG desktop web. Phase 3: RPG systems and local persistence.",
+  "description": "The Fate: Beyond Time - JRPG desktop web. Phase 4: opening vertical slice through Mournfang.",
   "type": "module",
   "scripts": {
     "dev": "vite",

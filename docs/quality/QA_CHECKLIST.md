@@ -1,5 +1,15 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 4 — vertical slice sampai Mournfang
+
+**PHASE 4 PASS (fungsional/QA otomatis).** Bukti/batasan: `../production/PHASE4_REPORT.md`. Bukan Chapter I penuh.
+
+- [x] Baseline diulang: 378 unit, 311 browser produksi, 54 dev; strict TS/build.
+- [x] 405 unit/15 files, TypeScript strict dan production build lulus; boss/counter/retry/reward/checkpoint/persistence/dialog/asset/route teruji.
+- [x] Produksi Edge 375/375 (cerita ulang 162/162), Chrome 38/38, dev Edge 38/38; Title→Mournfang→save/refresh→penutup, 1366×768/1920×1080, no JS/asset/audio request errors.
+- [x] Screenshot akhir map/boss/telegraph/defeat/ending/save diperiksa; hit/retry diverifikasi melalui frame/actor state. Art tetap DRAFT.
+- [ ] Playtest manusia/pacing 10–15 menit, review art/balancing, GPU/layar nyata. Audio tetap AWAITING_COMPOSER.
+
 ## Phase 3 — RPG/persistence
 
 **PHASE 3 PASS (fungsional/QA otomatis): 378 unit, 311 browser checks produksi, TypeScript strict dan build lulus.** Bukti dan batasan: `../production/PHASE3_REPORT.md`.

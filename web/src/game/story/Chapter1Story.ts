@@ -14,6 +14,8 @@ import type { DialogueScript } from '../dialogue/types';
 import type { GameState } from '../systems/GameState';
 import { FIRST_HOLLOWLING_FLAG } from '../combat/BattleSession';
 import { FIRST_HOLLOWLING_INTRO, FIRST_HOLLOWLING_VICTORY } from '../dialogue/firstHollowling';
+import { AVELORIA_SIGN, BEFORE_MOURNFANG, MOURNFANG_INTRO, MOURNFANG_RESPONSE, MOURNFANG_VICTORY } from '../dialogue/mournfang';
+import { BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, SLICE_COMPLETE, type EncounterId } from '../combat/encounters';
 
 /** Flag cerita kanonik (docs/narrative/STORY_AND_SCENES.md). Dinaikkan hanya setelah event benar-benar selesai. */
 export const FLAG = {
@@ -30,6 +32,10 @@ export const FLAG = {
   chestReward: 'reward.c1_chest_potion.claimed',
   hollowling: FIRST_HOLLOWLING_FLAG,
   victorySeen: 'c1.hollowling_victory_seen',
+  mournfang: MOURNFANG_FLAG,
+  mournfangVictorySeen: MOURNFANG_VICTORY_SEEN,
+  bossCheckpoint: BOSS_CHECKPOINT_FLAG,
+  sliceComplete: SLICE_COMPLETE,
 } as const;
 
 export const ITEM_POTION = 'potion';
@@ -44,7 +50,11 @@ export type StoryAction =
   | { type: 'npc'; id: 'nambo'; op: 'face_player' | 'step_aside' }
   | { type: 'openThicket' }
   | { type: 'openChest' }
-  | { type: 'battle' };
+  | { type: 'battle'; encounter?: EncounterId }
+  | { type: 'forestEdge' }
+  | { type: 'rest' }
+  | { type: 'mournfangApproach' }
+  | { type: 'sliceEnd' };
 
 export interface StoryContext {
   /** Salinan periodik (0 = pertama) untuk papan/semak/peti. */
@@ -93,12 +103,19 @@ export class Chapter1Story {
     if (!this.has(FLAG.introSeen)) return null;
     if (!this.awake) return `Periksa sekitar (${this.examinedCount}/2)`;
     if (!this.namboDone) return 'Cari jalan keluar dari hutan.';
-    if (this.has(FLAG.hollowling)) return 'Demo selesai. Esc: menu jeda.';
+    if (this.has(FLAG.sliceComplete)) return 'Bersambung di Aveloria.';
+    if (this.has(FLAG.mournfang)) return 'Lanjutkan ke arah Aveloria.';
+    if (this.state.snapshot()?.area === 'forest_edge') return 'Ikuti jejak jalan ke timur.';
+    if (this.has(FLAG.hollowling)) return 'Lanjutkan lewat ujung jalan utara.';
     return 'Ikuti jalan sampai gerbang batu.';
   }
 
   /** Aksi saat game dimulai: intro C1-01 sekali. */
   onStart(): StoryAction[] {
+    if (this.has(FLAG.mournfang) && !this.has(FLAG.mournfangVictorySeen)) return [
+      { type: 'dialogue', script: MOURNFANG_VICTORY },
+      { type: 'setFlag', flag: FLAG.mournfangVictorySeen }, { type: 'objective' },
+    ];
     if (this.has(FLAG.hollowling) && !this.has(FLAG.victorySeen)) return [
       { type: 'dialogue', script: FIRST_HOLLOWLING_VICTORY },
       { type: 'setFlag', flag: FLAG.victorySeen },
@@ -115,6 +132,16 @@ export class Chapter1Story {
   interact(id: string, ctx: StoryContext): StoryAction[] {
     const base = id.split('#')[0]!;
     switch (base) {
+      case 'forest_exit':
+        return this.has(FLAG.hollowling) && this.has(FLAG.victorySeen) ? [{ type: 'forestEdge' }] : [];
+      case 'rest':
+        return this.state.snapshot()?.area === 'forest_edge' && this.has(FLAG.hollowling)
+          ? [{ type: 'rest' }, { type: 'toast', text: 'HP dan MP pulih.' }] : [];
+      case 'aveloria_sign':
+        return [{ type: 'dialogue', script: AVELORIA_SIGN }];
+      case 'slice_exit':
+        return this.has(FLAG.mournfang) && this.has(FLAG.mournfangVictorySeen)
+          ? [{ type: 'setFlag', flag: FLAG.sliceComplete }, { type: 'objective' }, { type: 'sliceEnd' }] : [];
       case 'ground_tracks':
         return this.examine(C1_01_EXAMINE_GROUND, FLAG.examinedGround, FLAG.examinedSword);
       case 'sword':
@@ -142,6 +169,15 @@ export class Chapter1Story {
   trigger(id: string, _ctx: StoryContext): StoryAction[] {
     const base = id.split('#')[0]!;
     switch (base) {
+      case 'boss_checkpoint':
+        return this.has(FLAG.hollowling) && !this.has(FLAG.bossCheckpoint) ? [
+          { type: 'dialogue', script: BEFORE_MOURNFANG }, { type: 'rest' }, { type: 'toast', text: 'HP dan MP pulih.' },
+        ] : [];
+      case 'mournfang':
+        return this.state.snapshot()?.area === 'forest_edge' && this.has(FLAG.hollowling) && !this.has(FLAG.mournfang) ? [
+          { type: 'dialogue', script: MOURNFANG_INTRO }, { type: 'mournfangApproach' },
+          { type: 'dialogue', script: MOURNFANG_RESPONSE }, { type: 'battle', encounter: 'mournfang' },
+        ] : [];
       case 'gate_hint':
         return this.awake ? [] : [{ type: 'toast', text: TEXT.gateHint }];
       case 'nambo_zone':

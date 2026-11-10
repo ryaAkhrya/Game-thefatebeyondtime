@@ -13,6 +13,7 @@ import { BattleScene } from '../scenes/BattleScene';
 import { RpgMenuScene } from '../scenes/RpgMenuScene';
 import { SaveLoadScene } from '../scenes/SaveLoadScene';
 import { ShopScene } from '../scenes/ShopScene';
+import { SliceEndScene } from '../scenes/SliceEndScene';
 
 export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
   return {
@@ -30,6 +31,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     input: { keyboard: false, mouse: false, touch: false, gamepad: false },
     audio: { noAudio: false },
     disableContextMenu: true,
-    scene: [BootScene, TitleScene, SettingsScene, ControlsScene, PlaceholderScene, WorldScene, HudScene, PauseScene, BattleScene, RpgMenuScene, SaveLoadScene, ShopScene],
+    scene: [BootScene, TitleScene, SettingsScene, ControlsScene, PlaceholderScene, WorldScene, HudScene, PauseScene, BattleScene, RpgMenuScene, SaveLoadScene, ShopScene, SliceEndScene],
   };
 }

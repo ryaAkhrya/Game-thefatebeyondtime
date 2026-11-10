@@ -7,6 +7,10 @@ import { loadForest1, type LoadedMap } from '../world/forest1';
 import { Chapter1Story, FLAG, type StoryAction } from '../story/Chapter1Story';
 import { getServices, type Services } from '../systems/Services';
 import type { HudScene } from './HudScene';
+import { drawForestEdgeGround, loadForestEdge } from '../world/forestEdge';
+import { BOSS_CHECKPOINT, FOREST_EDGE_FLAG, MOURNFANG_FLAG } from '../combat/encounters';
+import { restBeforeMournfang } from '../rpg/checkpoints';
+import { BATTLE_TEXTURE } from '../combat/BattleAtlas';
 
 const WALK_SPEED = 88; // px/detik (2,75 petak/detik)
 const MAX_DT = 50; // ms; batas langkah waktu supaya tidak ada lompatan saat tab melambat
@@ -22,7 +26,7 @@ interface Walker {
 }
 
 /**
- * Dunia eksplorasi Hutan 1 (Chapter I, C1-01..C1-03). WorldScene hanya MENGHUBUNGKAN: collision (world/Collision),
+ * Dunia eksplorasi Hutan 1 dan tepi hutan (Chapter I, C1-01..C1-05). WorldScene menghubungkan collision (world/Collision),
  * interaksi (world/Interaction), keputusan cerita (story/Chapter1Story) dan UI (HudScene). Tidak ada logika cerita di sini.
  */
 export class WorldScene extends Phaser.Scene {
@@ -31,13 +35,15 @@ export class WorldScene extends Phaser.Scene {
   private story!: Chapter1Story;
   private hud!: HudScene;
   private player!: Walker;
-  private nambo!: Walker;
+  private nambo?: Walker;
+  private bossSprite?: Phaser.GameObjects.Sprite;
   private propSprites = new Map<string, Phaser.GameObjects.Image>();
   private interactables: Interactable[] = [];
   private insideTriggers = new Set<string>();
   private releaseInput?: () => void;
   private busy = false;
   private started = false;
+  private leaving = false;
   private wrapCount = 0;
   private wasMoving = false;
   private target: Interactable | null = null;
@@ -53,9 +59,11 @@ export class WorldScene extends Phaser.Scene {
     const { gameState, input, audio, settings } = this.services;
     if (!gameState.isActive) gameState.startNewGame();
     this.story = new Chapter1Story(gameState);
-    this.loaded = loadForest1();
+    this.loaded = gameState.snapshot()!.area === 'forest_edge' ? loadForestEdge() : loadForest1();
+    this.nambo = undefined; this.bossSprite = undefined;
     this.busy = false;
     this.started = false;
+    this.leaving = false;
     this.wrapCount = gameState.snapshot()!.world.forestWrapCount;
     this.insideTriggers.clear();
     this.propSprites.clear();
@@ -65,7 +73,8 @@ export class WorldScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(0x1d1625);
 
     // ---- dasar peta (fallback polos bila gambar gagal dimuat) ----
-    if (this.textures.exists(ENV.groundKey)) this.add.image(0, 0, ENV.groundKey).setOrigin(0, 0).setDepth(-1000);
+    if (map.id === 'forest_edge') drawForestEdgeGround(this, map);
+    else if (this.textures.exists(ENV.groundKey)) this.add.image(0, 0, ENV.groundKey).setOrigin(0, 0).setDepth(-1000);
     else this.add.rectangle(0, 0, map.width, map.height, 0x2e4934).setOrigin(0, 0).setDepth(-1000);
 
     // ---- prop ----
@@ -82,10 +91,15 @@ export class WorldScene extends Phaser.Scene {
     const saved = gameState.snapshot()!.position;
     const hasSaved = saved.x > 0 || saved.y > 0;
     this.player = this.makeWalker(SPRITE_KEYS.yaric, hasSaved ? saved.x : map.spawn.x, hasSaved ? saved.y : map.spawn.y, hasSaved ? saved.facing : map.spawn.facing, 4, 'c01');
-    const nm = map.npcs[0]!;
-    this.nambo = this.makeWalker(SPRITE_KEYS.nambo, nm.x, nm.y, nm.facing, 6, 'c08');
-    if (this.story.namboDone) this.placeNambo(352, 458, 'down');
-    else this.updateNamboBlocker();
+    const nm = map.npcs[0];
+    if (nm) {
+      this.nambo = this.makeWalker(SPRITE_KEYS.nambo, nm.x, nm.y, nm.facing, 6, 'c08');
+      if (this.story.namboDone) this.placeNambo(352, 458, 'down');
+      else this.updateNamboBlocker();
+    }
+    if (map.id === 'forest_edge' && !gameState.hasFlag(MOURNFANG_FLAG)) {
+      this.bossSprite = this.add.sprite(972, 400, BATTLE_TEXTURE.B01, 0).setOrigin(0.5, 92 / 96).setFlipX(true).setDepth(400);
+    }
 
     // ---- keadaan dinamis dari flag ----
     this.interactables = this.loaded.interactables.map((i) => ({ ...i }));
@@ -129,7 +143,7 @@ export class WorldScene extends Phaser.Scene {
   // ------------------------------------------------------------------ frame
 
   override update(_time: number, delta: number): void {
-    if (!this.hud?.ready) return;
+    if (!this.hud?.ready || this.leaving) return;
     if (!document.hidden) this.services.gameState.tick(delta / 1000);
     if (!this.started) {
       this.started = true;
@@ -159,12 +173,12 @@ export class WorldScene extends Phaser.Scene {
     }
     this.handleWrap();
     this.syncWalker(this.player, moved > 0);
-    this.syncWalker(this.nambo, false, true);
+    if (this.nambo) this.syncWalker(this.nambo, false, true);
 
     // ---- pemicu & prompt ----
     if (!this.busy) this.checkTriggers();
     this.updatePrompt();
-    this.services.gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'forest_1');
+    this.services.gameState.setPosition(this.player.x, this.player.y, this.player.facing, this.loaded.map.id === 'forest_edge' ? 'forest_edge' : 'forest_1');
     this.services.checkpoints.setSafe(!this.busy && !this.hud.dialogue.active);
     const saved = this.services.checkpoints.flush();
     if (saved && !saved.ok) this.hud.toast('Simpan otomatis gagal. Coba Simpan/Muat.');
@@ -240,20 +254,44 @@ export class WorldScene extends Phaser.Scene {
     } finally {
       this.busy = false;
       this.hud.setObjective(this.story.objective());
-      if (completed && actions.some(a => a.type === 'setFlag' || a.type === 'giveItem')) this.services.checkpoints.requestAutosave();
+      if (completed && actions.some(a => a.type === 'setFlag' || a.type === 'giveItem' || a.type === 'rest')) this.services.checkpoints.requestAutosave();
     }
   }
 
   private async runAction(a: StoryAction): Promise<void> {
     const { gameState } = this.services;
     switch (a.type) {
+      case 'forestEdge': {
+        this.leaving = true; // the old scene must not overwrite the new area's spawn during its fade
+        const data = gameState.snapshot()!;
+        data.area = 'forest_edge'; data.position = loadForestEdge().map.spawn; data.flags[FOREST_EDGE_FLAG] = true;
+        gameState.load(data); this.services.checkpoints.requestAutosave();
+        this.services.router.goto(this, SCENE_KEYS.World);
+        await new Promise<void>(() => undefined);
+        break;
+      }
+      case 'rest':
+        gameState.load(restBeforeMournfang(gameState.snapshot()!));
+        break;
+      case 'mournfangApproach':
+        if (this.bossSprite) {
+          this.bossSprite.setFrame(1);
+          await new Promise<void>(resolve => this.tweens.add({ targets: this.bossSprite, x: 948, duration: 480, onComplete: () => resolve() }));
+          this.bossSprite.setFrame(0);
+        }
+        break;
+      case 'sliceEnd':
+        gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'forest_edge');
+        this.services.checkpoints.setSafe(true); this.services.checkpoints.requestAutosave(); this.services.checkpoints.flush();
+        this.services.router.openOverlay(this, SCENE_KEYS.SliceEnd);
+        break;
       case 'dialogue':
         this.actionLog.push(`dialogue:${a.script.id}`);
         await this.hud.playDialogue(a.script);
         break;
       case 'setFlag':
         if (gameState.setFlag(a.flag)) this.actionLog.push(`flag:${a.flag}`);
-        if (a.flag === FLAG.awake) this.applyFlagState();
+        if (a.flag === FLAG.awake || a.flag === FLAG.victorySeen) this.applyFlagState();
         break;
       case 'objective':
         this.hud.setObjective(this.story.objective());
@@ -280,14 +318,21 @@ export class WorldScene extends Phaser.Scene {
         break;
       case 'battle':
         this.hud.showPrompt(null);
-        this.player.y = 100;
-        this.player.facing = 'down';
-        gameState.setPosition(this.player.x, 100, 'down', 'forest_1');
+        if (a.encounter === 'mournfang') {
+          gameState.load(restBeforeMournfang(gameState.snapshot()!));
+          this.player.x = BOSS_CHECKPOINT.x; this.player.y = BOSS_CHECKPOINT.y; this.player.facing = BOSS_CHECKPOINT.facing;
+          gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'forest_edge');
+        } else {
+          this.player.y = 100; this.player.facing = 'down';
+          gameState.setPosition(this.player.x, 100, 'down', 'forest_1');
+        }
         this.services.checkpoints.setSafe(true);
         this.services.checkpoints.requestAutosave();
-        this.services.checkpoints.flush(); // complete, safe checkpoint before entering the scripted encounter
+        const save = this.services.checkpoints.flush(); // complete, safe checkpoint before entering the scripted encounter
+        if (save && !save.ok) this.hud.toast('Simpan otomatis gagal.');
         this.services.checkpoints.setSafe(false);
-        this.services.router.goto(this, SCENE_KEYS.Battle);
+        this.leaving = true;
+        this.services.router.goto(this, SCENE_KEYS.Battle, { encounter: a.encounter ?? 'hollowling' });
         // router.goto menghentikan scene ini; tunggu tanpa melakukan apa pun lagi
         await new Promise<void>(() => undefined);
         break;
@@ -303,6 +348,9 @@ export class WorldScene extends Phaser.Scene {
     if (this.story.loopNoticed) this.openThicket(false);
     else for (const s of map.solidRects) if (s.id.startsWith('thicket_block')) collision.setDynamic(s.id, rectOf(s));
     if (this.services.gameState.hasFlag(FLAG.chestReward)) this.openChest(false);
+    const boss = map.solidRects.find(s => s.id === 'mournfang_block');
+    if (boss) collision.setDynamic(boss.id, this.services.gameState.hasFlag(MOURNFANG_FLAG) ? null : rectOf(boss));
+    for (const i of this.interactables) if (i.id.startsWith('forest_exit')) i.enabled = this.services.gameState.hasFlag(FLAG.victorySeen);
   }
 
   private openThicket(animate = true): void {
@@ -320,11 +368,13 @@ export class WorldScene extends Phaser.Scene {
   // ---------------------------------------------------------------- Nambo
 
   private updateNamboBlocker(): void {
+    if (!this.nambo) return;
     const b = footBox(this.nambo.x, this.nambo.y);
     this.loaded.collision.setDynamic('nambo', { x: b.x - 4, y: b.y - 2, w: b.w + 8, h: b.h + 4 });
   }
 
   private syncNamboInteractable(): void {
+    if (!this.nambo) return;
     const it = this.interactables.find((i) => i.id === 'nambo');
     if (!it) return;
     it.x = this.nambo.x - 26;
@@ -334,6 +384,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private placeNambo(x: number, y: number, facing: Facing): void {
+    if (!this.nambo) return;
     this.nambo.x = x;
     this.nambo.y = y;
     this.nambo.facing = facing;
@@ -342,6 +393,7 @@ export class WorldScene extends Phaser.Scene {
   }
 
   private facePlayer(): void {
+    if (!this.nambo) return;
     const dx = this.player.x - this.nambo.x;
     const dy = this.player.y - this.nambo.y;
     this.nambo.facing = Math.abs(dx) > Math.abs(dy) ? (dx < 0 ? 'left' : 'right') : dy < 0 ? 'up' : 'down';
@@ -351,8 +403,9 @@ export class WorldScene extends Phaser.Scene {
 
   /** "Nambo menepi memberi jalan": berjalan ke bahu jalan utara. */
   private namboStepAside(): Promise<void> {
+    if (!this.nambo) return Promise.resolve();
     return new Promise((resolve) => {
-      const n = this.nambo;
+      const n = this.nambo!;
       n.facing = 'up';
       const walking = true;
       void walking;
@@ -412,6 +465,7 @@ export class WorldScene extends Phaser.Scene {
     const cam = this.cameras.main;
     return {
       x: Math.round(this.player.x),
+      area: this.loaded.map.id,
       y: Math.round(this.player.y),
       facing: this.player.facing,
       busy: this.busy,
@@ -426,7 +480,8 @@ export class WorldScene extends Phaser.Scene {
       prompt: this.target?.verb ?? null,
       cam: { x: Math.round(cam.scrollX), y: Math.round(cam.scrollY), w: cam.width, h: cam.height, bw: this.loaded.map.width, bh: this.loaded.map.height },
       dialogue: this.hud?.dialogue.debug ?? null,
-      nambo: { x: Math.round(this.nambo.x), y: Math.round(this.nambo.y), facing: this.nambo.facing },
+      nambo: this.nambo ? { x: Math.round(this.nambo.x), y: Math.round(this.nambo.y), facing: this.nambo.facing } : null,
+      bossVisible: !!this.bossSprite?.visible,
       toast: this.hud?.currentToast ?? '',
       thicketOpen: [...this.propSprites.entries()].some(([id, img]) => id.startsWith('thicket') && img.frame.name === 'thicket_open'),
       chestOpen: [...this.propSprites.entries()].some(([id, img]) => id.startsWith('chest') && img.frame.name === 'chest_open'),

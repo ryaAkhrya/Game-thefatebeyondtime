@@ -15,14 +15,14 @@ function pngInfo(path: string): { width: number; height: number; colorType: numb
   return { width: b.readUInt32BE(16), height: b.readUInt32BE(20), colorType: b[25]! };
 }
 
-const battle = ASSET_MANIFEST.filter((a) => a.kind !== 'exploration_atlas');
+const battle = ASSET_MANIFEST.filter((a) => a.kind !== 'exploration_atlas' && a.version === 'v3.3');
 const explore = ASSET_MANIFEST.filter((a) => a.kind === 'exploration_atlas');
 
 describe('AssetRegistry', () => {
   const registry = new AssetRegistry();
 
   it('memetakan aset aktif battle v3.3 dan eksplorasi Yaric/Nambo', () => {
-    expect(registry.list().map((a) => a.id).sort()).toEqual(['C01_YARIC_BATTLE', 'C01_YARIC_EXPLORE', 'C08_NAMBO_EXPLORE', 'M01_HOLLOWLING_BATTLE', 'VFX_C01_GROUND_SLAM']);
+    expect(registry.list().map((a) => a.id).sort()).toEqual(['B01_MOURNFANG_BATTLE', 'C01_YARIC_BATTLE', 'C01_YARIC_EXPLORE', 'C08_NAMBO_EXPLORE', 'M01_HOLLOWLING_BATTLE', 'VFX_C01_GROUND_SLAM']);
   });
 
   it('battle dan eksplorasi diimpor; tidak ada yang PRODUCTION_READY', () => {
@@ -31,7 +31,7 @@ describe('AssetRegistry', () => {
       expect(registry.isProductionReady(a.id)).toBe(false);
     }
     expect(battle.every((a) => a.version === 'v3.3' && a.imported)).toBe(true);
-    expect(registry.loadable()).toHaveLength(5);
+    expect(registry.loadable()).toHaveLength(6);
   });
 
   it('memakai versi TERBARU yang ada: eksplorasi Yaric v3.2 (v3.3 tidak punya eksplorasi), Nambo masih DRAFT', () => {

@@ -1,5 +1,9 @@
 # Asset index v3.3 — per file
 
+## Web import Phase 4 — Mournfang
+
+`assets/bosses/B01_Mournfang/B01_BATTLE_ATLAS_DRAFT.{png,json}` disalin byte-identical ke `web/public/assets/battle/`; hanya empat pose grid 96×96 (idle/attack/hit/defeated). Tidak ada atlas B01 v3.3 yang menggantikannya. Adapter playback menahan pose existing; tidak menambah gambar/frame sumber atau mengklaim animasi final. Source JSON tetap DRAFT; review tetap NEEDS_REVIEW. Detail wajah tulang/tanduk, kaki, artikulasi gerak dan beberapa piksel tepi belum cukup mencerminkan concept art; masuk backlog `docs/production/PHASE4_REPORT.md`. Tidak ada perubahan hash/source asli atau audio.
+
 ## Web import status terkini — Phase 2, 10 November 2026
 
 Salinan runtime **byte-identical** PNG + JSON tersedia di `web/public/assets/battle/`:

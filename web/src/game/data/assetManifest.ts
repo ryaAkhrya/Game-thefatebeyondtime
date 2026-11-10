@@ -27,6 +27,14 @@ export interface AtlasAsset {
 
 export const ASSET_MANIFEST: readonly AtlasAsset[] = [
   {
+    id: 'B01_MOURNFANG_BATTLE', entity: 'B01', kind: 'battle_atlas', version: 'draft', status: 'NEEDS_REVIEW',
+    sourceImage: 'assets/bosses/B01_Mournfang/B01_BATTLE_ATLAS_DRAFT.png',
+    sourceJson: 'assets/bosses/B01_Mournfang/B01_BATTLE_ATLAS_DRAFT.json',
+    frameSize: [96, 96], atlasSize: [384, 96], frameCount: 4,
+    publicPath: 'assets/battle/B01_BATTLE_ATLAS_DRAFT.png', imported: true,
+    notes: 'Four original grid-authored key poses only, NOT finished animation. Runtime holds/reuses poses; no redraw or reference crop. Source JSON says DRAFT; registry review remains NEEDS_REVIEW.',
+  },
+  {
     id: 'C01_YARIC_BATTLE',
     entity: 'C01',
     kind: 'battle_atlas',

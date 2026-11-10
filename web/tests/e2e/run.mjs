@@ -13,7 +13,7 @@ try {
     });
   }
   let failed = false;
-  const suites = ['smoke.mjs', 'phase1.mjs', 'phase2.mjs', 'phase3.mjs'];
+  const suites = ['smoke.mjs', 'phase1.mjs', 'phase2.mjs', 'phase3.mjs', 'phase4.mjs'];
   const selected = process.env.E2E_SUITES?.split(',');
   for (const script of suites.filter(name => !selected || selected.includes(name))) {
     const code = await new Promise((resolveExit, reject) => {

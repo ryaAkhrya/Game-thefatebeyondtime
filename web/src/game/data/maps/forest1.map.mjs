@@ -213,6 +213,7 @@ export function buildForest1() {
 
   for (let k = 0; k < copies; k++) {
     triggers.push({ id: `demo_end#${k}`, x: sc(k, trailLocalX) - 26, y: 1.2 * TILE, w: 52, h: 40, copy: k });
+    interactables.push({ id: `forest_exit#${k}`, kind: 'object', verb: 'Lanjut', x: sc(k, trailLocalX) - 26, y: 0, w: 52, h: 42, copy: k });
   }
   triggers.push({ id: 'gate_hint', x: 236, y: 320, w: 28, h: 290 });
   triggers.push({ id: 'nambo_zone', x: 300, y: 14 * TILE, w: 30, h: 4 * TILE });

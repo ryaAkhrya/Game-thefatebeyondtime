@@ -1,5 +1,22 @@
 # Composer handoff — Game Director authored music only
 
+## Phase 4 — Mournfang dan akhir vertical slice
+
+Semua cue tetap **AWAITING_COMPOSER**. Tidak ada audio dibuat, diunduh, disintesis atau dimasukkan. Tidak ada track duplikat; game tetap playable dalam silent fallback.
+
+| Kebutuhan | Registry/file existing | Penempatan dan arah |
+|---|---|---|
+| Forest ambience | `BGM_FOREST_01.ogg` | Hutan 1 dan tepi hutan; ruang ringan, berhenti sebelum battle |
+| Normal battle | `BGM_BATTLE.ogg` | Hollowling, mulai sesudah transisi, berhenti saat hasil |
+| Boss Mournfang | `BGM_BOSS.ogg` | B01, tekanan ritmis yang memberi ruang untuk membaca tanda serangan |
+| Boss anticipation | tidak menambah BGM | Tanda visual/teks wajib cukup tanpa audio. Variasi bunyi gesekan kaki/ranting dapat dipertimbangkan komposer; tidak menggantikan peringatan visual |
+| Damage/serangan boss | `SFX_ENEMY_ATTACK.ogg`, `SFX_DAMAGE.ogg` | Sekali di kontak, bukan saat telegraph; tidak memotong BGM |
+| Victory | `SFX_VICTORY.ogg` | Sesudah recovery; singkat, tidak merayakan kematian hewan secara megah |
+| Defeat/retry | `SFX_DEFEAT.ogg` | Result kalah; retry kembali ke cue boss |
+| Transisi akhir demo | cue hutan existing lalu sunyi | Berhenti di penutup menuju Aveloria; bukan ending Chapter I/kredit anniversary |
+
+Mix di bawah dialog. Screen Shake OFF dan Reduced Flashes ON tidak boleh menghilangkan tanda serangan. Penilaian audio terdengar menunggu file user dan review; implementasi tidak meminta audio yang belum READY.
+
 ## Phase 3 UI — spesifikasi saja
 
 Status/Inventaris/Perlengkapan/Jurus/Simpan-Muat/toko reusable dapat memakai cue existing `SFX_UI_MOVE.ogg`, `SFX_UI_CONFIRM.ogg`, `SFX_UI_BACK.ogg` (pendek, kering, tenang; tidak menutupi teks). Tidak dibuat file, sintesis, placeholder audio, atau track duplikat. Semua tetap AWAITING_COMPOSER/silent fallback. Belum ada penilaian audio terdengar.

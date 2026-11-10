@@ -1,5 +1,14 @@
 # CHANGELOG — DOKUMENTASI & KODE
 
+## Phase 4 — 10 November 2026 (vertical slice sampai Mournfang)
+
+- Alur C1-01..04 berlanjut ke tepi Hutan 1, checkpoint, C1-05 Mournfang dan penutup demo menuju Aveloria; bukan Chapter I penuh. Tidak ada Phase 5/Chapter II atau NPC baru.
+- Configurable BattleSession dan pure boss intent: normal/persiapan/sapuan/pemulihan, counter Bertahan/GS, shared Potion, retry dan reward/loot sekali. HP 224 dan balancing DRAFT. Total normal EXP 70/level3/emas28 setelah dua kemenangan.
+- Checkpoint full HP/MP tanpa item/EXP/gold tambahan, save sebelum/sesudah boss, Continue/refresh dan ending save. Schema v2 diperluas dengan nilai area/beat/flags tanpa field wajib baru; save Phase 3 tetap terbaca.
+- Empat pose B01 PNG/JSON asli disalin utuh, adapter pose holds; art NEEDS_REVIEW, tidak mengklaim animasi final. Dialog C1-05 dari source; composer handoff tanpa audio baru.
+- Perbaikan transisi area: hentikan old-world writes saat fade. Perbaikan tiga digit HP/MP dan warning UI. Retry mempertahankan playtime. Assertion input browser lama menunggu frame aktual, mengukur kedua tombol selama sama-sama ditahan.
+- Gate fungsional PASS: 405 unit, 375 browser produksi Edge (cerita terkoreksi 162/162), 38 Chrome, 38 dev Edge, strict TS/build. Screenshot/waktu terukur/file changes/backlog: `PHASE4_REPORT.md`. Art/pacing manusia perlu review. Tidak ada dependency, commit/push atau deployment.
+
 ## Phase 3 — 10 November 2026 (RPG dan persistence)
 
 - Progression data murni, cap awal level 5, reward Hollowling 25 EXP/8 emas sekali; stat level 1 tetap sama dengan Phase 2. Growth, dua pasif swordsman dan harga item DRAFT untuk review.

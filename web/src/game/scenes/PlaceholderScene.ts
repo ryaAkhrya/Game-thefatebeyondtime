@@ -17,6 +17,7 @@ interface PlaceholderData {
 const AREA_LABEL_ID: Readonly<Record<AreaId, string>> = {
   none: '-',
   forest_1: 'Hutan 1',
+  forest_edge: 'Tepi Hutan',
   aveloria: 'Aveloria',
   liora: 'Liora',
   forest_2: 'Hutan 2',

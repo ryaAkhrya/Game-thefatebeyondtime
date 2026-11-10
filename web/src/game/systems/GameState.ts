@@ -4,6 +4,7 @@ import { changeItem } from '../rpg/inventory';
 import { createRpgState, effectiveStats } from '../rpg/progression';
 import { integer, record, validateRpg } from '../rpg/validation';
 import type { RpgResult } from '../rpg/actions';
+import { BOSS_CHECKPOINT_FLAG, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, SLICE_COMPLETE } from '../combat/encounters';
 
 export const GAME_STATE_VERSION = 2;
 export const MAX_PARTY_SIZE = 2; // GDD: party aktif maksimal dua
@@ -26,7 +27,7 @@ export interface GameStateData {
   /** Canonical v2 vitals; migration supplies defaults only for older saves. */
   vitals: { hp: number; mp: number };
   rpg: RpgState;
-  storyBeat: 'C1-01' | 'C1-02' | 'C1-03' | 'C1-04' | 'C1-04-DONE';
+  storyBeat: 'C1-01' | 'C1-02' | 'C1-03' | 'C1-04' | 'C1-04-DONE' | 'C1-05' | 'C1-05-DONE' | 'SLICE-DONE';
   world: { forestWrapCount: number };
   playtimeSec: number;
 }
@@ -51,6 +52,9 @@ export function createNewGameData(): GameStateData {
 const FACINGS: readonly Facing[] = ['up', 'down', 'left', 'right'];
 
 export function storyBeatFor(flags: Record<string, boolean>): GameStateData['storyBeat'] {
+  if (flags[SLICE_COMPLETE]) return 'SLICE-DONE';
+  if (flags[MOURNFANG_FLAG]) return 'C1-05-DONE';
+  if (flags[FOREST_EDGE_FLAG]) return 'C1-05';
   if (flags['battle.first_hollowling']) return 'C1-04-DONE';
   if (flags['story.c1_loop']) return 'C1-04';
   if (flags['story.c1_nambo']) return 'C1-03';
@@ -108,7 +112,10 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
   const rpg = validateRpg(r.rpg, items);
   if (!rpg || !(r.party as string[]).every(id => rpg.characters[id])) return null;
   if (!record(r.world) || !integer(r.world.forestWrapCount, 0, 1000000)) return null;
-  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE'].includes(String(r.storyBeat))) return null;
+  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE', 'C1-05', 'C1-05-DONE', 'SLICE-DONE'].includes(String(r.storyBeat))) return null;
+  if ((r.area === 'forest_edge' || flags[FOREST_EDGE_FLAG] || flags[BOSS_CHECKPOINT_FLAG] || flags[MOURNFANG_FLAG]) && !flags[FIRST_HOLLOWLING_FLAG]) return null;
+  if (flags['reward.mournfang.rpg'] && !flags[MOURNFANG_FLAG]) return null;
+  if ((flags[MOURNFANG_VICTORY_SEEN] || flags[SLICE_COMPLETE]) && !flags[MOURNFANG_FLAG]) return null;
   const stats = effectiveStats({ rpg });
   if (r.vitals === undefined) return null;
   let vitals: GameStateData['vitals'] | undefined;

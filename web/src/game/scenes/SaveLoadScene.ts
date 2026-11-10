@@ -7,7 +7,7 @@ import { SAVE_SLOTS, type SaveReadResult, type SaveSlot } from '../systems/SaveR
 import { getServices } from '../systems/Services';
 
 const slotName = (slot: SaveSlot): string => slot === 'auto' ? 'Otomatis' : `Slot ${slot.at(-1)}`;
-const BEAT_LABEL = { 'C1-01': 'Terbangun', 'C1-02': 'Mencari jalan', 'C1-03': 'Jalur berulang', 'C1-04': 'Sebelum Hollowling', 'C1-04-DONE': 'Usai Hollowling' } as const;
+const BEAT_LABEL = { 'C1-01': 'Terbangun', 'C1-02': 'Mencari jalan', 'C1-03': 'Jalur berulang', 'C1-04': 'Sebelum Hollowling', 'C1-04-DONE': 'Usai Hollowling', 'C1-05': 'Jejak Mournfang', 'C1-05-DONE': 'Usai Mournfang', 'SLICE-DONE': 'Menuju Aveloria' } as const;
 export class SaveLoadScene extends Phaser.Scene {
   private returnTo: SceneKey = SCENE_KEYS.Pause;
   private mode: 'save' | 'load' = 'save';
@@ -45,7 +45,7 @@ export class SaveLoadScene extends Phaser.Scene {
       this.detail.setText(`${slotName(slot)}\n\n${reasons[result.status]}`); return;
     }
     const d = result.data, local = new Date(result.savedAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
-    this.detail.setText(`Bab ${d.chapter} / ${d.area === 'forest_1' ? 'Hutan 1' : d.area}\n${BEAT_LABEL[d.storyBeat]}\nLevel ${d.rpg.characters.C01!.level}\nHP ${d.vitals!.hp}\nMP ${d.vitals!.mp}\n${local} WIB\n${Math.floor(d.playtimeSec / 60)} menit\n${result.recovered ? 'Dari cadangan.' : result.migrated ? 'Data lama terbaca.' : ''}`);
+    this.detail.setText(`Bab ${d.chapter} / ${d.area === 'forest_1' ? 'Hutan 1' : d.area === 'forest_edge' ? 'Tepi Hutan' : d.area}\n${BEAT_LABEL[d.storyBeat]}\nLevel ${d.rpg.characters.C01!.level}\nHP ${d.vitals!.hp}\nMP ${d.vitals!.mp}\n${local} WIB\n${Math.floor(d.playtimeSec / 60)} menit\n${result.recovered ? 'Dari cadangan.' : result.migrated ? 'Data lama terbaca.' : ''}`);
   }
   private render(focusId?: string): void {
     this.menu?.destroy(); this.heading.setText(this.mode === 'save' ? 'SIMPAN PERMAINAN' : 'MUAT PERMAINAN');
@@ -80,6 +80,7 @@ export class SaveLoadScene extends Phaser.Scene {
     if (result.status !== 'ok') { this.message.setText('Data tidak dapat dimuat.'); this.render(slot); return; }
     services.gameState.load(result.data); services.checkpoints.reset(); this.closing = true;
     this.scene.stop(SCENE_KEYS.Pause); this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud);
+    this.scene.stop(SCENE_KEYS.SliceEnd);
     services.router.goto(this, SCENE_KEYS.World);
   }
 }

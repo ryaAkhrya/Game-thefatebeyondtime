@@ -1,5 +1,7 @@
 # RPG SYSTEMS — Progression, skill, economy, quest, save
 
+> Phase 4: boss Mournfang memakai progression/inventory/save yang sama. Reward DRAFT sekali 45 EXP/20 emas/1 Potion (normal total level 3/70 EXP/28 emas); rest checkpoint hanya memulihkan HP/MP. Ground Slam saat telegraph sapuan menggagalkan serangan, tetap fisik dan 4 MP. Save v2 mendapat nilai area/beat/flags tambahan tanpa field wajib baru. Detail balancing, compatibility dan QA: [PHASE4_REPORT.md](docs/production/PHASE4_REPORT.md). Aveloria/seluruh Chapter I belum selesai.
+
 > Implementasi Phase 3 (10 November 2026): fondasi EXP/level, shared inventory/equipment, jurus dan save/load sudah berjalan di Chapter I. Threshold provisional di bawah dipakai sebagai curve DRAFT sampai level 5; growth, 25 EXP/8 emas Hollowling, dua pasif Yaric dan harga item juga DRAFT. Skill point kini diimplementasikan sesuai permintaan Phase 3 pengguna, tetap menunggu review balancing. Detail kode, schema v2/migrasi v1, QA dan batasan ada di [PHASE3_REPORT.md](docs/production/PHASE3_REPORT.md). Tabel/contoh roster dan quest di dokumen ini bukan klaim bahwa seluruhnya sudah dibuat.
 
 ## 1. Prinsip desain

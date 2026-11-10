@@ -10,6 +10,7 @@ import { chromium } from 'playwright-core';
 import { battleTutorial } from './battle-helpers.mjs';
 import { selectMenu } from './battle-helpers.mjs';
 import { persistenceJourney } from './phase3-helpers.mjs';
+import { verticalSliceJourney } from './phase4-helpers.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../..');
@@ -168,7 +169,9 @@ async function walkTo(page, tx, ty, { tol = 4, axisOrder = 'xy', timeout = 40000
 
 async function face(page, key) {
   await page.keyboard.down(key);
-  await sleep(page, 45);
+  // Polling movement needs a real world frame, especially on a busy headless host.
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.waitForFunction(dir => window.__tfbt.world()?.facing === dir, { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[key]);
   await page.keyboard.up(key);
   await sleep(page, 80);
 }
@@ -260,13 +263,15 @@ async function main() {
     const dist = Math.hypot(p4.x - p3.x, p4.y - p3.y);
     check('Kecepatan wajar (~88 px/dtk): 300 ms menempuh 15-35 px', dist > 15 && dist < 35, String(dist));
     // tidak ada diagonal: dua tombol bersamaan -> hanya satu sumbu
-    const q0 = await world(page);
     await page.keyboard.down('ArrowRight');
     await page.keyboard.down('ArrowUp');
+    // Measure only the interval with BOTH keys held, excluding the gap between keydown events.
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    const q0 = await world(page);
     await sleep(page, 350);
+    const q1 = await world(page);
     await page.keyboard.up('ArrowUp');
     await page.keyboard.up('ArrowRight');
-    const q1 = await world(page);
     check('Gerak 4 arah: dua panah bersamaan tidak menghasilkan diagonal', (q1.x === q0.x) !== (q1.y === q0.y) || (Math.abs(q1.x - q0.x) < 2 || Math.abs(q1.y - q0.y) < 2), `${q0.x},${q0.y} -> ${q1.x},${q1.y}`);
 
     // ---- collision ----
@@ -284,14 +289,15 @@ async function main() {
     check('Kamera: tidak keluar batas peta di awal (x>=0,y>=0)', cam.x >= 0 && cam.y >= 0 && cam.x + cam.w <= cam.bw && cam.y + cam.h <= cam.bh, JSON.stringify(cam));
 
     // ---- interaksi: arah dan jarak ----
-    await walkTo(page, 134, 438);
+    // Stay north of the tracks' hit area with enough margin for a few facing frames.
+    await walkTo(page, 134, 425);
     await face(page, 'ArrowDown');
     w = await world(page);
     check('Prompt interaksi muncul bila menghadap bekas langkah (Periksa)', w.target === 'ground_tracks' && w.prompt === 'Periksa', JSON.stringify([w.target, w.prompt]));
     await shot(page, '03_prompt_examine');
     await face(page, 'ArrowUp');
     w = await world(page);
-    check('Membelakangi objek: tidak ada prompt', w.target === null, String(w.target));
+    check('Membelakangi objek: tidak ada prompt', w.target === null, JSON.stringify({ x: w.x, y: w.y, facing: w.facing, target: w.target }));
     await page.keyboard.press('KeyE', { delay: 30 });
     await sleep(page, 200);
     w = await world(page);
@@ -547,6 +553,7 @@ async function main() {
     await walkTo(page, won.x, 55, { axisOrder: 'yx' });
     check('Encounter tidak terulang setelah kemenangan', !(await page.evaluate(() => window.__tfbt.battle())) && !(await world(page)).dialogue);
     await persistenceJourney(page, check, shot, { walkTo, face, playDialogue });
+    await verticalSliceJourney(page, check, shot, { walkTo, face, playDialogue });
 
     check('Tidak ada error JS sepanjang sesi cerita penuh', s.errors.length === 0, s.errors.join(' | '));
     check('Tidak ada request gagal / 404 (aset hilang)', s.failed.length === 0, s.failed.join(' | '));

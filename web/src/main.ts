@@ -16,7 +16,9 @@ import { registerServices, type Services } from './game/systems/Services';
 import { SettingsRepository } from './game/systems/SettingsRepository';
 import { probeStorage } from './game/systems/StorageAdapter';
 import { SaveCoordinator } from './game/systems/SaveCoordinator';
-import { effectiveStats } from './game/rpg/progression';
+import { effectiveStats, applyReward } from './game/rpg/progression';
+import { HOLLOWLING_REWARD } from './game/rpg/definitions';
+import { BOSS_CHECKPOINT, BOSS_CHECKPOINT_FLAG, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG } from './game/combat/encounters';
 
 function boot(): void {
   document.title = GAME_TITLE;
@@ -99,6 +101,14 @@ function boot(): void {
           services.gameState.addItem('potion', 1);
           services.gameState.setFlag('reward.c1_chest_potion.claimed');
           game.scene.getScene('TitleScene').scene.start('BattleScene');
+        },
+        mournfang: () => {
+          services.checkpoints.reset();
+          const data = applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data;
+          for (const flag of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed', 'c1.hollowling_victory_seen', FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, BOSS_CHECKPOINT_FLAG]) data.flags[flag] = true;
+          data.area = 'forest_edge'; data.position = { ...BOSS_CHECKPOINT }; data.items.potion = 1;
+          services.gameState.load(data);
+          game.scene.getScene('TitleScene').scene.start('WorldScene');
         },
         shop: () => {
           const data = services.gameState.startNewGame(); data.rpg.gold = 48;

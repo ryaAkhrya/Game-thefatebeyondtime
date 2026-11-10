@@ -1,6 +1,6 @@
 # TASKS — STATUS SEBENARNYA
 
-**Phase 0–2 playable; Phase 3 PASS (scope fungsional/QA otomatis)** (10 Nov 2026). 378 unit + 311 browser checks produksi, strict TS/build lulus; bukti: `docs/production/PHASE3_REPORT.md`. Keterbatasan art Phase 2 tetap dicatat; Phase 4–6 belum dikerjakan.
+**Phase 4 PASS (fungsional/QA otomatis)** (10 Nov 2026): intro sampai Mournfang dan penutup menuju Aveloria. 405 unit, 375 produksi Edge +38 Chrome +38 dev Edge, strict TS/build lulus. Bukti di `docs/production/PHASE4_REPORT.md`. Art DRAFT/NEEDS_REVIEW, human pacing belum divalidasi; Phase 5/Chapter II belum dikerjakan.
 
 ## Phase 0 — Web Foundation
 
@@ -38,10 +38,11 @@
 
 ## Phase 4 — MVP
 
-- [ ] Alur 10–15 menit lengkap dari title sampai demo end.
-- [ ] Full Settings acceptance.
-- [ ] QA Chrome/Edge, 1366x768/1080p, dev/preview build.
-- [ ] `npm run build` dan evidence playthrough.
+- [x] Intro/Nambo/loop/Hollowling/RPG → tepi hutan → checkpoint → Mournfang → penutup menuju Aveloria; bukan Chapter I penuh.
+- [x] Boss AI, telegraph, Bertahan/GS/Potion, retry aman, reward/loot sekali dan persistence.
+- [x] Source dialog C1-05 dan empat pose B01 existing, status DRAFT/NEEDS_REVIEW jujur.
+- [x] Gate akhir: 405 unit, 375 produksi Edge, 38 Chrome, 38 dev Edge, strict TypeScript/build dan screenshot readability. Bukti di PHASE4_REPORT.md.
+- [ ] Human playtest/pacing target 10–15 menit, review visual/animasi/balancing DRAFT dan GPU/layar nyata.
 
 ## Phase 5 — Full game
 

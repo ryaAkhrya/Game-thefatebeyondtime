@@ -1,6 +1,7 @@
 import type { Stats } from '../combat/BattleEngine';
-import { ITEMS, MAX_GOLD, PROFILES, SKILLS, YARIC_PROFILE, type CharacterProgress, type ProgressionProfile, type RpgState } from './definitions';
+import { ITEMS, MAX_GOLD, MAX_ITEMS, PROFILES, SKILLS, YARIC_PROFILE, type CharacterProgress, type ProgressionProfile, type RpgState } from './definitions';
 import type { GameStateData } from '../systems/GameState';
+import { changeItem } from './inventory';
 
 export const STAT_KEYS: readonly (keyof Stats)[] = ['HP', 'MP', 'ATK', 'DEF', 'MAG', 'MDEF', 'SPD'];
 export function levelForExp(exp: number, profile: ProgressionProfile = YARIC_PROFILE): number {
@@ -36,16 +37,22 @@ export function gainExp(character: CharacterProgress, amount: number, profile: P
   next.baseStats = baseStatsAt(next.level, profile); next.skillPoints += next.level - character.level;
   return next;
 }
-export interface RewardReceipt { exp: number; gold: number; beforeLevel: number; afterLevel: number; skillPoints: number }
+export interface RewardReceipt { exp: number; gold: number; beforeLevel: number; afterLevel: number; skillPoints: number; items?: Record<string, number> }
 /** Pure, idempotent transaction. The encounter caller checks victory before invoking this. */
-export function applyReward(data: GameStateData, reward: { id: string; exp: number; gold: number }): { data: GameStateData; receipt: RewardReceipt | null } {
+export function applyReward(data: GameStateData, reward: { id: string; exp: number; gold: number; items?: Readonly<Record<string, number>> }): { data: GameStateData; receipt: RewardReceipt | null } {
   if (!Number.isSafeInteger(reward.exp) || reward.exp < 0 || !Number.isSafeInteger(reward.gold) || reward.gold < 0) throw new Error('Invalid reward');
   if (data.flags[reward.id]) return { data, receipt: null };
   const next = structuredClone(data), before = effectiveStats(data), c = next.rpg.characters.C01!;
+  const loot: Record<string, number> = {};
+  for (const [id, count] of Object.entries(reward.items ?? {})) {
+    if (!Object.hasOwn(ITEMS, id) || !Number.isSafeInteger(count) || count < 1) throw new Error('Invalid reward item');
+    const amount = Math.min(count, MAX_ITEMS - (next.items[id] ?? 0));
+    if (amount > 0) { next.items = changeItem(next.items, id, amount)!; loot[id] = amount; }
+  }
   next.rpg.characters.C01 = gainExp(c, reward.exp, PROFILES.C01);
   const after = effectiveStats(next);
   next.vitals = { hp: Math.min(after.HP, (data.vitals?.hp ?? before.HP) + after.HP - before.HP), mp: Math.min(after.MP, (data.vitals?.mp ?? before.MP) + after.MP - before.MP) };
   next.rpg.gold = Math.min(MAX_GOLD, next.rpg.gold + reward.gold); next.flags[reward.id] = true;
   const upgraded = next.rpg.characters.C01!;
-  return { data: next, receipt: { exp: upgraded.exp - c.exp, gold: next.rpg.gold - data.rpg.gold, beforeLevel: c.level, afterLevel: upgraded.level, skillPoints: upgraded.skillPoints - c.skillPoints } };
+  return { data: next, receipt: { exp: upgraded.exp - c.exp, gold: next.rpg.gold - data.rpg.gold, beforeLevel: c.level, afterLevel: upgraded.level, skillPoints: upgraded.skillPoints - c.skillPoints, ...(Object.keys(loot).length ? { items: loot } : {}) } };
 }

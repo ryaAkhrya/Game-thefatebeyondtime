@@ -73,21 +73,23 @@ DoD: refresh → Continue memuat HP, MP, quest, item, skill, posisi, flags; Sett
 
 ## Phase 4 — MVP 0.1 (Vertical Slice)
 
+**STATUS: SELESAI (PHASE 4 PASS, fungsional/QA otomatis) — 10 November 2026.** 405 unit, 375 browser produksi Edge, 38 Chrome dan 38 dev Edge, strict TS/build lulus. Bukti/backlog di `docs/production/PHASE4_REPORT.md`. Instruksi Phase 4 terbaru memasukkan Mournfang ke MVP. Art/balancing/pacing manusia perlu review; Aveloria/Velthia dan seluruh Chapter I belum selesai. Phase 5/Chapter II belum dimulai.
+
 **Tujuan:** demo Chapter I 10–15 menit bisa dimainkan di browser PC dari Title → Ending Demo.
 
 Scope:
-- Integrasi Phase 0–3, start intro Yaric di hutan, temui Nambo, peti, Hollowling, progress EXP, Save/Continue, akhir demo.
+- Integrasi Phase 0–3: intro Yaric, Nambo, loop/peti, Hollowling/reward/RPG, checkpoint tepi hutan, Mournfang/telegraph/counter/retry, Save/Continue sebelum/sesudah boss, penutup menuju Aveloria.
 - Title menu `New Game / Continue / Settings / Controls`, pause, Settings fully functional, fokus keyboard jelas.
 - QA 1366×768 dan 1920×1080, browser loading, fullscreen exit, tab blur, audio autoplay, data storage.
 - Build statis `web/dist`, test preview production.
 
-Out of scope: Chapter I penuh, semua boss, ending anniversary, sprite final, deployment publik otomatis.
+Out of scope: Chapter I penuh/Aveloria/Velthia, boss selain B01, ending anniversary, sprite final, deployment publik otomatis.
 
 DoD: test di `docs/production/MVP_0_1.md` + `docs/quality/QA_CHECKLIST.md` lulus. Build dijalankan browser desktop tanpa error kritis, termasuk settings dan save.
 
 ## Phase 5 — Full Story Production
 
-P5A: Chapter I penuh (Mournfang, Aveloria, Talric, Azie, Velthia). P5B: Chapter II (Liora, Zira, Torvan, Veyrath). P5C: Chapter III (evakuasi Velthia, party swap, kuil, Chronolith, janji). P5D: Chapter IV (Varlgrim, Heart, Torvan reveal) → **modern interlude sesudah IV** → epilog tebing flashback. Semua 40 beat selesai lewat scene director dan script yang sudah direview manusia.
+P5A: sisa Chapter I setelah Mournfang (Aveloria, Talric, Azie, Velthia; review boss/aset). P5B: Chapter II (Liora, Zira, Torvan, Veyrath). P5C: Chapter III (evakuasi Velthia, party swap, kuil, Chronolith, janji). P5D: Chapter IV (Varlgrim, Heart, Torvan reveal) → **modern interlude sesudah IV** → epilog tebing flashback. Hanya setelah instruksi baru; semua 40 beat memerlukan scene director dan review naskah manusia.
 
 Scope tambahan: toko, equipment lanjutan, AI musuh, side quests singkat, art final sketsa, audio user, public/private assets sesuai izin.
 
