@@ -4,6 +4,7 @@ import { SCENE_KEYS } from '../data/ids';
 import { ENV, PORTRAIT_EXPRESSIONS } from '../data/assetPaths';
 import { portraitUrl } from '../dialogue/types';
 import { MUSIC_REGISTRY } from '../data/musicRegistry';
+import { BATTLE_SFX } from '../data/battleSfxRegistry';
 import { getServices } from '../systems/Services';
 import { FONT_LOAD_SPECS } from '../../ui/styles/theme';
 
@@ -28,8 +29,10 @@ export class BootScene extends Phaser.Scene {
     for (const cue of MUSIC_REGISTRY) {
       if (cue.status === 'READY') this.load.audio(cue.id, `assets/audio/${cue.file}`);
     }
+    for (const cue of BATTLE_SFX) if (cue.status === 'READY') this.load.audio(cue.id, `assets/audio/${cue.file}`);
     for (const a of assets.loadable()) {
       this.load.spritesheet(a.id, a.publicPath!, { frameWidth: a.frameSize[0], frameHeight: a.frameSize[1] });
+      if (a.kind !== 'exploration_atlas') this.load.json(`${a.id}:meta`, a.publicPath!.replace(/\.png$/, '.json'));
     }
     // Lingkungan Hutan 1 (DRAFT dev art) dan portrait ekspresi. Kegagalan memuat tidak fatal (lihat loaderror).
     this.load.image(ENV.groundKey, ENV.groundUrl);

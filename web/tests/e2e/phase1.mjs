@@ -7,6 +7,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { battleTutorial } from './battle-helpers.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../..');
@@ -363,19 +364,18 @@ async function main() {
     w = await world(page);
     check('C1-02: terpicu otomatis saat mendekati Nambo', w.dialogue?.script === 'C1-02-MEET' && w.dialogue.line === 'C1-02-L001', JSON.stringify(w.dialogue));
     check('C1-02: pembicara Nambo + portrait SURPRISED', w.dialogue.label === 'Nambo' && w.dialogue.portrait === 'C08_SURPRISED', JSON.stringify(w.dialogue));
+    // Exercise Enter before the movement hold/screenshots can finish the short line's typewriter.
+    const wasTyping = w.dialogue.state === 'typing';
+    if (wasTyping) await page.keyboard.press('Enter', { delay: 10 });
+    await sleep(page, 30);
+    w = await world(page);
+    check('Enter saat mengetik menampilkan teks penuh tanpa lanjut baris', w.dialogue?.line === 'C1-02-L001' && w.dialogue.state === 'waiting', JSON.stringify(w.dialogue));
     const xAt = w.x;
     await hold(page, 'ArrowRight', 400);
     w = await world(page);
     check('C1-02: pemain terkunci saat berbicara dengan Nambo', Math.abs(w.x - xAt) < 1.5 && w.busy);
     await shot(page, '06_nambo_dialogue_surprised');
     await layoutOk(page, 'dialog Nambo');
-
-    // Enter pertama saat teks diketik = tampilkan semua
-    const typed = w.dialogue.text.length;
-    await page.keyboard.press('Enter', { delay: 10 });
-    await sleep(page, 30);
-    w = await world(page);
-    check('Enter saat mengetik menampilkan teks penuh tanpa lanjut baris', w.dialogue?.line === 'C1-02-L001' && w.dialogue.text.length >= typed && w.dialogue.state === 'waiting', JSON.stringify(w.dialogue));
 
     const rec = [];
     // mainkan sampai pilihan
@@ -528,19 +528,22 @@ async function main() {
     w = await world(page);
     check('Potion tetap tepat 1 setelah membuka ulang', w.items.potion === 1, JSON.stringify(w.items));
 
-    // akhir demo
+    // Phase 2 replaces the old end marker with C1-04, preserving the entire keyboard journey.
     await walkTo(page, 832, 242, { axisOrder: 'xy' });
     await page.keyboard.down('ArrowUp');
-    await page.waitForFunction(() => window.__tfbt.activeScenes().includes('PlaceholderScene'), null, { timeout: 20000 });
+    await page.waitForFunction(() => window.__tfbt.world()?.dialogue?.script === 'C1-04-INTRO', null, { timeout: 20000 });
     await page.keyboard.up('ArrowUp');
     await sleep(page, 500);
-    const scs = await page.evaluate(() => window.__tfbt.activeScenes());
-    check('Akhir demo Phase 1: layar penutup (PlaceholderScene), dunia dan HUD berhenti', scs.includes('PlaceholderScene') && !scs.includes('WorldScene') && !scs.includes('HudScene'), JSON.stringify(scs));
-    await shot(page, '14_demo_end');
-    await layoutOk(page, 'layar akhir demo');
-    await page.keyboard.press('Enter', { delay: 30 });
-    await page.waitForFunction(() => window.__tfbt.activeScenes().includes('TitleScene'), null, { timeout: 10000 });
-    check('Dari akhir demo, Enter kembali ke Title', true);
+    check('Penanda akhir Phase 1 kini menuju C1-04 sesuai naskah', (await world(page)).dialogue.line === 'C1-04-L001');
+    await playDialogue(page);
+    await battleTutorial(page, check, shot);
+    const victoryLines = await playDialogue(page);
+    await idle(page);
+    check('Dialog kemenangan C1-04-L002/L003 berurutan', victoryLines.map(r => r.line).join(',') === 'C1-04-L002,C1-04-L003');
+    const won = await world(page);
+    check('Flag resmi, konsumsi Potion, HP/MP konsisten di dunia', won.flags['battle.first_hollowling'] === true && won.items.potion === 0 && won.vitals?.mp === 8);
+    await walkTo(page, won.x, 55, { axisOrder: 'yx' });
+    check('Encounter tidak terulang setelah kemenangan', !(await page.evaluate(() => window.__tfbt.battle())) && !(await world(page)).dialogue);
 
     check('Tidak ada error JS sepanjang sesi cerita penuh', s.errors.length === 0, s.errors.join(' | '));
     check('Tidak ada request gagal / 404 (aset hilang)', s.failed.length === 0, s.failed.join(' | '));

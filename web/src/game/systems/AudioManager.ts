@@ -1,5 +1,6 @@
 import type { Settings } from '../data/settingsSchema';
 import { findCue } from '../data/musicRegistry';
+import { BATTLE_SFX } from '../data/battleSfxRegistry';
 import type { SettingsRepository } from './SettingsRepository';
 
 export type AudioChannel = 'bgm' | 'sfx';
@@ -18,6 +19,7 @@ export interface SoundBackend {
   playLoop(key: string, volume: number, loop: boolean): void;
   stop(): void;
   setBgmVolume(volume: number): void;
+  setSfxVolume?(volume: number): void;
   /** Membuka AudioContext setelah gesture pemain. */
   resume(): void;
 }
@@ -96,8 +98,19 @@ export class AudioManager {
     this.currentTrack = null;
   }
 
+  playSfx(id: string): PlayBgmResult {
+    const cue = BATTLE_SFX.find(c => c.id === id);
+    if (!cue) return 'silent_unknown_track';
+    if (!this.unlocked) return 'silent_locked';
+    if (cue.status !== 'READY') return 'silent_awaiting_composer';
+    if (!this.backend.has(id)) return 'silent_not_loaded';
+    this.backend.playLoop(id, effectiveVolume(this.settings.snapshot(), 'sfx'), false);
+    return 'playing';
+  }
+
   private applyVolumes(): void {
     this.backend.setBgmVolume(effectiveVolume(this.settings.snapshot(), 'bgm'));
+    this.backend.setSfxVolume?.(effectiveVolume(this.settings.snapshot(), 'sfx'));
   }
 
   private silent(trackId: string, r: Exclude<PlayBgmResult, 'playing' | 'silent_locked'>): PlayBgmResult {

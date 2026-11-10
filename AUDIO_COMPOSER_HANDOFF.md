@@ -1,5 +1,21 @@
 # Composer handoff — Game Director authored music only
 
+## Phase 2 — battle handoff (10 November 2026)
+
+Tidak ada file audio yang ditambahkan. BGM battle memakai ID/file existing `BGM_BATTLE` / `BGM_BATTLE.ogg`, tetap AWAITING_COMPOSER. Registry SFX baru `web/src/game/data/battleSfxRegistry.ts` menyediakan cue di bawah; semuanya AWAITING_COMPOSER. Boot tidak meminta audio ini sebelum status READY dan file komposer tersedia. AudioManager memakai Master × SFX, Bisukan, gesture browser, dan one-shot tanpa loop.
+
+| File | Titik pemanggilan |
+|---|---|
+| `SFX_GREATSWORD_SWING.ogg` | Yaric bersiap/mengayunkan greatsword |
+| `SFX_GREATSWORD_IMPACT.ogg` | Basic Attack contact, sekali |
+| `SFX_GROUND_SLAM.ogg` | Frame `slab_strikes`, sekali |
+| `SFX_ENEMY_ATTACK.ogg` | Hollowling attack contact |
+| `SFX_DAMAGE.ogg` | Respons damage, tanpa mengambil alih musik |
+| `SFX_VICTORY.ogg` | Recovery selesai, victory menu |
+| `SFX_DEFEAT.ogg` | Defeat menu |
+
+Nama SFX ini baru karena registry sebelumnya hanya memuat BGM dan permintaan SFX eksplorasi/UI. Tidak ada nama track BGM duplikat, placeholder otomatis, unduhan, atau audio sintetis. Mix/grip timing/audio terdengar menunggu komposisi dan review user.
+
 **No music files are included.** Every cue below is `AWAITING_COMPOSER`. Claude Code must request the user's own `.ogg` files, never choose/generate/download generic or stock music. Game must work silently, with nullable audio keys and no console errors. BPM and lengths are suggestions, not composition requirements.
 
 | File requested | Scene and cue start/stop | Emotion and 16 bit palette | BPM / duration | Loop | Priority |

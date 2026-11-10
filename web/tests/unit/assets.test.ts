@@ -21,17 +21,17 @@ const explore = ASSET_MANIFEST.filter((a) => a.kind === 'exploration_atlas');
 describe('AssetRegistry', () => {
   const registry = new AssetRegistry();
 
-  it('memetakan aset aktif: battle v3.3 (belum diimpor) dan eksplorasi Yaric/Nambo (diimpor)', () => {
+  it('memetakan aset aktif battle v3.3 dan eksplorasi Yaric/Nambo', () => {
     expect(registry.list().map((a) => a.id).sort()).toEqual(['C01_YARIC_BATTLE', 'C01_YARIC_EXPLORE', 'C08_NAMBO_EXPLORE', 'M01_HOLLOWLING_BATTLE', 'VFX_C01_GROUND_SLAM']);
   });
 
-  it('tidak ada yang PRODUCTION_READY; hanya atlas eksplorasi yang diimpor ke build', () => {
+  it('battle dan eksplorasi diimpor; tidak ada yang PRODUCTION_READY', () => {
     for (const a of registry.list()) {
       expect(a.status).not.toBe('PRODUCTION_READY');
       expect(registry.isProductionReady(a.id)).toBe(false);
     }
-    expect(battle.every((a) => a.version === 'v3.3' && !a.imported)).toBe(true);
-    expect(registry.loadable().map((a) => a.id).sort()).toEqual(['C01_YARIC_EXPLORE', 'C08_NAMBO_EXPLORE']);
+    expect(battle.every((a) => a.version === 'v3.3' && a.imported)).toBe(true);
+    expect(registry.loadable()).toHaveLength(5);
   });
 
   it('memakai versi TERBARU yang ada: eksplorasi Yaric v3.2 (v3.3 tidak punya eksplorasi), Nambo masih DRAFT', () => {
@@ -56,6 +56,10 @@ describe('AssetRegistry', () => {
 });
 
 describe.each(battle.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas battle %s vs file asli', (_id, a) => {
+  it('runtime PNG and metadata are byte-identical to v3.3 originals', () => {
+    expect(readFileSync(resolve(PUBLIC, a.publicPath!))).toEqual(readFileSync(resolve(ROOT, a.sourceImage)));
+    expect(readFileSync(resolve(PUBLIC, a.publicPath!.replace(/\.png$/, '.json')))).toEqual(readFileSync(resolve(ROOT, a.sourceJson)));
+  });
   it('file PNG dan JSON ada', () => {
     expect(existsSync(resolve(ROOT, a.sourceImage))).toBe(true);
     expect(existsSync(resolve(ROOT, a.sourceJson))).toBe(true);

@@ -18,6 +18,8 @@ export interface GameStateData {
   flags: Record<string, boolean>;
   /** Inventaris minimal Phase 1 (hanya hitungan per ID item); inventaris penuh = Phase 3. */
   items: Record<string, number>;
+  /** Session vitals, optional for backwards compatibility. Full save/load gameplay remains Phase 3. */
+  vitals?: { hp: number; mp: number };
   playtimeSec: number;
 }
 
@@ -73,6 +75,15 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
 
   if (typeof r.playtimeSec !== 'number' || !Number.isFinite(r.playtimeSec) || r.playtimeSec < 0) return null;
 
+  let vitals: GameStateData['vitals'];
+  if (r.vitals !== undefined) {
+    const v = r.vitals as Record<string, unknown> | null;
+    if (!v || typeof v !== 'object' || Array.isArray(v)) return null;
+    if (typeof v.hp !== 'number' || !Number.isInteger(v.hp) || v.hp < 0 || v.hp > 96) return null;
+    if (typeof v.mp !== 'number' || !Number.isInteger(v.mp) || v.mp < 0 || v.mp > 12) return null;
+    vitals = { hp: v.hp, mp: v.mp };
+  }
+
   return {
     schemaVersion: GAME_STATE_VERSION,
     chapter: r.chapter as ChapterId,
@@ -81,6 +92,7 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
     party: [...(r.party as CharacterId[])],
     flags,
     items,
+    ...(vitals ? { vitals } : {}),
     playtimeSec: r.playtimeSec,
   };
 }

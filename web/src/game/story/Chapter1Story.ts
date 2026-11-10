@@ -12,6 +12,8 @@ import {
 } from '../dialogue/chapter1';
 import type { DialogueScript } from '../dialogue/types';
 import type { GameState } from '../systems/GameState';
+import { FIRST_HOLLOWLING_FLAG } from '../combat/BattleSession';
+import { FIRST_HOLLOWLING_INTRO, FIRST_HOLLOWLING_VICTORY } from '../dialogue/firstHollowling';
 
 /** Flag cerita kanonik (docs/narrative/STORY_AND_SCENES.md). Dinaikkan hanya setelah event benar-benar selesai. */
 export const FLAG = {
@@ -26,6 +28,8 @@ export const FLAG = {
   loopNoticed: 'c1.loop_noticed',
   demoEnd: 'c1.demo_end',
   chestReward: 'reward.c1_chest_potion.claimed',
+  hollowling: FIRST_HOLLOWLING_FLAG,
+  victorySeen: 'c1.hollowling_victory_seen',
 } as const;
 
 export const ITEM_POTION = 'potion';
@@ -40,7 +44,7 @@ export type StoryAction =
   | { type: 'npc'; id: 'nambo'; op: 'face_player' | 'step_aside' }
   | { type: 'openThicket' }
   | { type: 'openChest' }
-  | { type: 'endDemo' };
+  | { type: 'battle' };
 
 export interface StoryContext {
   /** Salinan periodik (0 = pertama) untuk papan/semak/peti. */
@@ -89,11 +93,17 @@ export class Chapter1Story {
     if (!this.has(FLAG.introSeen)) return null;
     if (!this.awake) return `Periksa sekitar (${this.examinedCount}/2)`;
     if (!this.namboDone) return 'Cari jalan keluar dari hutan.';
+    if (this.has(FLAG.hollowling)) return 'Demo selesai. Esc: menu jeda.';
     return 'Ikuti jalan sampai gerbang batu.';
   }
 
   /** Aksi saat game dimulai: intro C1-01 sekali. */
   onStart(): StoryAction[] {
+    if (this.has(FLAG.hollowling) && !this.has(FLAG.victorySeen)) return [
+      { type: 'dialogue', script: FIRST_HOLLOWLING_VICTORY },
+      { type: 'setFlag', flag: FLAG.victorySeen },
+      { type: 'objective' },
+    ];
     if (this.has(FLAG.introSeen)) return [];
     return [
       { type: 'dialogue', script: C1_01_INTRO },
@@ -139,7 +149,8 @@ export class Chapter1Story {
       case 'trail_enter':
         return this.loopNoticed && !this.loopDone ? [{ type: 'setFlag', flag: FLAG.loop }, { type: 'objective' }] : [];
       case 'demo_end':
-        return this.loopDone && !this.has(FLAG.demoEnd) ? [{ type: 'setFlag', flag: FLAG.demoEnd }, { type: 'endDemo' }] : [];
+        return this.loopDone && this.namboDone && !this.has(FLAG.hollowling)
+          ? [{ type: 'dialogue', script: FIRST_HOLLOWLING_INTRO }, { type: 'battle' }] : [];
       default:
         return [];
     }

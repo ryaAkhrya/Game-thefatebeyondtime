@@ -263,9 +263,11 @@ export class WorldScene extends Phaser.Scene {
       case 'openChest':
         this.openChest();
         break;
-      case 'endDemo':
+      case 'battle':
         this.hud.showPrompt(null);
-        this.services.router.goto(this, SCENE_KEYS.Placeholder, { variant: 'phase1_end', flags: gameState.snapshot()?.flags, items: gameState.snapshot()?.items });
+        this.player.y = 100;
+        gameState.setPosition(this.player.x, 100, 'down', 'forest_1');
+        this.services.router.goto(this, SCENE_KEYS.Battle);
         // router.goto menghentikan scene ini; tunggu tanpa melakukan apa pun lagi
         await new Promise<void>(() => undefined);
         break;
@@ -396,6 +398,7 @@ export class WorldScene extends Phaser.Scene {
       wrapCount: this.wrapCount,
       flags: snap?.flags ?? {},
       items: snap?.items ?? {},
+      vitals: snap?.vitals ?? null,
       objective: this.story.objective(),
       target: this.target?.id ?? null,
       prompt: this.target?.verb ?? null,

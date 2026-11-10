@@ -1,5 +1,18 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 2 — C1-04 (10 November 2026)
+
+**Status keseluruhan PARTIAL pada gate visual.** Bukti lengkap dan angka browser terbaru: `docs/production/PHASE2_REPORT.md`.
+
+- [x] Pure BattleEngine: SPD/tie-break, damage, batas HP/MP, defense, MP cost/no MP, item, escape eligibility, AI, KO, victory, retry, status duration, duplicate action; 273 unit test total lulus.
+- [x] Atlas v3.3 asli disalin utuh + JSON metadata; byte equality teruji. Durasi/pivot/event mengikuti metadata; perbedaan center pivot Hollowling dan foot pivot Yaric ditangani di penempatan panggung.
+- [x] Browser battle: dua resolusi, Basic Attack/Ground Slam/Bertahan/Potion, MP habis, victory/defeat/retry, Pause/Settings dan silent fallback sudah dieksekusi. Re-run final seluruh suite tercatat di laporan.
+- [x] Capture idle, anticipation/attack, Ground Slam fracture/impact, victory, defeat, retry; kontak-sheet seluruh frame sumber diperiksa.
+- [ ] Review manusia: rasa berat serangan, balance, keterbacaan pada layar nyata, fullscreen, GPU/performa dan browser lain.
+- [ ] Cleanup visual atlas sumber: potongan pedang Yaric dan piksel tepi pada beberapa sel. Sumber dipertahankan sesuai instruksi, status NEEDS_REVIEW.
+
+Checklist di bawah mencakup fase lain juga; save/EXP/leveling/random encounter belum dianggap selesai.
+
 **Jangan klaim PASS jika belum benar-benar diperiksa.** (Item tanpa centang = NOT RUN atau menunggu fase berikutnya, mis. audio terdengar, text speed pada dialog, Pause menu, Reduced Flashes pada efek nyata.) Setiap kolom adalah tes nyata: catat `PASS/FAIL/NOT RUN`, langkah, screenshot dan browser/OS.
 
 ## Build dan startup

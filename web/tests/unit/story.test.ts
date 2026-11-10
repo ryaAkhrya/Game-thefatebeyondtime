@@ -215,16 +215,24 @@ describe('C1-03 — jalur hutan berulang', () => {
     expect(s.state.itemCount(ITEM_POTION)).toBe(1);
   });
 
-  it('akhir demo hanya setelah story.c1_loop; sekali', () => {
+  it('C1-04 replaces demo end only after Nambo and loop; victory prevents retrigger', () => {
     const s = fresh();
     completeC101(s);
     expect(s.story.trigger('demo_end#0', s.ctx())).toEqual([]);
     run(s.state, s.story.interact('sign#1', s.ctx({ copy: 1 })));
     run(s.state, s.story.trigger('trail_enter#0', s.ctx()));
+    expect(s.story.trigger('demo_end#0', s.ctx())).toEqual([]); // cannot skip Nambo
+    run(s.state, s.story.trigger('nambo_zone', s.ctx()));
     const end = s.story.trigger('demo_end#0', s.ctx());
-    expect(end.map((a) => a.type)).toEqual(['setFlag', 'endDemo']);
-    run(s.state, end);
+    expect(end.map((a) => a.type)).toEqual(['dialogue', 'battle']);
+    expect(s.state.hasFlag(FLAG.hollowling)).toBe(false); // entry is not victory
+    s.state.setFlag(FLAG.hollowling);
     expect(s.story.trigger('demo_end#0', s.ctx())).toEqual([]);
+    const post = s.story.onStart();
+    expect(post.map(a => a.type)).toEqual(['dialogue', 'setFlag', 'objective']);
+    run(s.state, post);
+    expect(s.story.onStart()).toEqual([]);
+    expect(s.story.objective()).toContain('Demo selesai');
   });
 });
 

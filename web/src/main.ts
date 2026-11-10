@@ -41,7 +41,10 @@ function boot(): void {
     },
     stop: () => game.sound.stopAll(),
     setBgmVolume: (volume) => {
-      for (const s of game.sound.getAllPlaying()) (s as Phaser.Sound.WebAudioSound).setVolume(volume);
+      for (const s of game.sound.getAllPlaying()) if (!s.key.startsWith('SFX_')) (s as Phaser.Sound.WebAudioSound).setVolume(volume);
+    },
+    setSfxVolume: volume => {
+      for (const s of game.sound.getAllPlaying()) if (s.key.startsWith('SFX_')) (s as Phaser.Sound.WebAudioSound).setVolume(volume);
     },
     resume: () => {
       const ctx = (game.sound as Phaser.Sound.WebAudioSoundManager).context;
@@ -74,16 +77,28 @@ function boot(): void {
     activeScenes: () => game.scene.getScenes(true).map((s) => s.scene.key),
     inputLayer: () => input.topLayerId,
     settings: () => settings.snapshot(),
+    battle: () => (game.scene.isActive('BattleScene') || game.scene.isPaused('BattleScene') ? (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).debugState() : null),
     persistent: () => settings.isPersistent,
     world: () => (game.scene.isActive('WorldScene') || game.scene.isPaused('WorldScene') ? (game.scene.getScene('WorldScene') as import('./game/scenes/WorldScene').WorldScene).debugState() : null),
     qa: new URLSearchParams(location.search).has('qa')
-      ? { teleport: (x: number, y: number) => (game.scene.getScene('WorldScene') as import('./game/scenes/WorldScene').WorldScene).qaTeleport(x, y) }
+      ? {
+        teleport: (x: number, y: number) => (game.scene.getScene('WorldScene') as import('./game/scenes/WorldScene').WorldScene).qaTeleport(x, y),
+        encounter: () => {
+          services.gameState.startNewGame();
+          for (const flag of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed']) services.gameState.setFlag(flag);
+          services.gameState.setPosition(832, 100, 'down', 'forest_1');
+          services.gameState.addItem('potion', 1);
+          services.gameState.setFlag('reward.c1_chest_potion.claimed');
+          game.scene.getScene('TitleScene').scene.start('BattleScene');
+        },
+      }
       : undefined,
     focus: () => game.registry.get('debug.focus') as string | undefined,
     layoutIssues: () => {
       // Semua Text pada scene aktif harus berada di dalam 320x180 dan tidak saling menimpa (depth sama).
       const issues: string[] = [];
       for (const scene of game.scene.getScenes(true)) {
+        if (scene.scene.key === 'WorldScene') continue; // world coordinates use a scrolling camera
         const texts = scene.children.list.filter(
           (o): o is Phaser.GameObjects.Text => o instanceof Phaser.GameObjects.Text && o.visible && o.text.length > 0,
         );

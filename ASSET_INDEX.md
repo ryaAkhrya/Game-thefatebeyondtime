@@ -1,5 +1,17 @@
 # Asset index v3.3 — per file
 
+## Web import status terkini — Phase 2, 10 November 2026
+
+Salinan runtime **byte-identical** PNG + JSON tersedia di `web/public/assets/battle/`:
+
+- `C01_ATLAS_PIXEL_PASS_V3_3.*` dari `assets/characters/C01_Yaric/v3_3/` (11 frame 96x96; contact frame 4).
+- `M01_ATLAS_PIXEL_PASS_V3_3.*` dari `assets/monsters/M01_Hollowling/v3_3/` (10 frame 96x96; contact frame 3).
+- `C01_GROUND_SLAM_ATLAS_PIXEL_PASS_V3_3.*` dari `assets/vfx/C01_GROUND_SLAM/v3_3/` (8 frame 96x64; impact frame 5).
+
+Status semuanya **NEEDS_REVIEW**, bukan final. `web/scripts/prepare-battle-assets.mjs` hanya menyalin. Tes memverifikasi byte equality, grid, alpha channel dan event; playback memakai `duration_ms` dan pivot asli. Yaric pivot kaki [48,95]; Hollowling pivot tengah [48,48] ditempatkan agar titik bawah sama; VFX [48,63]. Tidak ada GIF gameplay atau atlas battle v3.2.
+
+Visual QA menemukan potongan pedang di sisi kanan beberapa frame Yaric dan piksel yang menyentuh tepi sel pada ketiga atlas. Ini ada pada sumber dan tidak digambar ulang/dihapus. Boundary/pivot/layout runtime sudah diverifikasi lewat screenshot; kualitas grip/siluet/orientasi pose dan perbaikan crop sumber masih perlu artist/Game Director. Lihat `docs/production/PHASE2_REPORT.md`. Bagian Phase 0/1 di bawah adalah riwayat, bukan status impor sekarang.
+
 All `assets/` PNG and JSON paths are indexed with SHA-256 from the actual file. Source sheets and draft UI are not production import targets. The old v3.2 file paths remain addressable. All new animation frames are `NEEDS_REVIEW`.
 
 | Path | Kind | Status | Dimensions | Transparent pixels | SHA-256 |

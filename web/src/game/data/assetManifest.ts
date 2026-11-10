@@ -38,8 +38,8 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     atlasSize: [1056, 96],
     frameCount: 11,
     eventFrame: { name: 'attack_contact', index: 4 },
-    publicPath: null,
-    imported: false,
+    publicPath: 'assets/battle/C01_ATLAS_PIXEL_PASS_V3_3.png',
+    imported: true,
     notes: 'Menghadap kiri. Menggantikan v3.2. Dibutuhkan mulai Phase 2 (battle).',
   },
   {
@@ -54,8 +54,8 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     atlasSize: [960, 96],
     frameCount: 10,
     eventFrame: { name: 'attack', index: 3 },
-    publicPath: null,
-    imported: false,
+    publicPath: 'assets/battle/M01_ATLAS_PIXEL_PASS_V3_3.png',
+    imported: true,
     notes: 'Menghadap kanan. Dibutuhkan mulai Phase 2 (battle).',
   },
   {
@@ -70,8 +70,8 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     atlasSize: [768, 64],
     frameCount: 8,
     eventFrame: { name: 'slab_strikes', index: 5 },
-    publicPath: null,
-    imported: false,
+    publicPath: 'assets/battle/C01_GROUND_SLAM_ATLAS_PIXEL_PASS_V3_3.png',
+    imported: true,
     notes: 'Damage hanya sekali pada frame 5 (0-based). Reduced Flashes tidak menghapus fracture/slab/dampak; Screen Shake OFF hanya menghapus gerak kamera.',
   },
   {

@@ -1,5 +1,16 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 2 — C1-04 (10 November 2026)
+
+Status PARTIAL pada gate visual; bukti dan angka test: `../production/PHASE2_REPORT.md`.
+
+- [x] 273 unit tests, strict TypeScript, production build.
+- [x] Browser commands, MP habis, kemenangan, defeat/retry, Pause/Settings, efek nyata, 1366x768 dan 1920x1080 sudah dieksekusi; hasil suite final di laporan.
+- [x] Atlas v3.3 PNG + metadata byte-identical; durasi/pivot/frame damage diintegrasikan.
+- [x] Screenshot idle/attack/fracture/impact/victory/defeat/retry dan lembar kontak diperiksa.
+- [ ] Cleanup potongan pedang/piksel tepi yang sudah ada pada atlas sumber; review artist/Game Director.
+- [ ] Playtest manusia, GPU/performa layar nyata, fullscreen non-headless dan browser selain Edge.
+
 **Jangan klaim PASS jika belum benar-benar diperiksa.** (Item tanpa centang = NOT RUN atau menunggu fase berikutnya, mis. audio terdengar, text speed pada dialog, Pause menu, Reduced Flashes pada efek nyata.) Setiap kolom adalah tes nyata: catat `PASS/FAIL/NOT RUN`, langkah, screenshot dan browser/OS.
 
 ## Build dan startup

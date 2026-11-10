@@ -1,5 +1,14 @@
 # CHANGELOG — DOKUMENTASI & KODE
 
+## Phase 2 — 10 November 2026 (playable; visual PARTIAL)
+
+- C1-04 scripted Hollowling menggantikan akhir demo Phase 1; dialog dari naskah existing, flag resmi `battle.first_hollowling`.
+- Pure BattleEngine: tujuh stat, SPD deterministic, prepare/impact/finish dengan token sekali, damage fisik, Ground Slam 4 MP, Potion 36 HP, Bertahan, aturan Kabur, status foundation.
+- BattleScene + BattlePanel terpisah, atlas PNG/JSON v3.3 asli, frame durations/pivots/event, efek Settings, UI kamera tetap saat shake medan.
+- BattleSession: checkpoint memori, retry setelah KO, victory commit vitals/items/flag sekali; tanpa EXP/level/save gameplay Phase 3.
+- 273 unit tests, TypeScript strict, production build; browser dan screenshot di PHASE2_REPORT.md. Baseline aktual Phase 1 91/93 karena timing assertion; assertion dipindah sebelum hold/screenshot agar baris tidak telanjur selesai.
+- Sumber art masih NEEDS_REVIEW: potongan pedang/piksel tepi terlihat; tidak diubah. Tidak ada dependency, musik, deployment atau fitur Phase 3 baru.
+
 ## v0.1.0 — 10 November 2026 (Phase 1: Exploration & Dialogue)
 
 - Intro Chapter I playable: C1-01 (bangun, periksa tanah/pedang, jurnal), C1-02 (Nambo, pilihan jawaban), C1-03 (papan berulang, semak berduri, jalan setapak, peti Potion), penanda akhir demo. Flag `story.c1_awake`, `story.c1_nambo`, `story.c1_loop`.

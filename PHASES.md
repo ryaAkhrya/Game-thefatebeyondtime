@@ -41,12 +41,14 @@ DoD: 60–90 detik pemain bisa berjalan, ngobrol, memeriksa objek; collision ben
 
 ## Phase 2 — Turn-Based Battle
 
+**STATUS: PARTIAL — gameplay C1-04 diimplementasikan dan playable, gate visual masih terbuka (10 November 2026).** Lihat `docs/production/PHASE2_REPORT.md`; atlas sumber memiliki potongan/tepi gambar yang perlu cleanup oleh artist dan belum direview manusia.
+
 **Tujuan:** satu duel Yaric vs Hollowling yang dapat dimenangkan/kalah dan kembali ke map.
 
 Scope:
 - Classic side-view, Attack/Skill/Item/Defend/Run; enemy AI sederhana.
 - HP/MP/stat, turn order, damage/heal, win/lose/escape/reward idempotent.
-- Encounter cooldown, safe zone disable, auto-back world.
+- Encounter C1-04 scripted satu kali, victory kembali ke dunia, defeat/retry memakai checkpoint aman. Random encounter/cooldown ditunda sesuai scope Phase 2 terbaru dari Game Director.
 - Unit tests battle engine terpisah dari Phaser rendering.
 
 Out of scope: 4 boss, party Torvan, semua status dan animasi final.

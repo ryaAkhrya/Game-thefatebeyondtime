@@ -16,6 +16,7 @@ export interface MenuListOptions {
   y: number; // atas baris pertama
   width: number;
   rowHeight: number;
+  depth?: number;
   items: MenuItem[];
   onConfirm: (item: MenuItem) => void;
   onDisabledConfirm?: (item: MenuItem) => void;
@@ -54,6 +55,9 @@ export class MenuList {
       });
       this.labels.push(t);
     });
+    this.bar.setDepth(opts.depth ?? 0);
+    this.outline.setDepth(opts.depth ?? 0);
+    this.labels.forEach(t => t.setDepth(opts.depth ?? 0));
     this.render();
   }
 

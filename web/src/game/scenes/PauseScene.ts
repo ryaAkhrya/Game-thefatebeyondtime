@@ -119,6 +119,7 @@ export class PauseScene extends Phaser.Scene {
     const { router } = getServices(this);
     this.scene.stop(SCENE_KEYS.World);
     this.scene.stop(SCENE_KEYS.Hud);
+    this.scene.stop(SCENE_KEYS.Battle);
     router.goto(this, SCENE_KEYS.Title);
   }
 }

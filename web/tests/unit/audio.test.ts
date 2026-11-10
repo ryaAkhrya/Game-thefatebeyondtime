@@ -6,6 +6,7 @@ import { AudioManager, effectiveVolume, type SoundBackend } from '../../src/game
 import { SettingsRepository } from '../../src/game/systems/SettingsRepository';
 import { MemoryStorage } from '../../src/game/systems/StorageAdapter';
 import { DEFAULT_SETTINGS } from '../../src/game/data/settingsSchema';
+import { BATTLE_SFX } from '../../src/game/data/battleSfxRegistry';
 
 function fakeBackend(loaded: string[] = []) {
   const calls: string[] = [];
@@ -53,6 +54,21 @@ describe('effectiveVolume', () => {
 });
 
 describe('AudioManager', () => {
+  it('all battle SFX remain silent awaiting composer; unknown cue and locked gesture are safe', () => {
+    const { backend, calls } = fakeBackend();
+    const audio = new AudioManager(new SettingsRepository(new MemoryStorage()), backend);
+    expect(audio.playSfx(BATTLE_SFX[0]!.id)).toBe('silent_locked'); audio.unlock();
+    for (const cue of BATTLE_SFX) { expect(cue.status).toBe('AWAITING_COMPOSER'); expect(audio.playSfx(cue.id)).toBe('silent_awaiting_composer'); }
+    expect(audio.playSfx('unknown')).toBe('silent_unknown_track'); expect(calls.filter(c => c.startsWith('play'))).toEqual([]);
+  });
+  it('future supplied SFX uses master x SFX volume and never loops', () => {
+    const cue = BATTLE_SFX[0]!; cue.status = 'READY';
+    try {
+      const settings = new SettingsRepository(new MemoryStorage()); settings.set('master_volume', 50); settings.set('sfx_volume', 40);
+      const { backend, calls } = fakeBackend([cue.id]); const audio = new AudioManager(settings, backend); audio.unlock();
+      expect(audio.playSfx(cue.id)).toBe('playing'); expect(calls).toContain(`play:${cue.id}:0.20:false`);
+    } finally { cue.status = 'AWAITING_COMPOSER'; }
+  });
   it('tanpa file komposer: senyap, tidak melempar, tidak memanggil play', () => {
     const settings = new SettingsRepository(new MemoryStorage());
     const { backend, calls } = fakeBackend();

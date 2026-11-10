@@ -1,6 +1,6 @@
 # TASKS — STATUS SEBENARNYA
 
-**Phase 0 (10 Nov 2026) dan Phase 1 (10 Nov 2026) selesai** — bukti di `docs/production/PHASE0_REPORT.md` dan `PHASE1_REPORT.md`. Phase 2–6 belum dikerjakan. Jangan tandai phase selesai sebelum ada bukti kode+tes.
+**Phase 0/1 selesai; Phase 2 playable, PARTIAL pada gate visual** (10 Nov 2026). Bukti: `docs/production/PHASE2_REPORT.md`. Phase 3–6 belum dikerjakan.
 
 ## Phase 0 — Web Foundation
 
@@ -20,11 +20,12 @@
 
 ## Phase 2 — Battle
 
-- [ ] Side-view battle vs Hollowling.
-- [ ] Attack/Skill/Item/Defend/Run dan target.
-- [ ] HP/MP, AI, status dasar, menang/kalah/escape.
-- [ ] Reward once, return context, cooldown.
-- [ ] Unit+browser tests.
+- [x] Side-view: Hollowling kiri, Yaric kanan; atlas v3.3 asli + metadata.
+- [x] Serang/Jurus Ground Slam/Barang Potion/Bertahan; Kabur tutorial nonaktif dengan alasan, escape engine biasa teruji unit.
+- [x] HP/MP, SPD deterministic, AI eksplisit, fondasi Poison/Stun/ATK Up/DEF Up, menang/kalah/retry.
+- [x] Commit sekali, konsumsi item dan vitals konsisten, flag `battle.first_hollowling`, kembali ke dunia. Encounter scripted satu kali; random encounter/cooldown tidak dibuat.
+- [x] 273 unit test + strict TypeScript + build; hasil browser terakhir dicatat di PHASE2_REPORT.md.
+- [ ] Gate visual final: potongan pedang/piksel tepi dalam atlas sumber dan review manusia. Status aset tetap NEEDS_REVIEW; Phase 2 tidak diklaim PASS penuh.
 
 ## Phase 3 — RPG / Save
 
