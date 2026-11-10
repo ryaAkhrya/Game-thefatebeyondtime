@@ -1,5 +1,9 @@
 # Composer handoff — Game Director authored music only
 
+## Phase 3 UI — spesifikasi saja
+
+Status/Inventaris/Perlengkapan/Jurus/Simpan-Muat/toko reusable dapat memakai cue existing `SFX_UI_MOVE.ogg`, `SFX_UI_CONFIRM.ogg`, `SFX_UI_BACK.ogg` (pendek, kering, tenang; tidak menutupi teks). Tidak dibuat file, sintesis, placeholder audio, atau track duplikat. Semua tetap AWAITING_COMPOSER/silent fallback. Belum ada penilaian audio terdengar.
+
 ## Phase 2 — battle handoff (10 November 2026)
 
 Tidak ada file audio yang ditambahkan. BGM battle memakai ID/file existing `BGM_BATTLE` / `BGM_BATTLE.ogg`, tetap AWAITING_COMPOSER. Registry SFX baru `web/src/game/data/battleSfxRegistry.ts` menyediakan cue di bawah; semuanya AWAITING_COMPOSER. Boot tidak meminta audio ini sebelum status READY dan file komposer tersedia. AudioManager memakai Master × SFX, Bisukan, gesture browser, dan one-shot tanpa loop.

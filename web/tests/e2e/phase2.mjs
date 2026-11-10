@@ -2,7 +2,7 @@
 import { chromium } from 'playwright-core';
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { battle, ready, press, command } from './battle-helpers.mjs';
+import { battle, ready, press, command, selectMenu } from './battle-helpers.mjs';
 const BASE = process.env.E2E_URL ?? 'http://127.0.0.1:5173/';
 const out = resolve('../.dev-cache/test-artifacts'); mkdirSync(out, { recursive: true });
 const results = [], errors = [], failedRequests = [], audioRequests = [];
@@ -82,13 +82,13 @@ try {
     await command(page, 'ground_slam');
     check('Retry remains playable, no stale action callbacks', (await battle(page)).turn === 3 && (await battle(page)).actors[1].hp === 82);
     const before = await battle(page);
-    await press(page, 'Escape'); await press(page, 'ArrowDown'); await press(page, 'Enter');
+    await press(page, 'Escape'); await selectMenu(page, 'settings'); await press(page, 'Enter');
     await page.waitForFunction(() => window.__tfbt.inputLayer() === 'settings');
     await press(page, 'Escape'); await press(page, 'Escape');
     await page.waitForFunction(() => window.__tfbt.inputLayer() === 'battle');
     const after = await battle(page);
     check('Pause/Settings preserves retry battle turn, resources and actors', JSON.stringify(before.actors) === JSON.stringify(after.actors) && before.turn === after.turn);
-    await press(page, 'Escape'); await press(page, 'ArrowDown', 2); await press(page, 'Enter'); await press(page, 'ArrowDown'); await press(page, 'Enter');
+    await press(page, 'Escape'); await selectMenu(page, 'title'); await press(page, 'Enter'); await press(page, 'ArrowDown'); await press(page, 'Enter');
     await page.waitForFunction(() => window.__tfbt.activeScenes().includes('TitleScene'));
     check('Battle pause -> Title stops battle and restores single title layer', await page.evaluate(() => !window.__tfbt.battle() && window.__tfbt.inputLayer() === 'title' && !window.__tfbt.activeScenes().includes('PauseScene')));
     check('No gameplay save written in Phase 2', await page.evaluate(() => !Object.keys(localStorage).some(k => k.startsWith('tfbt.save.'))));

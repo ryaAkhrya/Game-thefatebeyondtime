@@ -15,6 +15,8 @@ import { SceneRouter } from './game/systems/SceneRouter';
 import { registerServices, type Services } from './game/systems/Services';
 import { SettingsRepository } from './game/systems/SettingsRepository';
 import { probeStorage } from './game/systems/StorageAdapter';
+import { SaveCoordinator } from './game/systems/SaveCoordinator';
+import { effectiveStats } from './game/rpg/progression';
 
 function boot(): void {
   document.title = GAME_TITLE;
@@ -54,11 +56,13 @@ function boot(): void {
   const audio = new AudioManager(settings, backend, (m) => console.info(m));
   input.onFirstGesture(() => audio.unlock());
 
+  const gameState = new GameState();
   const services: Services = {
     storage,
     settings,
     saves,
-    gameState: new GameState(),
+    gameState,
+    checkpoints: new SaveCoordinator(gameState, saves),
     input,
     audio,
     assets: new AssetRegistry(),
@@ -72,24 +76,35 @@ function boot(): void {
     new DisplayController(window, game.canvas, guard, settings, input);
   });
 
-  // Hook diagnostik read-only untuk smoke test (nama scene, layer input, settings). Tidak berisi data save.
+  // Read-only diagnostic snapshots for browser QA; no renderer objects enter serialized gameplay state.
   (window as unknown as { __tfbt?: unknown }).__tfbt = {
     activeScenes: () => game.scene.getScenes(true).map((s) => s.scene.key),
     inputLayer: () => input.topLayerId,
     settings: () => settings.snapshot(),
     battle: () => (game.scene.isActive('BattleScene') || game.scene.isPaused('BattleScene') ? (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).debugState() : null),
     persistent: () => settings.isPersistent,
+    state: () => gameState.snapshot(),
+    stats: () => gameState.isActive ? effectiveStats(gameState.snapshot()!) : null,
+    saveStatus: () => ({ safe: services.checkpoints.isSafe, pending: services.checkpoints.hasPendingAutosave, message: services.checkpoints.lastMessage }),
+    shop: () => game.scene.isActive('ShopScene') ? (game.scene.getScene('ShopScene') as import('./game/scenes/ShopScene').ShopScene).debugState() : null,
     world: () => (game.scene.isActive('WorldScene') || game.scene.isPaused('WorldScene') ? (game.scene.getScene('WorldScene') as import('./game/scenes/WorldScene').WorldScene).debugState() : null),
     qa: new URLSearchParams(location.search).has('qa')
       ? {
         teleport: (x: number, y: number) => (game.scene.getScene('WorldScene') as import('./game/scenes/WorldScene').WorldScene).qaTeleport(x, y),
         encounter: () => {
+          services.checkpoints.reset();
           services.gameState.startNewGame();
           for (const flag of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed']) services.gameState.setFlag(flag);
           services.gameState.setPosition(832, 100, 'down', 'forest_1');
           services.gameState.addItem('potion', 1);
           services.gameState.setFlag('reward.c1_chest_potion.claimed');
           game.scene.getScene('TitleScene').scene.start('BattleScene');
+        },
+        shop: () => {
+          const data = services.gameState.startNewGame(); data.rpg.gold = 48;
+          data.items.qa_staff = 1; data.items.qa_key = 1;
+          services.gameState.load(data);
+          services.router.openOverlay(game.scene.getScene('TitleScene'), 'ShopScene', { shop: { id: 'qa_supply', name: 'Toko Uji', stock: { potion: 3, travel_coat: 1, qa_staff: 1 } } });
         },
       }
       : undefined,

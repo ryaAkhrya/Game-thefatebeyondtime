@@ -1,5 +1,15 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 3 — RPG dan persistence (10 November 2026)
+
+**PHASE 3 PASS (fungsional/QA otomatis): 378 unit, 311 browser checks produksi, TypeScript strict dan build lulus.** Bukti dan batasan: `docs/production/PHASE3_REPORT.md`.
+
+- [x] Pure progression: EXP sekali, level/growth/cap; inventory dan Potion bersama combat; equip/unequip tanpa stat stacking; skill requirements/points; shop/currency/stock transactions.
+- [x] Save schema v2 dan read-only migration v1, validasi base stat/EXP/skill/equipment, tiga slot manual + autosave, backup/recovery dan rollback kegagalan storage.
+- [x] Browser Phase 3 dieksekusi: menu keyboard, penggunaan Potion dunia, comparison equipment, locked skills, pre-encounter save, refresh/Continue, shop terisolasi, corrupt/unsupported/blocked/quota cases, kedua resolusi. Perbaikan/re-run final dicatat di laporan.
+- [x] Perjalanan Title→C1-04→victory→EXP/skill/equipment→save tiga slot→refresh→Continue→manual load→peti kosong tanpa duplikasi sudah dieksekusi.
+- [ ] Playtest manusia, browser lain, monitor/GPU nyata, dan review balancing DRAFT. Audio tetap menunggu komposer; art lama tidak dianggap final.
+
 ## Phase 2 — C1-04 (10 November 2026)
 
 **Status keseluruhan PARTIAL pada gate visual.** Bukti lengkap dan angka browser terbaru: `docs/production/PHASE2_REPORT.md`.

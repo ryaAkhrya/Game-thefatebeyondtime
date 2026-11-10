@@ -9,6 +9,7 @@ import type { SaveRepository } from './SaveRepository';
 import type { SceneRouter } from './SceneRouter';
 import type { SettingsRepository } from './SettingsRepository';
 import type { StorageLike } from './StorageAdapter';
+import type { SaveCoordinator } from './SaveCoordinator';
 
 /** Semua sistem non-render, dibuat sekali di main.ts dan dibagikan lewat game registry. */
 export interface Services {
@@ -22,6 +23,7 @@ export interface Services {
   fullscreen: FullscreenController;
   router: SceneRouter;
   effects: Effects;
+  checkpoints: SaveCoordinator;
 }
 
 const KEY = 'services';

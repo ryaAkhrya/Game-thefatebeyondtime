@@ -6,11 +6,11 @@ import { getServices } from '../systems/Services';
 import { MenuList } from '../../ui/components/MenuList';
 import { configureUiCamera, makeText } from '../../ui/styles/theme';
 
-type PauseAction = 'resume' | 'settings' | 'title';
+type PauseAction = 'resume' | 'status' | 'inventory' | 'equipment' | 'skills' | 'save' | 'settings' | 'title';
 
 /**
  * Menu Jeda (overlay di atas dunia). Esc dari dunia membukanya; Pengaturan memakai jalur overlay yang sama
- * dengan Title, jadi nilainya identik. Tombol Inventaris/Jurus/Simpan menyusul di fase berikutnya (sengaja tidak ditampilkan).
+ * dengan Title, jadi nilainya identik. Layar RPG dan save tersedia di dunia; selama battle hanya menu aman yang aktif.
  */
 export class PauseScene extends Phaser.Scene {
   private returnTo: SceneKey = SCENE_KEYS.World;
@@ -19,6 +19,7 @@ export class PauseScene extends Phaser.Scene {
   private mode: 'main' | 'confirm' = 'main';
   private releaseInput?: () => void;
   private closing = false;
+  private hint!: Phaser.GameObjects.Text;
 
   constructor() {
     super(SCENE_KEYS.Pause);
@@ -37,8 +38,9 @@ export class PauseScene extends Phaser.Scene {
     const { input } = getServices(this);
 
     this.add.rectangle(0, 0, UI_WIDTH, UI_HEIGHT, COLORS.ink, 0.62).setOrigin(0, 0);
-    this.add.rectangle(56, 38, 208, 104, COLORS.deepPlum).setOrigin(0, 0).setStrokeStyle(1, COLORS.bitterLime);
-    makeText(this, 160, 46, 'JEDA', { originX: 0.5, color: COLORS.bitterLime });
+    this.add.rectangle(36, 20, 248, 140, COLORS.deepPlum).setOrigin(0, 0).setStrokeStyle(1, COLORS.bitterLime);
+    makeText(this, 160, 27, 'JEDA', { originX: 0.5, color: COLORS.bitterLime });
+    this.hint = makeText(this, 160, 147, 'Esc: kembali', { originX: 0.5, size: 6, color: COLORS.paperDim });
     this.showMain();
 
     this.releaseInput = input.pushLayer('pause', (e) => {
@@ -64,15 +66,22 @@ export class PauseScene extends Phaser.Scene {
     this.mode = 'main';
     const items: { id: PauseAction; label: string }[] = [
       { id: 'resume', label: 'Lanjutkan' },
+      { id: 'status', label: 'Status' },
+      { id: 'inventory', label: 'Inventaris' },
+      { id: 'equipment', label: 'Perlengkapan' },
+      { id: 'skills', label: 'Jurus' },
+      { id: 'save', label: 'Simpan/Muat' },
       { id: 'settings', label: 'Pengaturan' },
       { id: 'title', label: 'Kembali ke Judul' },
     ];
     this.menu = new MenuList(this, {
       x: 160,
-      y: 68,
-      width: 160,
-      rowHeight: 14,
-      items,
+      y: 43,
+      width: 216,
+      rowHeight: 12,
+      items: items.map(item => ({ ...item, disabled: this.returnTo === SCENE_KEYS.Battle && ['status', 'inventory', 'equipment', 'skills', 'save'].includes(item.id), disabledHint: 'Selesaikan pertarungan dahulu.' })),
+      onFocusChange: item => this.hint.setText(item.disabled ? item.disabledHint ?? '' : 'Esc: kembali'),
+      onDisabledConfirm: item => this.hint.setText(item.disabledHint ?? ''),
       onConfirm: (item) => this.act(item.id as PauseAction),
     });
   }
@@ -82,7 +91,7 @@ export class PauseScene extends Phaser.Scene {
     this.mode = 'confirm';
     this.extra.push(
       makeText(this, 160, 62, 'Kembali ke judul?', { originX: 0.5 }),
-      makeText(this, 160, 74, 'Progres belum tersimpan.', { originX: 0.5, color: COLORS.paperDim }),
+      makeText(this, 160, 74, 'Simpan dulu bila perlu.', { originX: 0.5, color: COLORS.paperDim }),
     );
     this.menu = new MenuList(this, {
       x: 160,
@@ -104,6 +113,8 @@ export class PauseScene extends Phaser.Scene {
     const { router } = getServices(this);
     if (a === 'resume') this.resume();
     else if (a === 'settings') router.openOverlay(this, SCENE_KEYS.Settings);
+    else if (a === 'save') router.openOverlay(this, SCENE_KEYS.SaveLoad);
+    else if (a === 'status' || a === 'inventory' || a === 'equipment' || a === 'skills') router.openOverlay(this, SCENE_KEYS.RpgMenu, { kind: a });
     else this.showConfirm();
   }
 

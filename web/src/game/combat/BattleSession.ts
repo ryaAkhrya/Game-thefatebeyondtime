@@ -1,9 +1,11 @@
 import type { GameState, GameStateData } from '../systems/GameState';
-import { BattleEngine, HOLLOWLING_STATS, YARIC_STATS, actor } from './BattleEngine';
+import { BattleEngine, HOLLOWLING_STATS, actor } from './BattleEngine';
+import { applyReward, effectiveStats, type RewardReceipt } from '../rpg/progression';
+import { HOLLOWLING_REWARD } from '../rpg/definitions';
 
 export const FIRST_HOLLOWLING_FLAG = 'battle.first_hollowling';
 
-/** In-memory encounter checkpoint; SaveRepository remains the sole future persistence boundary. */
+/** In-memory encounter checkpoint; SaveRepository remains the sole persistence boundary. */
 export class BattleSession {
   private readonly checkpoint: GameStateData;
   engine: BattleEngine;
@@ -15,18 +17,21 @@ export class BattleSession {
     this.engine = this.createEngine();
   }
   private createEngine(): BattleEngine {
-    const yaric = actor('C01', 'player', YARIC_STATS);
-    yaric.hp = this.checkpoint.vitals?.hp ?? YARIC_STATS.HP;
-    yaric.mp = this.checkpoint.vitals?.mp ?? YARIC_STATS.MP;
+    const stats = effectiveStats(this.checkpoint);
+    const yaric = actor('C01', 'player', stats);
+    yaric.hp = this.checkpoint.vitals?.hp ?? stats.HP;
+    yaric.mp = this.checkpoint.vitals?.mp ?? stats.MP;
+    yaric.skills = [...this.checkpoint.rpg.characters.C01!.unlockedSkills];
     return new BattleEngine([yaric, actor('M01', 'enemy', HOLLOWLING_STATS)], this.checkpoint.items);
   }
+  previewReward(): RewardReceipt | null { return applyReward(this.checkpoint, HOLLOWLING_REWARD).receipt; }
   retry(): boolean {
     if (this.committed || this.engine.snapshot().outcome !== 'defeat') return false;
     this.gameState.load(this.checkpoint);
     this.engine = this.createEngine();
     return true;
   }
-  /** Empty reward foundation: no invented EXP/gold. Vitals + consumed items + completion commit together. */
+  /** Vitals, consumed items, completion and idempotent RPG reward commit together after victory. */
   commitVictory(): boolean {
     const result = this.engine.snapshot();
     if (this.committed || result.outcome !== 'victory' || result.pending || this.gameState.hasFlag(FIRST_HOLLOWLING_FLAG)) return false;
@@ -35,7 +40,7 @@ export class BattleSession {
     next.vitals = { hp: yaric.hp, mp: yaric.mp };
     next.items = { ...result.items };
     next.flags[FIRST_HOLLOWLING_FLAG] = true;
-    this.gameState.load(next);
+    this.gameState.load(applyReward(next, HOLLOWLING_REWARD).data);
     this.committed = true;
     return true;
   }

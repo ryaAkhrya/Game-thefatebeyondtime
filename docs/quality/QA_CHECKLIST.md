@@ -1,5 +1,14 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 3 — RPG/persistence
+
+**PHASE 3 PASS (fungsional/QA otomatis): 378 unit, 311 browser checks produksi, TypeScript strict dan build lulus.** Bukti dan batasan: `../production/PHASE3_REPORT.md`.
+
+- [x] Unit progression, inventory/equipment, skills, shop, validation, migration, backup, quota dan checkpoint scheduling.
+- [x] Browser menu/save/load/Continue, kedua resolusi, corrupted/unsupported/storage failure dan harness shop dieksekusi; re-run akhir di laporan.
+- [x] Perjalanan keyboard dari Title sampai kemenangan, progress, save, refresh dan rekonstruksi state dunia dieksekusi.
+- [ ] Review manusia untuk balance dan UI; browser selain Edge/headless belum diuji.
+
 ## Phase 2 — C1-04 (10 November 2026)
 
 Status PARTIAL pada gate visual; bukti dan angka test: `../production/PHASE2_REPORT.md`.

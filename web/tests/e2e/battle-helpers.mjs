@@ -5,6 +5,13 @@ export async function ready(page) {
 export async function press(page, key, n = 1) {
   for (let i = 0; i < n; i++) { await page.keyboard.press(key, { delay: 25 }); await page.waitForTimeout(50); }
 }
+export async function selectMenu(page, id) {
+  for (let n = 0; n < 24; n++) {
+    if (await page.evaluate(id => window.__tfbt.focus() === `menu:${id}`, id)) return;
+    await press(page, 'ArrowDown');
+  }
+  throw new Error(`Menu focus not found: ${id}`);
+}
 export async function command(page, id, wait = true) {
   await ready(page);
   const indices = { attack: 0, ground_slam: 1, potion: 2, defend: 3, run: 4 };
@@ -24,7 +31,7 @@ export async function battleTutorial(page, check, shot) {
   const beforePause = JSON.stringify(b.actors);
   await press(page, 'Escape');
   await page.waitForFunction(() => window.__tfbt.inputLayer() === 'pause');
-  await press(page, 'ArrowDown'); await press(page, 'Enter');
+  await selectMenu(page, 'settings'); await press(page, 'Enter');
   await page.waitForFunction(() => window.__tfbt.inputLayer() === 'settings');
   check('Pengaturan dapat dibuka dari Jeda saat battle', true);
   await press(page, 'ArrowDown', 7); await press(page, 'Enter'); // screen shake OFF

@@ -71,6 +71,11 @@ export class MenuList {
     return this.opts.items[this.index]!;
   }
 
+  focusId(id: string): void {
+    const index = this.opts.items.findIndex(item => item.id === id);
+    if (index >= 0) { this.index = index; this.render(); }
+  }
+
   setDisabled(id: string, disabled: boolean): void {
     const it = this.opts.items.find((i) => i.id === id);
     if (it) it.disabled = disabled;

@@ -10,6 +10,9 @@ import { PlaceholderScene } from '../scenes/PlaceholderScene';
 import { SettingsScene } from '../scenes/SettingsScene';
 import { TitleScene } from '../scenes/TitleScene';
 import { BattleScene } from '../scenes/BattleScene';
+import { RpgMenuScene } from '../scenes/RpgMenuScene';
+import { SaveLoadScene } from '../scenes/SaveLoadScene';
+import { ShopScene } from '../scenes/ShopScene';
 
 export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameConfig {
   return {
@@ -27,6 +30,6 @@ export function createGameConfig(parent: HTMLElement): Phaser.Types.Core.GameCon
     input: { keyboard: false, mouse: false, touch: false, gamepad: false },
     audio: { noAudio: false },
     disableContextMenu: true,
-    scene: [BootScene, TitleScene, SettingsScene, ControlsScene, PlaceholderScene, WorldScene, HudScene, PauseScene, BattleScene],
+    scene: [BootScene, TitleScene, SettingsScene, ControlsScene, PlaceholderScene, WorldScene, HudScene, PauseScene, BattleScene, RpgMenuScene, SaveLoadScene, ShopScene],
   };
 }

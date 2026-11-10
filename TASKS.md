@@ -1,6 +1,6 @@
 # TASKS — STATUS SEBENARNYA
 
-**Phase 0/1 selesai; Phase 2 playable, PARTIAL pada gate visual** (10 Nov 2026). Bukti: `docs/production/PHASE2_REPORT.md`. Phase 3–6 belum dikerjakan.
+**Phase 0–2 playable; Phase 3 PASS (scope fungsional/QA otomatis)** (10 Nov 2026). 378 unit + 311 browser checks produksi, strict TS/build lulus; bukti: `docs/production/PHASE3_REPORT.md`. Keterbatasan art Phase 2 tetap dicatat; Phase 4–6 belum dikerjakan.
 
 ## Phase 0 — Web Foundation
 
@@ -29,10 +29,12 @@
 
 ## Phase 3 — RPG / Save
 
-- [ ] EXP/level/skill, inventory/equipment.
-- [ ] Manual save, autosave, load, Continue.
-- [ ] Settings lengkap + persist + fullscreen error handling.
-- [ ] Save corruption/storage blocked handling.
+- [x] EXP/level berbasis data, shared inventory, equipment weapon/armor dan dua pasif DRAFT.
+- [x] Tiga slot manual + autosave aman + Load/Continue nyata setelah refresh.
+- [x] Shop buy/sell reusable + currency/stock/rollback, hanya harness QA tanpa merchant baru di hutan.
+- [x] Pause Status/Inventaris/Perlengkapan/Jurus/Simpan-Muat terhubung, Settings tetap terpisah/persisten.
+- [x] Save v2, migrasi v1 read-only, backup, corruption/quota/storage blocked handling; hasil unit/browser akhir di PHASE3_REPORT.md.
+- [ ] Review manusia untuk pilihan pasif/angka DRAFT dan UI baru pada layar nyata; bukan fitur Phase 4 yang dikerjakan otomatis.
 
 ## Phase 4 — MVP
 

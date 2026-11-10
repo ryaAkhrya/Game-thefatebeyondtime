@@ -57,6 +57,8 @@ DoD: tidak ada softlock/double reward; perintah navigasi keyboard, audio dan eff
 
 ## Phase 3 — RPG State / Save
 
+**STATUS: SELESAI (PHASE 3 PASS) — 10 November 2026.** 378 unit test, strict TypeScript, build dan 311 browser checks produksi lulus; bukti/batasan di PHASE3_REPORT.md. Progression, shared inventory, equipment, skill tree, shop foundation terisolasi, tiga slot manual, autosave aman, Continue, migration/backup berfungsi. Review balancing/art/manusia tetap terbuka; Phase 4 belum dimulai.
+
 **Tujuan:** progress persistent setelah browser ditutup/dibuka.
 
 Scope:

@@ -1,9 +1,9 @@
 import { SAVE_STORAGE_PREFIX } from '../config/constants';
 import type { AreaId, ChapterId } from '../data/ids';
-import { validateGameStateData, type GameStateData } from './GameState';
+import { migrateLegacyGameState, validateGameStateData, type GameStateData } from './GameState';
 import type { StorageLike } from './StorageAdapter';
 
-export const SAVE_SCHEMA_VERSION = 'save_v1';
+export const SAVE_SCHEMA_VERSION = 'save_v2';
 
 export const SAVE_SLOTS = ['auto', 'slot1', 'slot2', 'slot3'] as const;
 export type SaveSlot = (typeof SAVE_SLOTS)[number];
@@ -24,7 +24,7 @@ interface SaveEnvelope {
 }
 
 export type SaveReadResult =
-  | { status: 'ok'; savedAt: string; summary: SaveSummary; data: GameStateData }
+  | { status: 'ok'; savedAt: string; summary: SaveSummary; data: GameStateData; migrated?: boolean; recovered?: boolean }
   | { status: 'empty' }
   | { status: 'corrupt'; reason: string }
   | { status: 'unsupported_version'; found: string }
@@ -45,7 +45,7 @@ export function checksumOf(data: unknown): string {
 
 /**
  * Repository save berversi. Storage terpisah dari Settings (prefix berbeda).
- * Phase 0: belum ada gameplay yang memanggil write(); Continue hanya aktif bila ada save VALID.
+ * v2 preserves the original storage keys and reads legacy v1 without rewriting it.
  * State tidak dimodifikasi sebelum payload lulus validasi.
  */
 export class SaveRepository {
@@ -67,8 +67,17 @@ export class SaveRepository {
     } catch {
       return { status: 'storage_unavailable' };
     }
-    if (text === null) return { status: 'empty' };
+    const result: SaveReadResult = text === null ? { status: 'empty' } : this.decode(text, slot);
+    if (result.status === 'ok') return result;
+    try {
+      const backup = this.storage.getItem(`${this.keyOf(slot)}.backup`);
+      const recovered = backup ? this.decode(backup, slot) : null;
+      if (recovered?.status === 'ok') return { ...recovered, recovered: true };
+    } catch { /* original result remains available */ }
+    return result;
+  }
 
+  private decode(text: string, slot: SaveSlot): SaveReadResult {
     let parsed: unknown;
     try {
       parsed = JSON.parse(text);
@@ -77,12 +86,14 @@ export class SaveRepository {
     }
     if (typeof parsed !== 'object' || parsed === null) return { status: 'corrupt', reason: 'bukan objek' };
     const env = parsed as Partial<SaveEnvelope>;
-    if (env.schema !== SAVE_SCHEMA_VERSION) {
+    if (String(env.schema) !== SAVE_SCHEMA_VERSION && String(env.schema) !== 'save_v1') {
       return { status: 'unsupported_version', found: String(env.schema) };
     }
-    const data = validateGameStateData(env.data);
-    if (!data) return { status: 'corrupt', reason: 'data game tidak valid' };
-    if (env.checksum !== checksumOf(env.data)) return { status: 'corrupt', reason: 'checksum tidak cocok' };
+    if (env.slot !== slot) return { status: 'corrupt', reason: 'slot tidak cocok' };
+    if (!env.data || env.checksum !== checksumOf(env.data)) return { status: 'corrupt', reason: 'checksum tidak cocok' };
+    const legacy = String(env.schema) === 'save_v1';
+    const data = legacy ? migrateLegacyGameState(env.data) : validateGameStateData(env.data);
+    if (!data || (!legacy && env.data.schemaVersion !== 2)) return { status: 'corrupt', reason: 'data game tidak valid' };
     if (typeof env.savedAt !== 'string' || Number.isNaN(Date.parse(env.savedAt))) {
       return { status: 'corrupt', reason: 'savedAt tidak valid' };
     }
@@ -91,6 +102,7 @@ export class SaveRepository {
       savedAt: env.savedAt,
       summary: { chapter: data.chapter, area: data.area, playtimeSec: data.playtimeSec },
       data,
+      ...(legacy ? { migrated: true } : {}),
     };
   }
 
@@ -98,6 +110,7 @@ export class SaveRepository {
     if (!this.storage) return { ok: false, reason: 'storage_unavailable' };
     const valid = validateGameStateData(data);
     if (!valid) return { ok: false, reason: 'write_failed' };
+    if (!Number.isFinite(now.getTime())) return { ok: false, reason: 'write_failed' };
     const env: SaveEnvelope = {
       schema: SAVE_SCHEMA_VERSION,
       slot,
@@ -108,14 +121,25 @@ export class SaveRepository {
     };
     const key = this.keyOf(slot);
     let previous: string | null = null;
+    let attemptedWrite = false;
     try {
       previous = this.storage.getItem(key);
-      this.storage.setItem(key, JSON.stringify(env));
+      if (previous) {
+        const old = this.decode(previous, slot);
+        if (old.status === 'unsupported_version') return { ok: false, reason: 'write_failed' };
+        if (old.status === 'ok') this.storage.setItem(`${key}.backup`, previous);
+      }
+      const serialized = JSON.stringify(env);
+      attemptedWrite = true;
+      this.storage.setItem(key, serialized);
+      if (this.storage.getItem(key) !== serialized) throw new Error('Save verification failed');
       return { ok: true };
     } catch {
+      if (!attemptedWrite) return { ok: false, reason: 'write_failed' };
       // rollback best-effort agar save lama tidak rusak
       try {
         if (previous !== null) this.storage.setItem(key, previous);
+        else this.storage.removeItem(key);
       } catch {
         /* diabaikan */
       }

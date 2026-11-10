@@ -49,13 +49,14 @@ export class WorldScene extends Phaser.Scene {
 
   create(): void {
     this.services = getServices(this);
+    this.services.checkpoints.setSafe(false);
     const { gameState, input, audio, settings } = this.services;
     if (!gameState.isActive) gameState.startNewGame();
     this.story = new Chapter1Story(gameState);
     this.loaded = loadForest1();
     this.busy = false;
     this.started = false;
-    this.wrapCount = 0;
+    this.wrapCount = gameState.snapshot()!.world.forestWrapCount;
     this.insideTriggers.clear();
     this.propSprites.clear();
     this.actionLog = [];
@@ -90,6 +91,10 @@ export class WorldScene extends Phaser.Scene {
     this.interactables = this.loaded.interactables.map((i) => ({ ...i }));
     this.syncNamboInteractable();
     this.applyFlagState();
+    // Legacy/out-of-bounds positions return to the existing safe spawn; flags/items remain untouched.
+    if (!this.loaded.collision.canStand(footBox(this.player.x, this.player.y)) || (!this.story.awake && this.player.x > 264)) {
+      this.player.x = map.spawn.x; this.player.y = map.spawn.y; this.player.facing = map.spawn.facing;
+    }
 
     // ---- kamera ----
     const cam = this.cameras.main;
@@ -125,6 +130,7 @@ export class WorldScene extends Phaser.Scene {
 
   override update(_time: number, delta: number): void {
     if (!this.hud?.ready) return;
+    if (!document.hidden) this.services.gameState.tick(delta / 1000);
     if (!this.started) {
       this.started = true;
       this.hud.setObjective(this.story.objective());
@@ -159,6 +165,9 @@ export class WorldScene extends Phaser.Scene {
     if (!this.busy) this.checkTriggers();
     this.updatePrompt();
     this.services.gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'forest_1');
+    this.services.checkpoints.setSafe(!this.busy && !this.hud.dialogue.active);
+    const saved = this.services.checkpoints.flush();
+    if (saved && !saved.ok) this.hud.toast('Simpan otomatis gagal. Coba Simpan/Muat.');
     this.wasMoving = moved > 0;
   }
 
@@ -172,6 +181,8 @@ export class WorldScene extends Phaser.Scene {
     this.player.x -= shift;
     this.cameras.main.scrollX -= shift;
     this.wrapCount++;
+    this.services.gameState.setWrapCount(this.wrapCount);
+    this.services.checkpoints.requestAutosave();
     this.insideTriggers.clear();
     this.actionLog.push(`wrap#${this.wrapCount}`);
   }
@@ -221,11 +232,15 @@ export class WorldScene extends Phaser.Scene {
 
   private async runActions(actions: readonly StoryAction[]): Promise<void> {
     this.busy = true;
+    this.services.checkpoints.setSafe(false);
+    let completed = false;
     try {
       for (const a of actions) await this.runAction(a);
+      completed = true;
     } finally {
       this.busy = false;
       this.hud.setObjective(this.story.objective());
+      if (completed && actions.some(a => a.type === 'setFlag' || a.type === 'giveItem')) this.services.checkpoints.requestAutosave();
     }
   }
 
@@ -266,7 +281,12 @@ export class WorldScene extends Phaser.Scene {
       case 'battle':
         this.hud.showPrompt(null);
         this.player.y = 100;
+        this.player.facing = 'down';
         gameState.setPosition(this.player.x, 100, 'down', 'forest_1');
+        this.services.checkpoints.setSafe(true);
+        this.services.checkpoints.requestAutosave();
+        this.services.checkpoints.flush(); // complete, safe checkpoint before entering the scripted encounter
+        this.services.checkpoints.setSafe(false);
         this.services.router.goto(this, SCENE_KEYS.Battle);
         // router.goto menghentikan scene ini; tunggu tanpa melakukan apa pun lagi
         await new Promise<void>(() => undefined);
@@ -399,6 +419,8 @@ export class WorldScene extends Phaser.Scene {
       flags: snap?.flags ?? {},
       items: snap?.items ?? {},
       vitals: snap?.vitals ?? null,
+      rpg: snap?.rpg,
+      storyBeat: snap?.storyBeat,
       objective: this.story.objective(),
       target: this.target?.id ?? null,
       prompt: this.target?.verb ?? null,

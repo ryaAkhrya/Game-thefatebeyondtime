@@ -80,12 +80,15 @@ export class TitleScene extends Phaser.Scene {
       case 'new':
         // New Game hanya menyiapkan state di memori; tidak menulis atau menimpa save apa pun.
         gameState.startNewGame();
+        this.services.checkpoints.reset();
         router.goto(this, SCENE_KEYS.World);
         break;
       case 'continue': {
         const latest = saves.latestValid();
         if (!latest) return this.setStatus(NO_SAVE_HINT, COLORS.warn, 2500);
-        router.goto(this, SCENE_KEYS.Placeholder, { variant: 'continue', summary: latest.summary });
+        gameState.load(latest.data);
+        this.services.checkpoints.reset();
+        router.goto(this, SCENE_KEYS.World);
         break;
       }
       case 'settings':

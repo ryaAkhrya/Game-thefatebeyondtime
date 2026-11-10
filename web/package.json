@@ -2,7 +2,7 @@
   "name": "the-fate-beyond-time-web",
   "version": "0.1.0",
   "private": true,
-  "description": "The Fate: Beyond Time - JRPG desktop web. Phase 2: first Hollowling battle.",
+  "description": "The Fate: Beyond Time - JRPG desktop web. Phase 3: RPG systems and local persistence.",
   "type": "module",
   "scripts": {
     "dev": "vite",

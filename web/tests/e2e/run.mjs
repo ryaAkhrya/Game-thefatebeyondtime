@@ -13,7 +13,9 @@ try {
     });
   }
   let failed = false;
-  for (const script of ['smoke.mjs', 'phase1.mjs', 'phase2.mjs']) {
+  const suites = ['smoke.mjs', 'phase1.mjs', 'phase2.mjs', 'phase3.mjs'];
+  const selected = process.env.E2E_SUITES?.split(',');
+  for (const script of suites.filter(name => !selected || selected.includes(name))) {
     const code = await new Promise((resolveExit, reject) => {
       const child = spawn(process.execPath, [resolve('tests/e2e', script)], { stdio: 'inherit', env: { ...process.env, E2E_URL: base } });
       child.on('exit', resolveExit); child.on('error', reject);

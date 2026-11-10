@@ -1,6 +1,6 @@
-# STATUS TERKINI — Phase 2 playable (10 November 2026)
+# STATUS TERKINI — Phase 3: RPG dan save/load (10 November 2026)
 
-Kode game ada di `web/` (Phaser 4.2.1 + TypeScript strict + Vite). **Dapat dimainkan:** Title → intro C1-01..03 → duel C1-04 Yaric vs Hollowling → kemenangan kembali ke hutan; kekalahan dapat diulang dari checkpoint. Serang, Ground Slam, Potion dari peti, Bertahan dan alasan Kabur nonaktif sudah terhubung. Pause → Pengaturan tersedia saat menunggu perintah. **Phase 2: PARTIAL pada gate visual**, karena atlas sumber masih memiliki potongan pedang/piksel tepi dan belum direview manusia. Rincian: [PHASE2_REPORT.md](docs/production/PHASE2_REPORT.md). EXP, leveling, inventory penuh dan save/load tetap Phase 3; musik senyap. Dependency existing tidak perlu diinstal ulang. Dot-source `web/scripts/dev-env.ps1`, lalu `cd web` dan `npm run dev`.
+Kode game di `web/` tetap Phaser 4.2.1 + TypeScript strict + Vite. Alur C1-01..04, battle, victory dan retry tetap berjalan; kini kemenangan memberi EXP/level/emas, dan Pause menyediakan Status, Inventaris, Perlengkapan, Jurus serta Simpan/Muat. Ada tiga slot manual, satu autosave aman, migrasi data lama, backup, dan **Lanjut** yang benar-benar memulihkan dunia setelah refresh. Save berada lokal di browser dan dapat hilang bila data situs dihapus. Rincian QA/status akhir: [PHASE3_REPORT.md](docs/production/PHASE3_REPORT.md). Toko hanya foundation/harness QA; Derrria tidak dipindahkan ke hutan. Aset lama masih NEEDS_REVIEW, musik/SFX tetap senyap. Phase 4 belum dikerjakan. Dependency existing tidak perlu diinstal ulang; dot-source `web/scripts/dev-env.ps1`, lalu `cd web` dan `npm run dev`.
 
 # Aset aktif: v3.3
 

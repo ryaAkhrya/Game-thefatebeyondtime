@@ -1,5 +1,7 @@
 # RPG SYSTEMS — Progression, skill, economy, quest, save
 
+> Implementasi Phase 3 (10 November 2026): fondasi EXP/level, shared inventory/equipment, jurus dan save/load sudah berjalan di Chapter I. Threshold provisional di bawah dipakai sebagai curve DRAFT sampai level 5; growth, 25 EXP/8 emas Hollowling, dua pasif Yaric dan harga item juga DRAFT. Skill point kini diimplementasikan sesuai permintaan Phase 3 pengguna, tetap menunggu review balancing. Detail kode, schema v2/migrasi v1, QA dan batasan ada di [PHASE3_REPORT.md](docs/production/PHASE3_REPORT.md). Tabel/contoh roster dan quest di dokumen ini bukan klaim bahwa seluruhnya sudah dibuat.
+
 ## 1. Prinsip desain
 
 Game ini berdurasi pendek; sistem RPG harus mendukung perjalanan, bukan membebani pemain dengan grinding, mata uang berlapis, kompleksitas crafting, atau ratusan menu. **Keputusan locked:** EXP + Skill Tree, inventory, equipment, shop, main quest, side quest singkat, manual save dan autosave.

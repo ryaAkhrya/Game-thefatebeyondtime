@@ -1,6 +1,6 @@
 # WEB APP — THE FATE: BEYOND TIME
 
-Phaser 4.2.1 + TypeScript + Vite. C1-01..C1-04 playable, termasuk duel Hollowling, kemenangan, kekalahan/retry dan Pause/Settings. **Phase 2: PARTIAL (gate visual sumber dan review manusia)**; laporan: `../docs/production/PHASE2_REPORT.md`. Save/load, EXP dan leveling belum diimplementasikan (Phase 3).
+Phaser 4.2.1 + TypeScript + Vite. C1-01..C1-04 playable dengan EXP/level, inventory/equipment, skill points, dan save/load nyata. Status QA akhir: `../docs/production/PHASE3_REPORT.md`. Save lokal: tiga slot manual + satu autosave; Settings terpisah. Menghapus data situs dapat menghapus progress. Phase 4 belum dikerjakan.
 
 ## Menjalankan
 
@@ -12,7 +12,8 @@ npm run dev                 # http://127.0.0.1:5173/
 npm run build               # typecheck + build statis ke web/dist/
 npm run preview             # sajikan web/dist (http://127.0.0.1:4173/)
 npm test                    # unit test (vitest)
-npm run test:e2e            # satu preview server: Phase 0 + perjalanan Title→C1-04 + battle/retry (build dulu)
+npm run test:e2e            # satu preview server: Phase 0–3, journey Title→battle→save→refresh→Continue (build dulu)
+# Focused: $env:E2E_SUITES='phase3.mjs'; npm run test:e2e
 # Untuk memakai dev server yang sudah aktif:
 # $env:E2E_URL='http://127.0.0.1:5173/'; npm run test:e2e
 npm run assets:prepare      # buat ulang aset turunan (portrait, atlas bersih) dan seni lingkungan DRAFT
@@ -37,6 +38,9 @@ src/game/world/                  Collision, Interaction, loader peta Hutan 1
 src/game/dialogue/               DialogueRunner (murni), wrap/halaman, data C1-01..03
 src/game/story/                  Chapter1Story (keputusan cerita murni, flag kanonik)
 src/game/combat/                 BattleEngine murni, BattleSession checkpoint/commit, tipe atlas
+src/game/rpg/                    definisi, progression, shared inventory, equipment/skill/shop actions, validation
+src/game/systems/SaveCoordinator.ts safe checkpoint gate untuk repository existing
+src/game/scenes/                 RpgMenuScene, SaveLoadScene, ShopScene (hanya harness QA untuk Phase 3)
 src/game/scenes/BattleScene.ts   playback metadata, impact sekali, input layer battle
 src/ui/components/BattlePanel.ts menu/status/feedback yang dapat direvisi terpisah
 src/ui/                          MenuList, tema/teks, CSS halaman
@@ -51,3 +55,7 @@ tests/e2e/smoke.mjs              playwright-core + Edge
 - Tanpa musik: semua cue `AWAITING_COMPOSER`, game senyap. Jangan menambahkan BGM; minta dari Game Director (`../AUDIO_COMPOSER_HANDOFF.md`).
 - Atlas battle aktif v3.3 diimpor utuh di `public/assets/battle`, status NEEDS_REVIEW. `npm run assets:prepare` juga menyalinnya ulang. Jangan menaruh data personal di `public/`.
 - Font Press Start 2P (OFL) hanya placeholder.
+
+Pause dunia: Lanjutkan, Status, Inventaris, Perlengkapan, Jurus, Simpan/Muat, Pengaturan, Kembali ke Judul. Saat battle, perubahan RPG/save dinonaktifkan agar snapshot duel tetap konsisten; Pengaturan tetap bisa dibuka saat giliran aman. Save v2 memvalidasi stat/EXP/level/skill/equipment; v1 dimigrasikan tanpa mengubah byte slot asal saat dibaca. Sebelum overwrite, save valid sebelumnya disalin ke `.backup`; write/readback diverifikasi, error storage ditangani.
+
+Angka DRAFT: Hollowling 25 EXP +8 emas, level 2 pada 25 EXP, satu poin jurus. Dataset kecil: Potion, greatsword Yaric, Baju Jalan, Ground Slam dan pilihan pasif ATK+2/DEF+2. Tidak ada merchant/quest baru untuk mendemonstrasikan sistem. `?qa=1` menyediakan harness toko terpisah untuk testing saja.

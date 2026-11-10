@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { SAVE_STORAGE_PREFIX } from '../../src/game/config/constants';
-import { GameState, createNewGameData, validateGameStateData } from '../../src/game/systems/GameState';
+import { GameState, createNewGameData, migrateLegacyGameState, validateGameStateData } from '../../src/game/systems/GameState';
+import { STARTER_ITEMS } from '../../src/game/rpg/definitions';
 import { SaveRepository, checksumOf } from '../../src/game/systems/SaveRepository';
 import { MemoryStorage } from '../../src/game/systems/StorageAdapter';
 
@@ -32,7 +33,7 @@ describe('validateGameStateData', () => {
   });
   it.each([
     ['null', null],
-    ['versi salah', { ...createNewGameData(), schemaVersion: 2 }],
+    ['versi salah', { ...createNewGameData(), schemaVersion: 3 }],
     ['chapter tak dikenal', { ...createNewGameData(), chapter: 'V' }],
     ['area tak dikenal', { ...createNewGameData(), area: 'mars' }],
     ['party kosong', { ...createNewGameData(), party: [] }],
@@ -141,8 +142,9 @@ describe('SaveRepository', () => {
 describe('Kompatibilitas items (Phase 1)', () => {
   it('save lama tanpa items valid dan items menjadi kosong', () => {
     const old = JSON.parse(JSON.stringify(createNewGameData()));
+    old.schemaVersion = 1;
     delete old.items;
-    expect(validateGameStateData(old)?.items).toEqual({});
+    expect(migrateLegacyGameState(old)?.items).toEqual(STARTER_ITEMS);
   });
   it('items tersimpan dan terbaca kembali bersama flag cerita', () => {
     const repo = new SaveRepository(new MemoryStorage());
@@ -153,7 +155,7 @@ describe('Kompatibilitas items (Phase 1)', () => {
     const r = repo.read('slot1');
     expect(r.status).toBe('ok');
     if (r.status === 'ok') {
-      expect(r.data.items).toEqual({ potion: 1 });
+      expect(r.data.items).toEqual({ ...STARTER_ITEMS, potion: 1 });
       expect(r.data.flags['story.c1_awake']).toBe(true);
     }
   });

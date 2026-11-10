@@ -1,5 +1,14 @@
 # CHANGELOG — DOKUMENTASI & KODE
 
+## Phase 3 — 10 November 2026 (RPG dan persistence)
+
+- Progression data murni, cap awal level 5, reward Hollowling 25 EXP/8 emas sekali; stat level 1 tetap sama dengan Phase 2. Growth, dua pasif swordsman dan harga item DRAFT untuk review.
+- Shared inventory dunia/battle, Potion effect bersama, dua slot equipment dengan class/ownership checks, skill requirements dan point spending. Status/Inventaris/Perlengkapan/Jurus di Pause, tanpa mengganti visual greatsword.
+- Reusable buy/sell dengan rollback by construction; ShopScene hanya harness QA, tidak menambah NPC atau memindahkan Derrria ke Hutan 1.
+- SaveRepository existing: envelope save_v2/data v2, key lama dipertahankan; migrasi v1 hanya di memori, backup/recovery, readback/rollback dan future-schema protection. Tiga manual slot, autosave checkpoint aman dan Continue memulihkan world sesudah refresh.
+- TypeScript strict, 378 unit tests dan production build lulus. Hasil browser final, screenshots, file list dan keterbatasan di `PHASE3_REPORT.md`.
+- Tidak ada dependency, audio, perubahan approved story/atlas, deployment, commit/push atau implementasi Phase 4. Review art sebelumnya tetap terbuka.
+
 ## Phase 2 — 10 November 2026 (playable; visual PARTIAL)
 
 - C1-04 scripted Hollowling menggantikan akhir demo Phase 1; dialog dari naskah existing, flag resmi `battle.first_hollowling`.

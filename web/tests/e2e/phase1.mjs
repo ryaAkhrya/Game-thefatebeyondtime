@@ -8,6 +8,8 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
 import { battleTutorial } from './battle-helpers.mjs';
+import { selectMenu } from './battle-helpers.mjs';
+import { persistenceJourney } from './phase3-helpers.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../..');
@@ -541,9 +543,10 @@ async function main() {
     await idle(page);
     check('Dialog kemenangan C1-04-L002/L003 berurutan', victoryLines.map(r => r.line).join(',') === 'C1-04-L002,C1-04-L003');
     const won = await world(page);
-    check('Flag resmi, konsumsi Potion, HP/MP konsisten di dunia', won.flags['battle.first_hollowling'] === true && won.items.potion === 0 && won.vitals?.mp === 8);
+    check('Flag resmi, konsumsi Potion, HP/MP dan level-up konsisten di dunia', won.flags['battle.first_hollowling'] === true && won.items.potion === 0 && won.vitals?.mp === 10 && won.rpg.characters.C01.level === 2);
     await walkTo(page, won.x, 55, { axisOrder: 'yx' });
     check('Encounter tidak terulang setelah kemenangan', !(await page.evaluate(() => window.__tfbt.battle())) && !(await world(page)).dialogue);
+    await persistenceJourney(page, check, shot, { walkTo, face, playDialogue });
 
     check('Tidak ada error JS sepanjang sesi cerita penuh', s.errors.length === 0, s.errors.join(' | '));
     check('Tidak ada request gagal / 404 (aset hilang)', s.failed.length === 0, s.failed.join(' | '));
@@ -572,8 +575,7 @@ async function main() {
     const during = await world(page);
     check('Selama Jeda dunia tidak bergerak', during.x === before.x && during.y === before.y);
     // Pengaturan dari Jeda
-    await page.keyboard.press('ArrowDown', { delay: 30 });
-    await sleep(page, 100);
+    await selectMenu(page, 'settings');
     await page.keyboard.press('Enter', { delay: 30 });
     await sleep(page, 400);
     check('Pengaturan terbuka dari Menu Jeda', (await page.evaluate(() => window.__tfbt.inputLayer())) === 'settings');

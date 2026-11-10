@@ -1,3 +1,5 @@
+import { ITEMS } from '../rpg/definitions';
+import { itemUseReason, useConsumable } from '../rpg/inventory';
 /** Pure combat model. All balance values are DRAFT, independent of Phaser and wall-clock time. */
 export interface Stats { HP: number; MP: number; ATK: number; DEF: number; MAG: number; MDEF: number; SPD: number }
 export type StatusId = 'poison' | 'stun' | 'atk_up' | 'def_up';
@@ -5,6 +7,7 @@ export interface StatusEffect { id: StatusId; turns: number }
 export interface BattleActor {
   id: string; name: string; side: 'player' | 'enemy'; stats: Stats;
   hp: number; mp: number; defending: boolean; statuses: StatusEffect[];
+  skills?: string[];
 }
 export type Command = 'attack' | 'ground_slam' | 'potion' | 'defend' | 'run' | 'stunned';
 export type Outcome = 'victory' | 'defeat' | 'escaped' | null;
@@ -15,12 +18,12 @@ export interface BattleState {
   pending: PendingAction | null; log: string[];
 }
 export const GROUND_SLAM = { cost: 4, power: 1.65 } as const;
-export const POTION_HEAL = 36;
+export const POTION_HEAL = ITEMS.potion!.healHP!;
 export const YARIC_STATS: Stats = { HP: 96, MP: 12, ATK: 20, DEF: 8, MAG: 5, MDEF: 7, SPD: 10 };
 export const HOLLOWLING_STATS: Stats = { HP: 112, MP: 0, ATK: 19, DEF: 6, MAG: 3, MDEF: 5, SPD: 7 };
 
 export function actor(id: string, side: BattleActor['side'], stats: Stats): BattleActor {
-  return { id, name: id === 'C01' ? 'Yaric' : 'Hollowling', side, stats: { ...stats }, hp: stats.HP, mp: stats.MP, defending: false, statuses: [] };
+  return { id, name: id === 'C01' ? 'Yaric' : 'Hollowling', side, stats: { ...stats }, hp: stats.HP, mp: stats.MP, defending: false, statuses: [], skills: id === 'C01' ? ['ground_slam'] : [] };
 }
 
 /** SPD descending; equal speeds use stable lexical actor ID (no locale-dependent sorting). */
@@ -68,9 +71,9 @@ export class BattleEngine {
     const a = this.currentActor();
     if (command === 'stunned') return 'Pilih perintah yang tersedia.';
     if (a.side === 'enemy' && command !== 'attack') return 'Musuh hanya dapat menyerang.';
+    if (command === 'ground_slam' && !a.skills?.includes('ground_slam')) return 'Ground Slam belum terbuka.';
     if (command === 'ground_slam' && a.mp < GROUND_SLAM.cost) return 'MP tidak cukup. Perlu 4 MP.';
-    if (command === 'potion' && (s.items.potion ?? 0) < 1) return 'Potion sudah habis.';
-    if (command === 'potion' && a.hp === a.stats.HP) return 'HP masih penuh. Potion tidak dipakai.';
+    if (command === 'potion') return itemUseReason(s.items, 'potion', a, a.stats.HP);
     if (command === 'run' && !s.allowRun) return 'Jalan dihalangi. Hadapi Hollowling dulu.';
     return null;
   }
@@ -101,10 +104,11 @@ export class BattleEngine {
         text = `${a.name}: ${p.command === 'ground_slam' ? 'Ground Slam' : 'tebasan'}. ${t.name} menerima ${amount} kerusakan.`;
         break;
       }
-      case 'potion':
-        s.items.potion = (s.items.potion ?? 0) - 1;
-        amount = Math.min(POTION_HEAL, a.stats.HP - a.hp); a.hp += amount;
+      case 'potion': {
+        const effect = useConsumable(s.items, 'potion', a, a.stats.HP)!;
+        s.items = effect.items; a.hp = effect.vitals.hp; amount = effect.healed;
         text = `Potion memulihkan ${amount} HP Yaric.`; break;
+      }
       case 'defend': a.defending = true; text = 'Yaric bertahan. Kerusakan berikutnya berkurang separuh.'; break;
       case 'run':
         if (this.random() < 0.75) { s.outcome = 'escaped'; text = 'Berhasil melarikan diri.'; }

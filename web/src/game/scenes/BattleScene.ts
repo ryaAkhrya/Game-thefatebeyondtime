@@ -26,6 +26,7 @@ export class BattleScene extends Phaser.Scene {
   constructor() { super(SCENE_KEYS.Battle); }
   create(): void {
     this.services = getServices(this);
+    this.services.checkpoints.setSafe(false);
     this.session = new BattleSession(this.services.gameState);
     this.closing = false; this.locked = true; this.history = []; this.impacts = []; this.idle = {};
     configureUiCamera(this);
@@ -170,7 +171,7 @@ export class BattleScene extends Phaser.Scene {
     if (state.outcome) {
       this.phase = state.outcome; this.services.audio.stopBgm();
       this.services.audio.playSfx(state.outcome === 'victory' ? 'SFX_VICTORY' : 'SFX_DEFEAT');
-      this.panel.result(state.outcome === 'victory'); return;
+      this.panel.result(state.outcome === 'victory', state.outcome === 'victory' ? this.session.previewReward() : null); return;
     }
     if (engine.current.side === 'enemy') { void this.act(enemyAI()); return; }
     this.panel.show(engine);
@@ -178,6 +179,7 @@ export class BattleScene extends Phaser.Scene {
     else if (engine.current.hp < engine.current.stats.HP) this.panel.say('HP berkurang. Barang: Potion. Bertahan: kurangi kerusakan.');
   }
   override update(_time: number, delta: number): void {
+    if (this.services && !document.hidden) this.services.gameState.tick(delta / 1000);
     if (!this.sprites || this.locked || this.phase !== 'idle') return;
     for (const id of ['C01', 'M01']) {
       const idle = this.idle[id] ??= { elapsed: 0, frame: 'idle_a' };

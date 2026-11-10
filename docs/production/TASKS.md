@@ -1,6 +1,6 @@
 # TASKS — STATUS SEBENARNYA
 
-**Phase 0/1 selesai; Phase 2 playable, PARTIAL pada gate visual** (10 Nov 2026). Bukti: `PHASE2_REPORT.md`. Phase 3–6 belum dikerjakan.
+**Phase 0–2 playable; Phase 3 PASS (scope fungsional/QA otomatis)** (10 Nov 2026). 378 unit + 311 browser checks produksi, strict TS/build lulus; bukti di `PHASE3_REPORT.md`. Keterbatasan art sebelumnya tetap dicatat. Phase 4–6 belum dikerjakan.
 
 ## Phase 0 — Web Foundation
 
@@ -29,10 +29,12 @@
 
 ## Phase 3 — RPG / Save
 
-- [ ] EXP/level/skill, inventory/equipment.
-- [ ] Manual save, autosave, load, Continue.
-- [ ] Settings lengkap + persist + fullscreen error handling.
-- [ ] Save corruption/storage blocked handling.
+- [x] EXP/level, shared inventory, equipment dan dua pasif DRAFT Yaric.
+- [x] Manual save tiga slot, autosave aman, Load/Continue setelah refresh.
+- [x] Shop foundation/UI terisolasi dari cerita; buy/sell/currency/stock dan transaksi gagal aman.
+- [x] Delapan menu Pause terhubung; Settings tetap persisten dan terpisah.
+- [x] Migrasi save v1→v2 read-only, backup/recovery, quota/corruption/storage unavailable; bukti akhir di PHASE3_REPORT.md.
+- [ ] Review manusia untuk UI dan balancing/pasif DRAFT.
 
 ## Phase 4 — MVP
 

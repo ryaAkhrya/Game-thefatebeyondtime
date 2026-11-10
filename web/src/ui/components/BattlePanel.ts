@@ -4,6 +4,7 @@ import { COLORS } from '../../game/config/palette';
 import type { BattleEngine, Command } from '../../game/combat/BattleEngine';
 import { MenuList, type MenuItem } from './MenuList';
 import { makeText } from '../styles/theme';
+import type { RewardReceipt } from '../../game/rpg/progression';
 
 /** All battle UI layout/text lives here; combat rules remain in BattleEngine. Coordinates: 320x180. */
 export class BattlePanel {
@@ -64,9 +65,10 @@ export class BattlePanel {
     this.menu?.handleIntent({ ...event, intent: event.intent === 'left' ? 'up' : event.intent === 'right' ? 'down' : event.intent });
   }
   busy(): void { this.mode = 'busy'; this.menu?.destroy(); this.menu = undefined; this.hint.setText('Tunggu sampai aksi selesai.'); }
-  result(victory: boolean): void {
+  result(victory: boolean, reward?: RewardReceipt | null): void {
     this.mode = 'result';
     this.say(victory ? 'MENANG\nHollowling dikalahkan.' : 'KALAH\nCoba lagi dari sebelum pertarungan.');
+    if (victory && reward) this.say(`MENANG  +${reward.exp} EXP\n+${reward.gold} emas  Lv ${reward.beforeLevel} > ${reward.afterLevel}\n+${reward.skillPoints} poin jurus`);
     this.hint.setText(victory ? 'Enter: lanjutkan eksplorasi' : 'Item dan MP kembali ke checkpoint.');
     this.makeMenu([
       { id: victory ? 'continue' : 'retry', label: victory ? 'Lanjutkan' : 'Coba Lagi' },

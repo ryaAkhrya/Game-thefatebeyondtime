@@ -31,5 +31,8 @@ export const SCENE_KEYS = {
   Hud: 'HudScene',
   Pause: 'PauseScene',
   Battle: 'BattleScene',
+  RpgMenu: 'RpgMenuScene',
+  SaveLoad: 'SaveLoadScene',
+  Shop: 'ShopScene',
 } as const;
 export type SceneKey = (typeof SCENE_KEYS)[keyof typeof SCENE_KEYS];

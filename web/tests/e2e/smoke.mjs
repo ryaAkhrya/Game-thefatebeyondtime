@@ -7,6 +7,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from 'playwright-core';
+import { selectMenu } from './battle-helpers.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../..');
@@ -184,7 +185,7 @@ async function main() {
     await press(page, 'Escape');
     await page.waitForTimeout(300);
     check('Esc di dunia membuka Menu Jeda (layer pause)', (await layer(page)) === 'pause', String(await layer(page)));
-    await press(page, 'ArrowDown', 2);
+    await selectMenu(page, 'title');
     await press(page, 'Enter');
     await page.waitForTimeout(250);
     await press(page, 'ArrowDown');
@@ -301,10 +302,10 @@ async function main() {
     await waitScene(page, 'TitleScene');
     await press(page, 'ArrowDown');
     await press(page, 'Enter');
-    await waitScene(page, 'PlaceholderScene');
-    await shot(page, '09_continue_placeholder');
-    await layoutOk(page, 'Lanjut (placeholder)');
-    check('Dengan save valid, Lanjut aktif -> PlaceholderScene (jujur belum ada gameplay)', (await scenes(page)).includes('PlaceholderScene'));
+    await waitScene(page, 'WorldScene');
+    await shot(page, '09_continue_world');
+    await layoutOk(page, 'Lanjut ke dunia');
+    check('Dengan save lama valid, Lanjut memigrasikan dan memuat WorldScene', (await scenes(page)).includes('WorldScene'));
     check('Lanjut tidak mengubah save', (await stored(page, 'tfbt.save.v1.slot1')) === validSaveEnvelope());
 
     check('Tidak ada error JS di sesi Settings', s.errors.length === 0, s.errors.join(' | '));
