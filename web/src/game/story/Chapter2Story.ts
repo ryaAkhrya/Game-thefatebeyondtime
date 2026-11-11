@@ -2,8 +2,9 @@ import type { GameState } from '../systems/GameState';
 import type { StoryAction } from './Chapter1Story';
 import { AveloriaStory } from './AveloriaStory';
 import { C2 } from './chapter2Flags';
+import { IDENTITY_FLAG } from './identity';
 import { C2_AZIE, C2_DUO_INTRO, C2_DUO_OUTRO, C2_FAREWELL, C2_FRAGMENT_A, C2_FRAGMENT_B,
-  C2_RECORDS, C2_RETURN, C2_SHADOW, C2_STONE, C2_TORVAN, C2_VEYRATH_INTRO, C2_VEYRATH_OUTRO, C2_ZIRA, c2Draft } from '../dialogue/chapter2';
+  C2_NAME_ECHO, C2_NAME_FOUND, C2_RECORDS, C2_RETURN, C2_SHADOW, C2_STONE, C2_TORVAN, C2_VEYRATH_INTRO, C2_VEYRATH_OUTRO, C2_ZIRA, c2Draft } from '../dialogue/chapter2';
 
 const say = (id: string, text: string, label?: string): StoryAction[] => [{ type: 'dialogue', script: {
   id, nodes: [c2Draft(`${id}-X001`, text, 'SYSTEM', undefined, label)],
@@ -89,7 +90,8 @@ export class Chapter2Story {
   }
   private forest(id: string): StoryAction[] {
     if (id === 'forest2_marker') return this.has(C2.forest) ? [{ type: 'dialogue', script: C2_STONE }]
-      : [{ type: 'dialogue', script: C2_STONE }, { type: 'setFlag', flag: C2.forest }];
+      : [{ type: 'dialogue', script: C2_STONE }, { type: 'dialogue', script: C2_NAME_ECHO }, { type: 'setFlag', flag: IDENTITY_FLAG },
+        { type: 'dialogue', script: C2_NAME_FOUND }, { type: 'setFlag', flag: C2.forest }];
     if (id === 'torvan') return this.has(C2.forest) && !this.has(C2.torvan)
       ? [{ type: 'dialogue', script: C2_TORVAN }, { type: 'joinTorvan' }]
       : say('C2-05-BLOCKED', 'Batu penanda di barat masih perlu diperiksa.');

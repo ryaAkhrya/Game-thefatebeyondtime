@@ -1,5 +1,9 @@
 # SESSION HANDOFF — FOR CLAUDE CODE (v2.0, diperbarui setelah Phase 0)
 
+## Polish Sprint 1 handoff terkini
+
+UI memakai `src/ui/kit/ui.ts` (ruang desain 960x540, ukuran dibulatkan ke piksel perangkat; scene UI memakai `bindRelayout`). Dunia/battle: zoom bulat (`DisplayScale.computeDisplay`). Nama Yaric: `story/identity.ts` (`isNameKnown`, `speakerLabel`); reveal DRAFT_IMPL di `Chapter2Story` (batu penanda pertama). Tujuan hanya di `JournalScene` (`story/journal.ts`). Sprite eksplorasi memuat `characters/normalized/`. QA: `tests/e2e/sprint1.mjs`, hook `__tfbt.sceneTexts/frameBounds/display/router`, `qa.chapter2/bossBattle`. Tidak ada commit/push. Sprint 2 dan Bab III menunggu instruksi baru. Detail: `POLISH_SPRINT1_REPORT.md`.
+
 ## Phase 6 handoff terkini — Chapter II
 
 Bab II C2-01..09 playable dari ending Bab I hingga `chapter.2_complete`. `SliceEndScene` menawarkan **Mulai Bab II** hanya dari `chapter.1_complete`. `Chapter2Story` mengatur Azie → Velthia → Liora/Zira → Hutan 2 → Torvan join → M01+M02 tutorial → penanda → Veyrath → dua fragmen → Aveloria/Velthia. Tidak ada launcher Bab III. Detail QA/batasan di `PHASE6_REPORT.md`.

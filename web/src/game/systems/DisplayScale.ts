@@ -1,47 +1,61 @@
-import { GAME_HEIGHT, GAME_WIDTH, MIN_VIEWPORT_HEIGHT, MIN_VIEWPORT_WIDTH } from '../config/constants';
+import { GAME_HEIGHT, GAME_WIDTH, MIN_VIEWPORT_HEIGHT, MIN_VIEWPORT_WIDTH, UI_HEIGHT } from '../config/constants';
 import type { ScreenScale } from '../data/settingsSchema';
 
-export interface ScaleResult {
-  /** Ukuran canvas dalam CSS px (bilangan bulat). */
+export interface DisplayLayout {
+  /** Ukuran tampilan kanvas dalam CSS px (boleh pecahan agar tepat satu-banding-satu dengan piksel perangkat). */
   cssWidth: number;
   cssHeight: number;
-  /** Pengali terhadap resolusi internal, dalam piksel perangkat (device pixel). */
-  deviceZoom: number;
-  integer: boolean;
+  /** Ukuran backing-store kanvas = piksel perangkat. UI digambar 1:1 pada resolusi ini. */
+  pixelWidth: number;
+  pixelHeight: number;
+  dpr: number;
+  /** Zoom kamera dunia, SELALU bilangan bulat (pixel art rata, tanpa shimmer). */
+  worldZoom: number;
+  /** Zoom sprite battle, SELALU bilangan bulat. */
+  battleZoom: number;
+  /** Piksel perangkat per satuan desain UI (960x540). Pecahan diperbolehkan; semua ukuran UI dibulatkan. */
+  uiScale: number;
+  /** Fit mengisi viewport; pixel_perfect hanya kelipatan bulat 640x360 dengan letterbox. */
+  mode: ScreenScale;
 }
 
 /**
- * Menghitung ukuran tampilan 16:9 untuk viewport tertentu.
- * - pixel_perfect: zoom bilangan bulat dalam PIKSEL PERANGKAT (memperhitungkan devicePixelRatio),
- *   sisanya letterbox. Tidak ada piksel yang tidak rata.
- * - fit: memenuhi viewport (tetap 16:9, tanpa stretch), zoom boleh pecahan; ukuran CSS dibulatkan.
+ * Menghitung tata letak tampilan 16:9 untuk viewport tertentu.
+ * - fit: kanvas sebesar viewport (rasio 16:9, tanpa stretch) dalam piksel perangkat.
+ * - pixel_perfect: kanvas = kelipatan bulat 640x360 dalam piksel perangkat, sisanya letterbox.
+ * Zoom dunia dan battle dipilih sebagai bilangan bulat pada kedua mode, sehingga tidak ada penskalaan pecahan
+ * pada pixel art. Hanya UI vektor/teks yang memakai skala pecahan, dan ia dirasterisasi pada resolusi perangkat.
  */
-export function computeScale(
-  viewportWidth: number,
-  viewportHeight: number,
-  mode: ScreenScale,
-  devicePixelRatio = 1,
-): ScaleResult {
+export function computeDisplay(viewportWidth: number, viewportHeight: number, mode: ScreenScale, devicePixelRatio = 1): DisplayLayout {
   const dpr = devicePixelRatio > 0 ? devicePixelRatio : 1;
-  const devW = Math.max(1, viewportWidth * dpr);
-  const devH = Math.max(1, viewportHeight * dpr);
-  const rawZoom = Math.min(devW / GAME_WIDTH, devH / GAME_HEIGHT);
+  const devW = Math.max(1, Math.floor(viewportWidth * dpr));
+  const devH = Math.max(1, Math.floor(viewportHeight * dpr));
 
+  let pixelWidth: number;
+  let pixelHeight: number;
+  let worldZoom: number;
   if (mode === 'pixel_perfect') {
-    const z = Math.max(1, Math.floor(rawZoom + 1e-6));
-    return {
-      cssWidth: Math.round((GAME_WIDTH * z) / dpr),
-      cssHeight: Math.round((GAME_HEIGHT * z) / dpr),
-      deviceZoom: z,
-      integer: true,
-    };
+    const k = Math.max(1, Math.floor(Math.min(devW / GAME_WIDTH, devH / GAME_HEIGHT) + 1e-6));
+    pixelWidth = GAME_WIDTH * k;
+    pixelHeight = GAME_HEIGHT * k;
+    worldZoom = k;
+  } else {
+    pixelHeight = Math.max(1, Math.min(devH, Math.floor((devW * 9) / 16)));
+    pixelWidth = Math.max(1, Math.round((pixelHeight * 16) / 9));
+    worldZoom = Math.max(1, Math.round(pixelWidth / GAME_WIDTH));
   }
-
-  const z = Math.max(1, rawZoom);
-  // Bulatkan ke bawah agar tidak melebihi viewport; jaga rasio 16:9 dari sisi lebar.
-  const cssWidth = Math.max(1, Math.floor((GAME_WIDTH * z) / dpr));
-  const cssHeight = Math.max(1, Math.floor((cssWidth * GAME_HEIGHT) / GAME_WIDTH));
-  return { cssWidth, cssHeight, deviceZoom: z, integer: Number.isInteger(z) };
+  const battleZoom = Math.max(2, Math.round(pixelHeight / 250));
+  return {
+    cssWidth: pixelWidth / dpr,
+    cssHeight: pixelHeight / dpr,
+    pixelWidth,
+    pixelHeight,
+    dpr,
+    worldZoom,
+    battleZoom,
+    uiScale: pixelHeight / UI_HEIGHT,
+    mode,
+  };
 }
 
 export interface DesktopCheckInput {

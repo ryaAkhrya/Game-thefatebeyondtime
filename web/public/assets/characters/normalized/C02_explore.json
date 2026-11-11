@@ -1,0 +1,1136 @@
+{
+  "entity_id": "C02",
+  "status": "DRAFT",
+  "generated_by": "web/scripts/normalize-exploration-sprites.mjs",
+  "normalization_version": 1,
+  "note_status": "Turunan runtime Polish Sprint 1. Bukan aset final; tetap DRAFT. Sumber di assets/ tidak diubah.",
+  "frame_size": [
+    32,
+    48
+  ],
+  "atlas_size": [
+    192,
+    192
+  ],
+  "grid": {
+    "cols": 6,
+    "rows": 4,
+    "row_order": [
+      "front(down)",
+      "left",
+      "right",
+      "back(up)"
+    ]
+  },
+  "pivot": [
+    16,
+    46
+  ],
+  "pivot_note": "Pivot [16,46] = piksel baris kaki terbawah. Tepi bawah kaki = y 47 sel; Phaser origin (0.5, 47/48) menempatkan tepi bawah kaki tepat di y dunia (sama dengan dasar footBox).",
+  "baseline_y": 46,
+  "source": {
+    "path": "assets/characters/C02_Velthia/C02_EXPLORATION_ATLAS_DRAFT.png",
+    "sha256": "df0fa4af60db6600027439ac48d9bf1787b7a55f8594c738e3d67ca6aaab683d",
+    "json": "assets/characters/C02_Velthia/C02_EXPLORATION_ATLAS_DRAFT.json"
+  },
+  "input_runtime_copy": {
+    "path": "web/public/assets/characters/C02_explore.png",
+    "sha256": "df0fa4af60db6600027439ac48d9bf1787b7a55f8594c738e3d67ca6aaab683d",
+    "identical_to_source": true
+  },
+  "output_sha256_note": "sha256 PNG keluaran ada di normalized.generated.json",
+  "per_direction": {
+    "down": {
+      "dx": -1,
+      "dyAll": [
+        1
+      ],
+      "heightsAfter": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "heightsBefore": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "bottomBefore": [
+        45,
+        45,
+        45,
+        45,
+        45,
+        45
+      ],
+      "bottomAfter": 46,
+      "footCenterMean": 15.68
+    },
+    "left": {
+      "dx": -1,
+      "dyAll": [
+        1
+      ],
+      "heightsAfter": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "heightsBefore": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "bottomBefore": [
+        45,
+        45,
+        45,
+        45,
+        45,
+        45
+      ],
+      "bottomAfter": 46,
+      "footCenterMean": 15.68
+    },
+    "right": {
+      "dx": -1,
+      "dyAll": [
+        1
+      ],
+      "heightsAfter": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "heightsBefore": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "bottomBefore": [
+        45,
+        45,
+        45,
+        45,
+        45,
+        45
+      ],
+      "bottomAfter": 46,
+      "footCenterMean": 15.68
+    },
+    "up": {
+      "dx": -1,
+      "dyAll": [
+        1
+      ],
+      "heightsAfter": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "heightsBefore": [
+        42,
+        41,
+        42,
+        41,
+        42,
+        41
+      ],
+      "bottomBefore": [
+        45,
+        45,
+        45,
+        45,
+        45,
+        45
+      ],
+      "bottomAfter": 46,
+      "footCenterMean": 15.68
+    }
+  },
+  "frames": {
+    "front_0": {
+      "rect": [
+        0,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "front_0 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "front_1": {
+      "rect": [
+        32,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "front_1 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "front_2": {
+      "rect": [
+        64,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "front_2 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "front_3": {
+      "rect": [
+        96,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "front_3 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "front_4": {
+      "rect": [
+        128,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "front_4 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "front_5": {
+      "rect": [
+        160,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "front_5 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "left_0": {
+      "rect": [
+        0,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "left_0 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "left_1": {
+      "rect": [
+        32,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "left_1 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "left_2": {
+      "rect": [
+        64,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "left_2 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "left_3": {
+      "rect": [
+        96,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "left_3 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "left_4": {
+      "rect": [
+        128,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "left_4 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "left_5": {
+      "rect": [
+        160,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "left_5 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "right_0": {
+      "rect": [
+        0,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "right_0 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "right_1": {
+      "rect": [
+        32,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "right_1 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "right_2": {
+      "rect": [
+        64,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "right_2 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "right_3": {
+      "rect": [
+        96,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "right_3 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "right_4": {
+      "rect": [
+        128,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "right_4 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "right_5": {
+      "rect": [
+        160,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "right_5 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "back_0": {
+      "rect": [
+        0,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "back_0 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "back_1": {
+      "rect": [
+        32,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "back_1 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "back_2": {
+      "rect": [
+        64,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "back_2 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "back_3": {
+      "rect": [
+        96,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "back_3 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "back_4": {
+      "rect": [
+        128,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 4,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 42
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 5,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 42
+      },
+      "transform": {
+        "derived_from": "back_4 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    },
+    "back_5": {
+      "rect": [
+        160,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox_before": {
+        "x0": 5,
+        "y0": 5,
+        "x1": 27,
+        "y1": 45,
+        "w": 23,
+        "h": 41
+      },
+      "bbox_after": {
+        "x0": 4,
+        "y0": 6,
+        "x1": 26,
+        "y1": 46,
+        "w": 23,
+        "h": 41
+      },
+      "transform": {
+        "derived_from": "back_5 (sama)",
+        "mirror": false,
+        "duplicate_rows_src_y": [],
+        "dy": 1,
+        "dx": -1,
+        "foot_center_x_before_dx": 16.68,
+        "foot_center_x_after": 15.68
+      }
+    }
+  },
+  "animations": {
+    "front_idle": {
+      "frames": [
+        "front_0",
+        "front_1"
+      ],
+      "fps": 2
+    },
+    "front_walk": {
+      "frames": [
+        "front_2",
+        "front_3",
+        "front_4",
+        "front_5"
+      ],
+      "fps": 7
+    },
+    "left_idle": {
+      "frames": [
+        "left_0",
+        "left_1"
+      ],
+      "fps": 2
+    },
+    "left_walk": {
+      "frames": [
+        "left_2",
+        "left_3",
+        "left_4",
+        "left_5"
+      ],
+      "fps": 7
+    },
+    "right_idle": {
+      "frames": [
+        "right_0",
+        "right_1"
+      ],
+      "fps": 2
+    },
+    "right_walk": {
+      "frames": [
+        "right_2",
+        "right_3",
+        "right_4",
+        "right_5"
+      ],
+      "fps": 7
+    },
+    "back_idle": {
+      "frames": [
+        "back_0",
+        "back_1"
+      ],
+      "fps": 2
+    },
+    "back_walk": {
+      "frames": [
+        "back_2",
+        "back_3",
+        "back_4",
+        "back_5"
+      ],
+      "fps": 7
+    }
+  },
+  "notes": [
+    "Prototipe kasar: badan sama untuk keempat arah, hanya kepala berbeda; siklus jalan = kepala naik-turun 1 px dengan kaki tetap.",
+    "Hanya satu pergeseran vertikal (kaki ke y=46) dan satu pergeseran horizontal per baris arah; bob kepala 1 px asli dipertahankan."
+  ],
+  "frames_needing_artist_redraw": [
+    "Semua frame: sprite prototipe kasar, tanpa animasi kaki/lengan, arah hanya dibedakan kepala; perlu redraw seniman untuk final."
+  ],
+  "review": "Hand-authored low-resolution pixel prototype; visually compare against approved portrait and direction sheet at native 1x. Not production ready."
+}

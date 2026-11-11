@@ -1,5 +1,14 @@
 # TASKS — STATUS SEBENARNYA
 
+## Polish Sprint 1 — UI/UX, Title, identitas Yaric, sprite (11 November 2026)
+
+- [x] Kanvas = piksel perangkat, zoom dunia/battle bulat, UI 960x540 tajam (Cinzel + Source Sans 3); Fit/Pixel Perfect/resize berfungsi.
+- [x] Title Screen baru (siluet Yaric–Velthia), dialog, Inventaris/Status/Jeda/Jurnal/Simpan/Pengaturan/Toko dan battle solo/duo didesain ulang; banner tujuan dihapus (tujuan di Jurnal).
+- [x] Nama Yaric anonim sampai reveal DRAFT_IMPL di batu penanda pertama Hutan 2 (`identity.name_known`); save lama kompatibel.
+- [x] Sprite eksplorasi ternormalisasi (kaki y=46; Yaric kiri/kanan tidak lagi melayang/kecil). Perlu redraw artist: Yaric belakang/kanan dan seluruh sprite pendukung.
+- [x] 588 unit, produksi Edge 645 (84+197+37+54+38+75+55+105), Chrome sprint1 105 + kota 75; strict TS/build. Laporan: `docs/production/POLISH_SPRINT1_REPORT.md`.
+- [ ] Review manusia (tipografi/komposisi/key art Title, monitor nyata), font final, key art; Sprint 2 (idle animation) dan Bab III menunggu instruksi.
+
 ## Phase 6 otonom — Chapter II
 
 - [x] Baseline Phase 0–5: 460 unit, 484 Edge produksi, 113 Chrome, 113 dev Edge; TypeScript/build.

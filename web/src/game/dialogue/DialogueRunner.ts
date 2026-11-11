@@ -12,6 +12,8 @@ export interface RunnerOptions {
   charsWithPortrait?: number;
   charsWithoutPortrait?: number;
   linesPerPage?: number;
+  /** Pembungkus berbasis ukur (font proporsional). Bila ada, menggantikan wrapText berbasis jumlah karakter. */
+  wrap?: (text: string, hasPortrait: boolean, kind: DialogueLine['kind']) => string[];
   defaultPauseMs?: number;
   /** Dipanggil saat pilihan dipilih (ID pilihan, ID opsi). */
   onChoice?: (choiceId: string, optionId: string) => void;
@@ -182,7 +184,8 @@ export class DialogueRunner {
     this.line = node;
     const chars = (this.hasPortraitLayout ? this.opts.charsWithPortrait : this.opts.charsWithoutPortrait) ?? 28;
     const text = node.kind === 'thought' ? `(${node.text})` : node.text;
-    this.pages = paginate(wrapText(text, chars), this.opts.linesPerPage ?? 4);
+    const wrapped = this.opts.wrap ? this.opts.wrap(text, this.hasPortraitLayout, node.kind) : wrapText(text, chars);
+    this.pages = paginate(wrapped, this.opts.linesPerPage ?? 4);
     this.pageIndex = 0;
     this.beginPage();
     return true;

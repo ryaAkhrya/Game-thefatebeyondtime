@@ -1,0 +1,1090 @@
+{
+  "generatedBy": "web/scripts/normalize-exploration-sprites.mjs",
+  "status": "NEEDS_REVIEW/DRAFT",
+  "pivot": [
+    16,
+    46
+  ],
+  "items": [
+    {
+      "id": "C01",
+      "status": "NEEDS_REVIEW",
+      "out": "assets/characters/normalized/C01_explore.png",
+      "source": "assets/characters/C01_Yaric/v3_2/C01_EXPLORATION_PIXEL_PASS_V3_2.png",
+      "source_sha256": "f6c736c2c5e0665079c03b39d01eb35b51b8d436c373c68dcf1eb7990b69632c",
+      "output_sha256": "b0749f2f255ef1aa544d75137ac72b02500454ac1de4971b5b4a1134da88f9f6",
+      "per_direction": {
+        "down": {
+          "dx": 0,
+          "dyAll": [
+            0
+          ],
+          "heightsAfter": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "heightsBefore": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "bottomBefore": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 16.5
+        },
+        "left": {
+          "dx": 2,
+          "dyAll": [
+            0
+          ],
+          "heightsAfter": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "heightsBefore": [
+            40,
+            40,
+            40,
+            40
+          ],
+          "bottomBefore": [
+            40,
+            40,
+            40,
+            40
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 16.42
+        },
+        "right": {
+          "dx": -2,
+          "dyAll": [
+            0
+          ],
+          "heightsAfter": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "heightsBefore": [
+            36,
+            36,
+            36,
+            36
+          ],
+          "bottomBefore": [
+            36,
+            36,
+            36,
+            36
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.58
+        },
+        "up": {
+          "dx": 1,
+          "dyAll": [
+            0
+          ],
+          "heightsAfter": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "heightsBefore": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "bottomBefore": [
+            46,
+            46,
+            46,
+            46
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 16.34
+        }
+      }
+    },
+    {
+      "id": "C02",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C02_explore.png",
+      "source": "assets/characters/C02_Velthia/C02_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "df0fa4af60db6600027439ac48d9bf1787b7a55f8594c738e3d67ca6aaab683d",
+      "output_sha256": "2d96363128e1dd3a120919c47c89c98f4d713ae0dbf6a4bba027781ab27b5e2b",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        }
+      }
+    },
+    {
+      "id": "C03",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C03_explore.png",
+      "source": "assets/characters/C03_Torvan/C03_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "e4b4e352987648046ae710e8e1b0c8072fb321d3bfed840b4c3dbe455bd60c61",
+      "output_sha256": "c2428a5ce519131b1fe5b1052cfb544fbe00a8488a95c92c638fe39f73b93128",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        }
+      }
+    },
+    {
+      "id": "C05",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C05_explore.png",
+      "source": "assets/characters/C05_Azie/C05_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "cac7935a5eee8505ea3291c77b9f4ba83dd2134201a8c53b9a76043304b5f579",
+      "output_sha256": "6b6408335e8633af48a409d28cbb9262c2ede43288c17a1b7004184bf98629e6",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        }
+      }
+    },
+    {
+      "id": "C06",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C06_explore.png",
+      "source": "assets/characters/C06_Talric/C06_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "2e396139419b1f5f90d30015fb4d50a06e2cc7a003dc1fd34bc281138a81db20",
+      "output_sha256": "d00da513e066110ba602749556c39964461dc4e05615011f63dc33faae58d352",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        }
+      }
+    },
+    {
+      "id": "C07",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C07_explore.png",
+      "source": "assets/characters/C07_Zira/C07_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "4916b7b324f3a0081466818dccb8c9490e00946b7f0b727c45c76e5fb95a6fc1",
+      "output_sha256": "a4f48a9de5b129180003f49e6d18edaf1476bdd26aab7d3f378d69a8156cea06",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "heightsBefore": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "heightsBefore": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "heightsBefore": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "heightsBefore": [
+            46,
+            45,
+            46,
+            45,
+            46,
+            45
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        }
+      }
+    },
+    {
+      "id": "C08",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C08_explore.png",
+      "source": "assets/characters/C08_Nambo/C08_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "a56bc9c736797a6555ebbbcd35358ff79b372fcae3d9e3d2bc8a884bab81c3f7",
+      "output_sha256": "77ea751b7918e53b49534821c05d0ccca7b7527bae392bf8a00b9b7ebade642e",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        }
+      }
+    },
+    {
+      "id": "C09",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C09_explore.png",
+      "source": "assets/characters/C09_Derrria/C09_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "113a28b6a8ec3f9e707e448477bf1c62097ab7914c63d1d141229eb3260e50df",
+      "output_sha256": "d4e7399d06ad1876bd1132afc1ebd04ded9c6ea275e0d037ae1ac033236d1b32",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            1
+          ],
+          "heightsAfter": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "heightsBefore": [
+            42,
+            41,
+            42,
+            41,
+            42,
+            41
+          ],
+          "bottomBefore": [
+            45,
+            45,
+            45,
+            45,
+            45,
+            45
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.68
+        }
+      }
+    }
+  ]
+}

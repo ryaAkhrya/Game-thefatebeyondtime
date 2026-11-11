@@ -24,7 +24,7 @@ export class AveloriaView {
     this.dusk = scene.add.rectangle(0, 0, loaded.map.width, loaded.map.height, 0x25263d, 0).setOrigin(0).setDepth(9000);
     for (const n of CITY_NPCS) {
       const shadow = scene.add.ellipse(n.x, n.y - 1, 18, 6, 0x20272a, 0.35).setDepth(n.y - 1);
-      const sprite = scene.add.sprite(n.x, n.y, `${n.entity}_CITY_EXPLORE`, ROW[n.facing] * 6).setOrigin(0.5, 46 / 48).setDepth(n.y);
+      const sprite = scene.add.sprite(n.x, n.y, `${n.entity}_CITY_EXPLORE`, ROW[n.facing] * 6).setOrigin(0.5, 47 / 48).setDepth(n.y);
       this.actors.set(n.id, { ...n, sprite, shadow });
     }
     for (const n of CITIZENS) {

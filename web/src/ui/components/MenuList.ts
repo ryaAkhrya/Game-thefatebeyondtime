@@ -1,7 +1,7 @@
 import type Phaser from 'phaser';
 import type { IntentEvent } from '../../game/core/InputManager';
 import { COLORS, css } from '../../game/config/palette';
-import { FOCUS_BAR_HEIGHT, makeText } from '../styles/theme';
+import { TYPE, type Ui } from '../kit/ui';
 
 export interface MenuItem {
   id: string;
@@ -9,66 +9,117 @@ export interface MenuItem {
   disabled?: boolean;
   /** Pesan singkat saat item nonaktif difokuskan / dikonfirmasi. */
   disabledHint?: string;
+  /** Teks rata kanan (mis. jumlah "x3", harga). */
+  right?: string;
+  /** Tetap tidak dapat dikonfirmasi (disabled) tetapi digambar normal, bukan redup (mis. perlengkapan di Inventaris). */
+  soft?: boolean;
+  /** Penanda warna kecil di kiri baris (kategori). */
+  tone?: number;
 }
 
 export interface MenuListOptions {
-  x: number; // tengah menu
-  y: number; // atas baris pertama
+  ui: Ui;
+  /** Koordinat desain. `x` = tepi kiri daftar, kecuali align 'center' (x = tengah). */
+  x: number;
+  y: number;
   width: number;
   rowHeight: number;
-  depth?: number;
   items: MenuItem[];
+  depth?: number;
+  align?: 'left' | 'center';
+  size?: number;
+  family?: 'body' | 'display';
+  /** Jumlah baris terlihat; lebih banyak dari itu digulir mengikuti fokus. */
+  maxRows?: number;
+  /** Fokus awal (setelah tata letak dibangun ulang). */
+  initialId?: string;
   onConfirm: (item: MenuItem) => void;
   onDisabledConfirm?: (item: MenuItem) => void;
   onFocusChange?: (item: MenuItem) => void;
 }
 
+interface Row {
+  fill: Phaser.GameObjects.Rectangle;
+  edge: Phaser.GameObjects.Rectangle;
+  outline: Phaser.GameObjects.Rectangle[];
+  tone: Phaser.GameObjects.Rectangle;
+  label: Phaser.GameObjects.Text;
+  right: Phaser.GameObjects.Text;
+}
+
 /**
  * Daftar menu vertikal berfokus-keyboard. Fokus selalu terlihat:
- * - aktif   : batang Bitter Lime + teks gelap
- * - nonaktif: teks redup; saat difokuskan hanya diberi kerangka lime (tidak terlihat seperti aktif)
- * Item nonaktif tidak pernah memanggil onConfirm.
+ * - aktif   : alas terangkat + garis lime di kiri + teks terang tebal
+ * - nonaktif: teks redup; saat difokuskan hanya diberi kerangka tipis (tidak terlihat seperti aktif)
+ * Item nonaktif tidak pernah memanggil onConfirm. Daftar panjang digulir (indikator di tepi).
  */
 export class MenuList {
   private index = 0;
-  private readonly bar: Phaser.GameObjects.Rectangle;
-  private readonly outline: Phaser.GameObjects.Rectangle;
-  private readonly labels: Phaser.GameObjects.Text[] = [];
+  private top = 0;
+  private readonly rows: Row[] = [];
+  private readonly more: Phaser.GameObjects.Text[] = [];
   private readonly registry: Phaser.Data.DataManager;
+  private readonly visible: number;
 
   constructor(
     scene: Phaser.Scene,
     private readonly opts: MenuListOptions,
   ) {
     this.registry = scene.registry;
-    const left = opts.x - opts.width / 2;
-    this.bar = scene.add.rectangle(left, 0, opts.width, FOCUS_BAR_HEIGHT, COLORS.bitterLime).setOrigin(0, 0);
-    this.outline = scene.add
-      .rectangle(left, 0, opts.width, FOCUS_BAR_HEIGHT)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, COLORS.bitterLime)
-      .setFillStyle(0, 0);
-    opts.items.forEach((item, i) => {
-      const t = makeText(scene, opts.x, opts.y + i * opts.rowHeight + 2, item.label, {
-        originX: 0.5,
-        color: COLORS.paper,
-      });
-      this.labels.push(t);
-    });
-    this.bar.setDepth(opts.depth ?? 0);
-    this.outline.setDepth(opts.depth ?? 0);
-    this.labels.forEach(t => t.setDepth(opts.depth ?? 0));
+    const { ui } = opts;
+    const depth = opts.depth ?? 0;
+    this.visible = Math.min(opts.items.length, opts.maxRows ?? opts.items.length);
+    const left = opts.align === 'center' ? opts.x - opts.width / 2 : opts.x;
+    const h = ui.hair / ui.s;
+    for (let i = 0; i < this.visible; i++) {
+      const y = opts.y + i * opts.rowHeight;
+      const fill = ui.rect(left, y, opts.width, opts.rowHeight - 2, COLORS.plumLift, 0.9, depth).setVisible(false);
+      const edge = ui.rect(left, y, 3, opts.rowHeight - 2, COLORS.bitterLime, 1, depth + 1).setVisible(false);
+      const outline = [
+        ui.rect(left, y, opts.width, h, COLORS.bitterLime, 0.8, depth + 1),
+        ui.rect(left, y + opts.rowHeight - 2 - h, opts.width, h, COLORS.bitterLime, 0.8, depth + 1),
+        ui.rect(left, y, h, opts.rowHeight - 2, COLORS.bitterLime, 0.8, depth + 1),
+        ui.rect(left + opts.width - h, y, h, opts.rowHeight - 2, COLORS.bitterLime, 0.8, depth + 1),
+      ];
+      outline.forEach(o => o.setVisible(false));
+      const tone = ui.rect(left + 9, y + (opts.rowHeight - 2) / 2 - 2.5, 5, 5, COLORS.plumLine, 1, depth + 1).setVisible(false);
+      const size = opts.size ?? TYPE.body;
+      const ty = y + (opts.rowHeight - 2) / 2;
+      const label = opts.align === 'center'
+        ? ui.text(opts.x, ty, '', { size, originX: 0.5, originY: 0.5, depth: depth + 2, family: opts.family })
+        : ui.text(left + 10, ty, '', { size, originY: 0.5, depth: depth + 2, family: opts.family, maxWidth: opts.width - 24 });
+      const right = ui.text(left + opts.width - 10, ty, '', { size: size - 1, originX: 1, originY: 0.5, depth: depth + 2, color: COLORS.paperDim });
+      this.rows.push({ fill, edge, outline, tone, label, right });
+    }
+    if (opts.items.length > this.visible) {
+      this.more.push(
+        ui.text(left + opts.width / 2, opts.y - 9, '▲', { size: TYPE.tiny, originX: 0.5, originY: 0.5, color: COLORS.paperDim, depth: depth + 2 }),
+        ui.text(left + opts.width / 2, opts.y + this.visible * opts.rowHeight + 5, '▼', { size: TYPE.tiny, originX: 0.5, originY: 0.5, color: COLORS.paperDim, depth: depth + 2 }),
+      );
+    }
+    if (opts.initialId) {
+      const i = opts.items.findIndex(item => item.id === opts.initialId);
+      if (i >= 0) this.index = i;
+    }
     this.render();
   }
 
   destroy(): void {
-    this.bar.destroy();
-    this.outline.destroy();
-    this.labels.forEach((l) => l.destroy());
+    for (const r of this.rows) {
+      r.fill.destroy(); r.edge.destroy(); r.tone.destroy(); r.label.destroy(); r.right.destroy();
+      r.outline.forEach(o => o.destroy());
+    }
+    this.rows.length = 0;
+    this.more.forEach(m => m.destroy());
+    this.more.length = 0;
   }
 
   get focusedItem(): MenuItem {
     return this.opts.items[this.index]!;
+  }
+
+  get items(): readonly MenuItem[] {
+    return this.opts.items;
   }
 
   focusId(id: string): void {
@@ -105,16 +156,32 @@ export class MenuList {
   }
 
   private render(notify = false): void {
-    const y = this.opts.y + this.index * this.opts.rowHeight;
-    const focused = this.focusedItem;
-    this.bar.setPosition(this.bar.x, y).setVisible(!focused.disabled);
-    this.outline.setPosition(this.outline.x, y).setVisible(!!focused.disabled);
-    this.opts.items.forEach((item, i) => {
-      const isFocus = i === this.index;
-      const color = item.disabled ? COLORS.disabled : isFocus ? COLORS.ink : COLORS.paper;
-      this.labels[i]!.setColor(css(color));
+    const n = this.opts.items.length;
+    if (this.index < this.top) this.top = this.index;
+    if (this.index >= this.top + this.visible) this.top = this.index - this.visible + 1;
+    this.top = Math.max(0, Math.min(this.top, n - this.visible));
+    this.rows.forEach((row, i) => {
+      const item = this.opts.items[this.top + i]!;
+      const focus = this.top + i === this.index;
+      const looksDisabled = !!item.disabled && !item.soft;
+      row.fill.setVisible(focus && !looksDisabled);
+      row.edge.setVisible(focus && !looksDisabled);
+      row.outline.forEach(o => o.setVisible(focus && looksDisabled));
+      row.tone.setVisible(item.tone !== undefined);
+      if (item.tone !== undefined) row.tone.setFillStyle(looksDisabled ? COLORS.plumLine : item.tone);
+      const color = looksDisabled ? COLORS.disabled : COLORS.paper;
+      row.label.setText(item.label).setColor(css(color)).setFontStyle(focus && !looksDisabled ? '600' : '400');
+      if (this.opts.align !== 'center') {
+        row.label.setX(Math.round(this.opts.ui.u((this.opts.x) + (item.tone !== undefined ? 22 : 10))));
+        this.opts.ui.fit(row.label, this.opts.width - (item.tone !== undefined ? 36 : 24) - (item.right ? 56 : 0));
+      }
+      row.right.setText(item.right ?? '').setColor(css(looksDisabled ? COLORS.disabled : focus ? COLORS.paper : COLORS.paperDim));
     });
-    this.registry.set('debug.focus', `menu:${focused.id}`); // dibaca smoke test lewat window.__tfbt
-    if (notify) this.opts.onFocusChange?.(focused);
+    if (this.more.length) {
+      this.more[0]!.setVisible(this.top > 0);
+      this.more[1]!.setVisible(this.top + this.visible < n);
+    }
+    this.registry.set('debug.focus', `menu:${this.focusedItem.id}`); // dibaca smoke test lewat window.__tfbt
+    if (notify) this.opts.onFocusChange?.(this.focusedItem);
   }
 }

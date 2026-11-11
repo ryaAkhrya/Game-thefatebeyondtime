@@ -24,3 +24,6 @@ export const PORTRAIT_EXPRESSIONS: Readonly<Record<string, readonly string[]>> =
 
 /** Key spritesheet eksplorasi (sama dengan id di AssetRegistry). */
 export const SPRITE_KEYS = { yaric: 'C01_YARIC_EXPLORE', nambo: 'C08_NAMBO_EXPLORE' } as const;
+
+/** Bahan siluet Title Screen (assets/title/<key>.png). Turunan crop referensi DRAFT. */
+export const TITLE_ART_KEYS = ['title_yaric', 'title_velthia', 'title_greatsword'] as const;

@@ -55,6 +55,11 @@ export class SceneRouter {
     overlay.scene.resume(returnTo);
   }
 
+  /** Diagnostik QA: keadaan router. */
+  debug(): { busy: boolean; overlays: string[] } {
+    return { busy: this.busy, overlays: [...this.overlays] };
+  }
+
   get hasOverlay(): boolean {
     return this.overlays.length > 0;
   }

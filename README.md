@@ -1,3 +1,7 @@
+# POLISH SPRINT 1 (11 November 2026)
+
+UI/UX, Title Screen, tipografi tajam (kanvas = piksel perangkat), banner tujuan dihapus (tujuan di Jurnal), nama Yaric anonim sampai momen pengenalan di Bab II, dan sprite eksplorasi ternormalisasi. Status, bukti, screenshot dan batasan: [POLISH_SPRINT1_REPORT.md](docs/production/POLISH_SPRINT1_REPORT.md). Phase 6 (Bab II) tetap playable; Sprint 2 dan Bab III belum dimulai.
+
 # STATUS TERKINI — Phase 6: Chapter II, Whispers of Fate (10 November 2026)
 
 Chapter II C2-01..09 kini terhubung dari ending Bab I: arsip Azie, perpisahan Velthia, Liora/Zira, Hutan 2, Torvan bergabung, battle dua anggota, Veyrath, dua fragmen, dan laporan akhir ke Velthia. Akhir Bab II berhenti sebelum Bab III. Save v2 tetap membaca slot Bab I, dengan extension opsional untuk HP/MP Torvan dan waktu encounter terakhir. Art C03/C07/B02/M02/M03 serta lingkungan baru tetap DRAFT; audio tetap AWAITING_COMPOSER. Hasil QA dan batasan aktual: [PHASE6_REPORT.md](docs/production/PHASE6_REPORT.md). Preview lokal: **http://127.0.0.1:5173/**.

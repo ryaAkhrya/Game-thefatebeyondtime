@@ -1,84 +1,145 @@
 import Phaser from 'phaser';
 import { MenuList } from '../../ui/components/MenuList';
-import { configureUiCamera, makeText } from '../../ui/styles/theme';
+import { bar, menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
+import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
+import { AREA_LABEL, BEAT_LABEL, formatPlaytime, partyName } from '../../ui/labels';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS, type SceneKey } from '../data/ids';
+import { effectiveStats } from '../rpg/progression';
+import { isNameKnown } from '../story/identity';
 import { SAVE_SLOTS, type SaveReadResult, type SaveSlot } from '../systems/SaveRepository';
 import { getServices } from '../systems/Services';
 
 const slotName = (slot: SaveSlot): string => slot === 'auto' ? 'Otomatis' : `Slot ${slot.at(-1)}`;
-const BEAT_LABEL = { 'C1-01': 'Terbangun', 'C1-02': 'Mencari jalan', 'C1-03': 'Jalur berulang', 'C1-04': 'Sebelum Hollowling', 'C1-04-DONE': 'Usai Hollowling', 'C1-05': 'Jejak Mournfang', 'C1-05-DONE': 'Usai Mournfang', 'SLICE-DONE': 'Menuju Aveloria', 'C1-06': 'Gerbang Aveloria', 'C1-07': 'Laporan Azie', 'C1-08': 'Audiensi Velthia', 'C1-09': 'Lonceng menara', 'C1-DONE': 'Bab I selesai',
-  'C2-01': 'Dua catatan Azie', 'C2-02': 'Bekal Velthia', 'C2-03': 'Desa Liora', 'C2-04': 'Hutan kedua', 'C2-05': 'Torvan bergabung', 'C2-06': 'Belajar bersama', 'C2-07': 'Jalan Veyrath', 'C2-08': 'Fragmen ramalan', 'C2-09': 'Kembali melapor', 'C2-DONE': 'Bab II selesai' } as const;
+const WIN: WindowSpec = { x: 140, y: 52, w: 680, h: 436, title: 'Simpan / Muat' };
+
 export class SaveLoadScene extends Phaser.Scene {
+  private ui!: Ui;
   private returnTo: SceneKey = SCENE_KEYS.Pause;
   private mode: 'save' | 'load' = 'save';
   private confirmation: SaveSlot | null = null;
   private menu?: MenuList;
-  private heading!: Phaser.GameObjects.Text;
-  private detail!: Phaser.GameObjects.Text;
-  private message!: Phaser.GameObjects.Text;
+  private messageText = '';
+  private message?: Phaser.GameObjects.Text;
+  private detailObjs: Phaser.GameObjects.GameObject[] = [];
   private releaseInput?: () => void;
   private closing = false;
+  private focusId?: string;
+
   constructor() { super(SCENE_KEYS.SaveLoad); }
-  init(data: { returnTo?: SceneKey }): void { this.returnTo = data.returnTo ?? SCENE_KEYS.Pause; this.mode = 'save'; this.confirmation = null; this.menu = undefined; this.closing = false; }
+
+  init(data: { returnTo?: SceneKey }): void {
+    this.returnTo = data.returnTo ?? SCENE_KEYS.Pause; this.mode = 'save'; this.confirmation = null; this.menu = undefined;
+    this.closing = false; this.messageText = ''; this.focusId = undefined;
+  }
+
   create(): void {
-    configureUiCamera(this);
-    this.add.rectangle(0, 0, 320, 180, COLORS.ink).setOrigin(0);
-    this.add.rectangle(6, 5, 308, 170, COLORS.deepPlum).setOrigin(0).setStrokeStyle(1, COLORS.bitterLime);
-    this.heading = makeText(this, 14, 12, '', { color: COLORS.bitterLime });
-    makeText(this, 14, 28, 'Kiri / Kanan: ganti Simpan / Muat', { size: 6, color: COLORS.paperDim });
-    this.detail = makeText(this, 156, 46, '', { wrapWidth: 150, lineSpacing: 2 });
-    this.message = makeText(this, 14, 146, '', { wrapWidth: 290, lineSpacing: 1, color: COLORS.bitterLime });
-    makeText(this, 14, 166, 'Simpan lokal hilang jika data situs dihapus.', { size: 6, color: COLORS.paperDim });
+    this.ui = new Ui(this);
     this.render();
+    this.ui.fadeIn();
+    bindRelayout(this, () => { this.focusId = this.menu?.focusedItem.id; this.render(this.focusId); });
     const services = getServices(this);
     this.releaseInput = services.input.pushLayer('save-load', event => {
       if (this.closing) return;
-      if (event.intent === 'back') { if (this.confirmation) { this.confirmation = null; this.render(); } else services.router.closeOverlay(this, this.returnTo); }
-      else if (!this.confirmation && (event.intent === 'left' || event.intent === 'right')) { this.mode = this.mode === 'save' ? 'load' : 'save'; this.render(); }
+      if (event.intent === 'back') { if (this.confirmation) { this.confirmation = null; this.redraw(); } else services.router.closeOverlay(this, this.returnTo); }
+      else if (!this.confirmation && (event.intent === 'left' || event.intent === 'right')) { this.mode = this.mode === 'save' ? 'load' : 'save'; this.messageText = ''; this.redraw(this.menu?.focusedItem.id); }
       else this.menu?.handleIntent(event);
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
   }
-  private describe(slot: SaveSlot, result: SaveReadResult): void {
+
+  private redraw(focusId?: string): void {
+    this.menu?.destroy();
+    this.children.removeAll(true);
+    this.render(focusId);
+  }
+
+  private put(o: Phaser.GameObjects.GameObject | Phaser.GameObjects.GameObject[]): void {
+    this.detailObjs.push(...(Array.isArray(o) ? o : [o]));
+  }
+  private clearDetail(): void { this.detailObjs.forEach(o => o.destroy()); this.detailObjs = []; }
+
+  private describe(slot: SaveSlot, result: SaveReadResult, x: number, y: number, w: number): void {
+    const ui = this.ui;
+    this.clearDetail();
+    const t = (px: number, py: number, v: string, o: Parameters<Ui['text']>[3] = {}): void => { this.put(ui.text(px, py, v, { depth: 3, ...o })); };
     if (result.status !== 'ok') {
       const reasons = { empty: 'Slot kosong.', corrupt: 'Data rusak. Pilih slot lain atau timpa dengan konfirmasi.', unsupported_version: 'Versi belum didukung. Slot lama dilindungi.', storage_unavailable: 'Penyimpanan browser tidak tersedia.' };
-      this.detail.setText(`${slotName(slot)}\n\n${reasons[result.status]}`); return;
+      t(x, y, slotName(slot), { family: 'display', weight: '700', size: TYPE.heading + 2 });
+      t(x, y + 38, reasons[result.status], { color: COLORS.paperDim, width: w });
+      return;
     }
-    const d = result.data, local = new Date(result.savedAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
-    this.detail.setText(`Bab ${d.chapter} / ${d.area === 'forest_1' ? 'Hutan 1' : d.area === 'forest_edge' ? 'Tepi Hutan' : d.area === 'forest_2' ? 'Hutan 2' : d.area === 'liora' ? 'Liora' : d.area}\n${BEAT_LABEL[d.storyBeat]}\nYaric Lv${d.rpg.characters.C01!.level} HP${d.vitals.hp} MP${d.vitals.mp}\n${d.partyVitals ? `Torvan Lv${d.rpg.characters.C03!.level} HP${d.partyVitals.C03.hp} MP${d.partyVitals.C03.mp}\n` : ''}${local} WIB\n${Math.floor(d.playtimeSec / 60)} menit\n${result.recovered ? 'Dari cadangan.' : result.migrated ? 'Data lama terbaca.' : ''}`);
+    const d = result.data;
+    const known = isNameKnown(d.flags);
+    const local = new Date(result.savedAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
+    t(x, y, slotName(slot), { family: 'display', weight: '700', size: TYPE.heading + 2 });
+    t(x, y + 34, `Bab ${d.chapter}  ·  ${AREA_LABEL[d.area] ?? d.area}`, { weight: '600', color: COLORS.bitterLime });
+    t(x, y + 58, BEAT_LABEL[d.storyBeat] ?? '', { color: COLORS.paperDim });
+    let py = y + 100;
+    const member = (id: 'C01' | 'C03', hp: number, mp: number): void => {
+      const c = d.rpg.characters[id]!;
+      t(x, py, partyName(id, known), { weight: '600' });
+      t(x + w, py, `Lv ${c.level}`, { originX: 1, color: COLORS.paperDim });
+      const max = effectiveStats(d, id);
+      this.put(bar(ui, x, py + 26, w * 0.48 - 6, 4, hp / Math.max(1, max.HP), COLORS.bitterLime));
+      t(x, py + 34, `HP ${hp}`, { size: TYPE.tiny, color: COLORS.paperDim });
+      this.put(bar(ui, x + w * 0.52, py + 26, w * 0.48, 4, mp / Math.max(1, max.MP), COLORS.mp));
+      t(x + w * 0.52, py + 34, `MP ${mp}`, { size: TYPE.tiny, color: COLORS.paperDim });
+      py += 66;
+    };
+    member('C01', d.vitals.hp, d.vitals.mp);
+    if (d.partyVitals) member('C03', d.partyVitals.C03.hp, d.partyVitals.C03.mp);
+    t(x, py + 6, `${local} WIB   ·   ${formatPlaytime(d.playtimeSec)}`, { size: TYPE.small, color: COLORS.paperDim });
+    if (result.recovered || result.migrated) t(x, py + 28, result.recovered ? 'Dari cadangan.' : 'Data lama terbaca.', { size: TYPE.small, color: COLORS.warn });
   }
+
   private render(focusId?: string): void {
-    this.menu?.destroy(); this.heading.setText(this.mode === 'save' ? 'SIMPAN PERMAINAN' : 'MUAT PERMAINAN');
+    const ui = this.ui;
+    this.detailObjs = [];
     const { saves, checkpoints } = getServices(this);
+    veil(ui, 0.97);
+    const body = menuWindow(ui, { ...WIN, aside: this.mode === 'save' ? '[ Simpan ]    Muat' : 'Simpan    [ Muat ]' });
+    this.message = ui.text(body.bodyX, WIN.y + WIN.h - 58, this.messageText, { size: TYPE.small, color: COLORS.bitterLime, depth: 3, width: body.bodyW });
+    windowHint(ui, WIN, '←  →  ganti Simpan / Muat        Esc  kembali        Data tersimpan di browser ini');
     const rows = SAVE_SLOTS.map(slot => {
       const result = saves.read(slot);
       const disabled = this.mode === 'save' ? slot === 'auto' || !checkpoints.isSafe || result.status === 'unsupported_version' || result.status === 'storage_unavailable' : result.status !== 'ok';
-      return { id: slot, label: `${slotName(slot)} - ${result.status === 'ok' ? `Lv${result.data.rpg.characters.C01!.level}` : result.status === 'empty' ? 'Kosong' : result.status === 'corrupt' ? 'Rusak' : 'Blokir'}`, disabled,
-        disabledHint: this.mode === 'save' && slot === 'auto' ? 'Slot ini khusus simpan otomatis.' : 'Slot belum dapat digunakan.' };
+      return { id: slot, label: slotName(slot), right: result.status === 'ok' ? `Lv ${result.data.rpg.characters.C01!.level}` : result.status === 'empty' ? 'Kosong' : result.status === 'corrupt' ? 'Rusak' : 'Blokir', disabled,
+        disabledHint: this.mode === 'save' && slot === 'auto' ? 'Slot ini khusus simpan otomatis.' : this.mode === 'save' && !checkpoints.isSafe ? 'Belum aman menyimpan sekarang.' : 'Slot belum dapat digunakan.' };
     });
-    this.menu = new MenuList(this, { x: 76, y: 44, width: 136, rowHeight: 23, items: rows,
-      onFocusChange: item => this.describe(item.id as SaveSlot, saves.read(item.id as SaveSlot)),
-      onDisabledConfirm: item => this.message.setText(item.disabledHint ?? ''),
+    const dx = body.bodyX + 280;
+    const dw = body.bodyW - 280;
+    if (this.confirmation) {
+      const slot = this.confirmation;
+      ui.text(dx, body.bodyY + 4, this.mode === 'save' ? `Timpa ${slotName(slot)}?` : `Muat ${slotName(slot)}?`, { family: 'display', weight: '700', size: TYPE.heading + 2, depth: 3 });
+      ui.text(dx, body.bodyY + 42, this.mode === 'save' ? 'Data sebelumnya menjadi cadangan jika valid.' : 'Progres yang belum disimpan akan diganti.', { color: COLORS.paperDim, width: dw, depth: 3 });
+      this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 256, rowHeight: 40, depth: 4, size: TYPE.body + 0.5,
+        items: [{ id: 'cancel', label: 'Batal' }, { id: 'yes', label: this.mode === 'save' ? 'Ya, timpa' : 'Ya, muat' }],
+        onConfirm: item => { this.confirmation = null; if (item.id === 'yes') this.perform(slot); else this.redraw(slot); } });
+      return;
+    }
+    this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 256, rowHeight: 48, depth: 4, size: TYPE.body + 1, items: rows, initialId: focusId,
+      onFocusChange: item => this.describe(item.id as SaveSlot, saves.read(item.id as SaveSlot), dx, body.bodyY + 4, dw),
+      onDisabledConfirm: item => { this.messageText = item.disabledHint ?? ''; this.message?.setText(this.messageText); },
       onConfirm: item => {
         const slot = item.id as SaveSlot;
-        if (this.mode === 'load' || saves.read(slot).status !== 'empty') this.confirm(slot);
+        if (this.mode === 'load' || saves.read(slot).status !== 'empty') this.askConfirm(slot);
         else this.perform(slot);
       } });
-    if (focusId) this.menu.focusId(focusId);
-    this.describe(this.menu.focusedItem.id as SaveSlot, saves.read(this.menu.focusedItem.id as SaveSlot));
+    const f = this.menu.focusedItem.id as SaveSlot;
+    this.describe(f, saves.read(f), dx, body.bodyY + 4, dw);
   }
-  private confirm(slot: SaveSlot): void {
-    this.confirmation = slot; this.menu?.destroy();
-    this.detail.setText(this.mode === 'save' ? `Timpa ${slotName(slot)}?\nData sebelumnya menjadi cadangan jika valid.` : `Muat ${slotName(slot)}?\nProgres yang belum disimpan akan diganti.`);
-    this.menu = new MenuList(this, { x: 76, y: 56, width: 136, rowHeight: 22, items: [{ id: 'cancel', label: 'Batal' }, { id: 'yes', label: this.mode === 'save' ? 'Ya, timpa' : 'Ya, muat' }],
-      onConfirm: item => { this.confirmation = null; if (item.id === 'yes') this.perform(slot); else this.render(slot); } });
+
+  private askConfirm(slot: SaveSlot): void {
+    this.confirmation = slot;
+    this.redraw();
   }
+
   private perform(slot: SaveSlot): void {
     const services = getServices(this);
-    if (this.mode === 'save') { const result = services.checkpoints.save(slot); this.message.setText(result.ok ? `${slotName(slot)} tersimpan.` : services.checkpoints.lastMessage); this.render(slot); return; }
+    if (this.mode === 'save') { const result = services.checkpoints.save(slot); this.messageText = result.ok ? `${slotName(slot)} tersimpan.` : services.checkpoints.lastMessage; this.redraw(slot); return; }
     const result = services.saves.read(slot);
-    if (result.status !== 'ok') { this.message.setText('Data tidak dapat dimuat.'); this.render(slot); return; }
+    if (result.status !== 'ok') { this.messageText = 'Data tidak dapat dimuat.'; this.redraw(slot); return; }
     services.gameState.load(result.data); services.checkpoints.reset(); this.closing = true;
     this.scene.stop(SCENE_KEYS.Pause); this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud);
     this.scene.stop(SCENE_KEYS.SliceEnd);

@@ -109,7 +109,7 @@ export function drawChapter2Ground(scene: Phaser.Scene, area: 'liora' | 'forest_
     rect(824, 412, 32, 4, 0x887e61); rect(832, 420, 26, 3, 0x887e61);
     rect(1072, 272, 48, 32, 0x5d5546); rect(1128, 320, 40, 32, 0x696358);
   }
-  const label = (x: number, y: number, value: string): void => { scene.add.text(x, y, value, { fontFamily: '"Press Start 2P"', fontSize: '8px', color: '#e1d9bd', backgroundColor: '#3b4240', padding: { x: 4, y: 4 } }).setDepth(-500); };
+  const label = (x: number, y: number, value: string): void => { scene.add.text(x, y, value, { fontFamily: "'Source Sans 3', sans-serif", fontStyle: '600', fontSize: '9px', color: '#e1d9bd', backgroundColor: '#3b4240', padding: { x: 4, y: 2 }, resolution: Math.max(2, scene.cameras.main.zoom) }).setDepth(-500); };
   if (area === 'liora') { label(416, 112, 'HUTAN 2'); label(412, 608, 'AVELORIA'); label(496, 260, 'ZIRA'); }
   else { label(128, 488, 'LIORA'); label(792, 304, 'BERISTIRAHAT'); label(1064, 424, 'JALAN LAMA'); }
 }

@@ -213,7 +213,7 @@ async function main() {
     check('C1-01: intro dimulai (skrip C1-01-INTRO, baris L001)', w.dialogue?.script === 'C1-01-INTRO' && w.dialogue.line === 'C1-01-L001', JSON.stringify(w.dialogue));
     await waitText(page);
     w = await world(page);
-    check('C1-01: pembicara Yaric, portrait CONFUSED, teks dalam kurung (pikiran)', w.dialogue.label === 'Yaric' && w.dialogue.portrait === 'C01_CONFUSED' && /^\(Hah\.\.\.\?/.test(w.dialogue.text), JSON.stringify(w.dialogue));
+    check('C1-01: monolog anonim (tanpa label nama), portrait CONFUSED, teks dalam kurung (pikiran)', w.dialogue.label === '' && w.dialogue.portrait === 'C01_CONFUSED' && /^\(Hah\.\.\.\?/.test(w.dialogue.text), JSON.stringify(w.dialogue));
     check('C1-01: pemain terkunci (busy) selama dialog', w.busy === true);
     await shot(page, '01_intro_dialogue_confused');
     await layoutOk(page, 'dialog intro');
@@ -426,11 +426,12 @@ async function main() {
     const expectIds = Array.from({ length: 16 }, (_, i) => `C1-02-L${String(i + 1).padStart(3, '0')}`);
     check('Semua 16 baris C1-02 tampil berurutan tanpa terlewat (dengan pilihan di antara L011 dan L012)', JSON.stringify(ids) === JSON.stringify(expectIds), JSON.stringify(ids));
     const namboPortraits = new Set(rec.filter((r) => r.label === 'Nambo').map((r) => r.portrait));
-    const yaricPortraits = new Set(rec.filter((r) => r.label === 'Yaric').map((r) => r.portrait));
+    const yaricPortraits = new Set(rec.filter((r) => r.portrait.startsWith('C01_')).map((r) => r.portrait));
+    check('Label pembicara Yaric tidak pernah "Yaric" sebelum pengungkapan (???/tanpa label)', rec.every((r) => !/yaric/i.test(r.label ?? '')), JSON.stringify(rec.map((r) => r.label)));
     check('Ekspresi Nambo berubah sesuai emosi (SURPRISED, NEUTRAL, HAPPY)', ['C08_SURPRISED', 'C08_NEUTRAL', 'C08_HAPPY'].every((p) => namboPortraits.has(p)), JSON.stringify([...namboPortraits]));
     check('Ekspresi Yaric berubah (NEUTRAL dan CONFUSED)', ['C01_NEUTRAL', 'C01_CONFUSED'].every((p) => yaricPortraits.has(p)), JSON.stringify([...yaricPortraits]));
     const l012 = rec.filter((r) => r.line === 'C1-02-L012');
-    check('Baris panjang (L012, 141 karakter) dibagi halaman dan tidak terpotong', l012.length >= 2 && l012.every((r) => r.text.split(String.fromCharCode(10)).every((ln) => ln.length <= 28)), JSON.stringify(l012.map((r) => r.text)));
+    check('Baris panjang (L012, 141 karakter) utuh (semua kata tampil), dibungkus per lebar ukur, maksimal tiga baris per halaman', l012.length >= 1 && l012.every((r) => r.text.split(String.fromCharCode(10)).length <= 3) && l012.map((r) => r.text.replace(/\s+/g, ' ')).join(' ').replace(/\s+/g, ' ').includes('Ikuti jalan sampai gerbang batu. Namanya Aveloria.') && l012.map((r) => r.text).join(' ').includes('bisa membantu.'), JSON.stringify(l012.map((r) => r.text)));
     w = await world(page);
     check('story.c1_nambo naik setelah percakapan; Nambo menepi ke bahu jalan', w.flags['story.c1_nambo'] === true && w.nambo.y < 470, JSON.stringify([w.flags, w.nambo]));
     check('Tujuan: Ikuti jalan sampai gerbang batu.', w.objective === 'Ikuti jalan sampai gerbang batu.', String(w.objective));

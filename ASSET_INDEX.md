@@ -1,5 +1,38 @@
 # Asset index v3.3 — per file
 
+## Polish Sprint 1 – aset UI turunan (portrait HD dan siluet Title)
+
+Dibuat oleh `web/scripts/prepare-ui-assets.mjs` (Edge headless canvas; sumber di `assets/` TIDAK diubah). Manifes: `web/public/assets/ui.generated.json`. Semua DRAFT.
+
+- **Portrait HD** `web/public/assets/portraits_hd/<ID>_<EKSPRESI>.png` (42 file, tinggi 352 px, latar transparan): turunan resampling bertahap berkualitas tinggi dari PNG ekspresi individual (bukan redraw, bukan pixelation) untuk dialog yang kini digambar 1:1 pada resolusi perangkat. Portrait 128 px lama tetap ada di `portraits/` (kompatibilitas/tes). Dimuat dengan filter linear.
+- **Siluet Title Screen** `web/public/assets/title/title_yaric.png`, `title_velthia.png` (tampak samping turnaround, tinggi 760 px) dan `title_greatsword.png` (bilah). Sumbernya crop REFERENCE (`C01_TURNAROUND_SIDE`, `C02_TURNAROUND_SIDE`, `C01_WEAPON_GREATSWORD`); dipakai hanya sebagai **siluet bernada gelap** (tint fill + detail samar), tidak pernah sebagai tekstur final. Belum ada key art final; artist harus menggantinya dengan ilustrasi resmi yang tetap mengikuti desain approved (jubah/greatsword Yaric, rambut bob/busana kerajaan Velthia). Velthia ditampilkan dengan flip horizontal dari tampak samping.
+- Font UI: Cinzel 600/700 (judul) dan Source Sans 3 400/600/italic (isi) dari paket npm @fontsource (SIL OFL 1.1), terpasang lokal di `web/node_modules` (drive D:). Font final belum ditetapkan Game Director.
+
+## Polish Sprint 1 – normalized exploration atlases
+
+Game kini memuat **turunan runtime ternormalisasi** `web/public/assets/characters/normalized/Cxx_explore.png` + `.json` (+ `normalized.generated.json`) untuk C01, C02, C03, C05, C06, C07, C08, C09. Dibuat deterministik oleh `web/scripts/normalize-exploration-sprites.mjs` (rantai `npm run assets:prepare`, dijalankan paling akhir; membaca salinan runtime lama). **Source di `assets/` tidak diubah.** Salinan runtime lama `web/public/assets/characters/Cxx_explore.*` juga tidak diubah dan tetap byte-identical dengan source (kecuali PNG C01 = source v3.2 minus piksel liar y>=44 pada frame kiri/kanan, hasil `prepare-assets.mjs`); salinan itu tidak lagi dimuat game (`rawPublicPath` di `assetManifest.ts`). Semua tetap **NEEDS_REVIEW (C01) / DRAFT (lainnya)**; ini bukan aset final dan tidak ada yang PRODUCTION_READY.
+
+Metode (hanya memindahkan/menggandakan piksel yang sudah ada; tanpa resampling, interpolasi, blur; palet dan alpha keras identik; frame/grid/indeks sama: sel 32x48, baris down, left, right, up; C01 4 kolom, lainnya 6):
+1. Garis kaki: baris opak terbawah setiap frame dipindah ke y=46 (pivot [16,46]). Satu `dy` per baris arah.
+2. Satu `dx` per baris arah (tidak ada centering per frame, jadi siklus jalan tidak bergetar): titik berat 8 baris terbawah (tumpuan kaki) rata-rata dibulatkan ke x=16,0.
+3. C01 saja: `left` (sumber tinggi 40 px, kaki melayang 6 px) diregangkan ke tinggi tampak depan, 46 px, dengan menggandakan 6 baris (y11,15,19,23,27,31) yang sama di semua frame; `right` (sumber hanya 36 px dan proporsi lebih kecil) tidak dipakai lagi dan diganti cermin horizontal `left` (frame k = cermin left_k), diregangkan sama. Opsi yang dievaluasi dan ditolak: rata-bawah saja (figur tetap 40/36 px, "lebih kecil"), skala nearest-neighbour seluruh frame 1,15x/1,28x (lebar ikut membesar, kepala lebih besar dari tampak depan, baris/kolom ganda tidak beraturan; 1,28x jelek), peregangan 10 baris pada `right` asli (kurus dan memanjang).
+
+| Karakter | Sebelum (bawah y / tinggi per arah) | Sesudah |
+|---|---|---|
+| C01 Yaric | down 1-46 (46); left 1-40 (40); right 1-36 (36); up 1-46 (46) | semua arah y1-46, tinggi 46; dx down 0, left +2, right -2 (cermin), up +1 |
+| C02 / C05 / C09 | kaki y45, tinggi 41-42 (bob 1 px) | kaki y46 (dy +1), dx -1 |
+| C03 / C06 / C08 | kaki y47, tinggi 43-44 | kaki y46 (dy -1), dx -1 |
+| C07 Zira | y0-45 (puncak menyentuh tepi sel di frame genap), tinggi 45-46 | y1-46 (dy +1), tidak lagi menyentuh tepi, dx -1 |
+
+Frame yang tetap membutuhkan **redraw seniman** (tidak diklaim final):
+- C01 `back_0..back_3` (tampak belakang): bagian atas rambut terpotong rata di y=1 (baris selebar 12-13 px tanpa outline, sedangkan mahkota depan runcing 3 px); pemotongan sudah ada di source dan tidak bisa dipulihkan tanpa menggambar ulang.
+- C01 `right_0..right_3`: turunan cermin `left` (shading cahaya dan detail asimetris ikut terbalik); `left_0..left_3` / `right_0..right_3` mengandung 6 baris piksel setinggi 2x pada badan/jubah (bersih secara visual, bukan gambar asli). Frame `left_1/left_3` (dan cerminannya) memiliki garis cokelat 1 px di bawah sepatu yang dipertahankan sebagai sol.
+- C02/C03/C05/C06/C07/C08/C09 (semua frame): prototipe kasar, badan sama untuk keempat arah dan hanya kepala berbeda, tanpa animasi kaki/lengan; hanya garis kaki dan offset yang dikoreksi. Tinggi antar-karakter berbeda (41-46 px) karena sumbernya; tidak diskalakan.
+
+Origin Phaser yang cocok dengan pivot [16,46]: pivot = baris piksel kaki terbawah, tepi bawahnya y=47 sel, jadi `setOrigin(0.5, 47/48)` menempatkan tepi bawah kaki tepat pada y dunia (dasar `footBox`). Origin `46/48` akan menurunkan sprite 1 px di bawah footBox.
+
+Tes: `web/tests/unit/sprites.test.ts` (invarian atlas ternormalisasi) dan `web/tests/unit/assets.test.ts` (salinan lama identik byte dengan source; game memuat jalur normalized).
+
 ## Web import Phase 6 — Liora, Hutan 2, party dan Veyrath
 
 `web/scripts/prepare-chapter2-assets.mjs` menyalin **6 atlas DRAFT PNG+JSON byte-identical** dari library: C03 eksplorasi/battle, C07 eksplorasi, M02/M03/B02 battle. **13 portrait** C03/C07/C02 VULNERABLE diturunkan dari PNG individual existing lewat resize 128 px. Jejak sumber/output/ukuran dan status ada di `web/public/assets/chapter2.generated.json`. Lingkungan Liora/Hutan 2 dan dua warga tanpa nama adalah code-native DRAFT. Atlas battle C03/M02/M03/B02 hanya empat pose sumber; adapter menahan pose saat playback, tanpa mengklaim frame animasi final. Siluet/ekspresi, terutama C03/C07/B02, perlu review artist. Tidak ada audio baru. Screenshot dan catatan di `docs/production/PHASE6_REPORT.md`.

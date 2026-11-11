@@ -32,7 +32,7 @@ export interface ItemDefinition {
 }
 export const ITEMS: Readonly<Record<string, ItemDefinition>> = {
   potion: { id: 'potion', name: 'Potion', description: 'Pulihkan hingga 36 HP. Tidak dipakai saat HP penuh.', kind: 'consumable', healHP: 36, buy: 12, sell: 6, sellable: true },
-  yaric_greatsword: { id: 'yaric_greatsword', name: 'Pedang Besar', description: 'Greatsword Yaric. ATK +4. Tampilan pedang tetap.', kind: 'equipment', slot: 'weapon', classes: ['swordsman'], bonus: { ATK: 4 }, buy: 0, sell: 0, sellable: false },
+  yaric_greatsword: { id: 'yaric_greatsword', name: 'Pedang Besar', description: 'Greatsword berat. ATK +4. Tampilan pedang tetap.', kind: 'equipment', slot: 'weapon', classes: ['swordsman'], bonus: { ATK: 4 }, buy: 0, sell: 0, sellable: false },
   travel_coat: { id: 'travel_coat', name: 'Baju Jalan', description: 'Pakaian perjalanan. DEF +2. Data perlengkapan DRAF.', kind: 'equipment', slot: 'armor', classes: ['swordsman', 'mage', 'royal_mage'], bonus: { DEF: 2 }, buy: 20, sell: 8, sellable: true },
   // Test harness only: never granted by Chapter I or placed in the forest.
   qa_staff: { id: 'qa_staff', name: 'Tongkat Uji', description: 'Perlengkapan uji kelas penyihir; bukan hadiah cerita.', kind: 'equipment', slot: 'weapon', classes: ['mage'], bonus: { MAG: 3 }, buy: 20, sell: 8, sellable: true },

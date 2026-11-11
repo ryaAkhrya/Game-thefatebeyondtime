@@ -19,7 +19,7 @@ export class Chapter2View {
     const area = loaded.map.id as 'liora' | 'forest_2';
     drawChapter2Ground(scene, area);
     if (area === 'liora') {
-      this.zira = scene.add.sprite(480, 320, 'C07_CH2_EXPLORE', 0).setOrigin(0.5, 46 / 48).setDepth(320);
+      this.zira = scene.add.sprite(480, 320, 'C07_CH2_EXPLORE', 0).setOrigin(0.5, 47 / 48).setDepth(320);
       loaded.collision.setDynamic('zira', footBox(480, 320));
       for (const [x, y, coat, task] of [[428, 584, 0x667057, 'guard'], [348, 464, 0x927859, 'drying']] as const) {
         const g = scene.add.graphics().setPosition(x, y).setDepth(y);
@@ -32,7 +32,7 @@ export class Chapter2View {
         loaded.collision.setDynamic(task, footBox(x, y));
       }
     } else {
-      this.torvan = scene.add.sprite(684, 496, 'C03_CH2_EXPLORE', 0).setOrigin(0.5, 46 / 48).setDepth(496);
+      this.torvan = scene.add.sprite(684, 496, 'C03_CH2_EXPLORE', 0).setOrigin(0.5, 47 / 48).setDepth(496);
       this.veyrath = scene.add.sprite(1032, 296, 'B02_CH2_BATTLE', 0).setOrigin(0.5, 92 / 96).setDepth(296);
       this.barricade = scene.add.graphics().setDepth(450);
       this.barricade.fillStyle(0x675f50); this.barricade.fillRect(992, 208, 16, 240);

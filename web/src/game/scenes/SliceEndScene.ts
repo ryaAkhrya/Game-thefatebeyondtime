@@ -1,32 +1,49 @@
 import Phaser from 'phaser';
 import { MenuList } from '../../ui/components/MenuList';
-import { configureUiCamera, makeText } from '../../ui/styles/theme';
+import { veil } from '../../ui/components/frame';
+import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS } from '../data/ids';
 import { getServices } from '../systems/Services';
 import { CITY_FLAG, CITY_SPAWN } from '../story/aveloriaFlags';
 import { C2 } from '../story/chapter2Flags';
 
-/** Existing classic checkpoint/ending menu, now also the Chapter II boundary. */
+/** Layar jeda akhir segmen/bab: kartu tengah yang tenang. Bukan launcher Bab III. */
 export class SliceEndScene extends Phaser.Scene {
+  private ui!: Ui;
   private releaseInput?: () => void;
   private closing = false;
+  private menu?: MenuList;
   constructor() { super(SCENE_KEYS.SliceEnd); }
   create(): void {
     this.closing = false;
-    configureUiCamera(this);
+    this.ui = new Ui(this);
+    const services = getServices(this);
+    services.audio.stopBgm();
+    this.build();
+    this.ui.fadeIn();
+    bindRelayout(this, () => this.build(this.menu?.focusedItem.id));
+    this.releaseInput = services.input.pushLayer('slice-end', event => {
+      if (this.closing) return;
+      if (event.intent === 'back') this.resumeWorld(); else this.menu?.handleIntent(event);
+    });
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
+  }
+
+  private build(focusId?: string): void {
+    const ui = this.ui;
     const services = getServices(this);
     const chapterDone = services.gameState.hasFlag(CITY_FLAG.complete);
     const chapter2Done = services.gameState.hasFlag(C2.complete);
     const canStartChapter2 = chapterDone && services.gameState.snapshot()?.chapter === 'I';
-    services.audio.stopBgm();
-    this.add.rectangle(0, 0, 320, 180, COLORS.ink).setOrigin(0);
-    this.add.rectangle(10, 10, 300, 160, COLORS.deepPlum).setOrigin(0).setStrokeStyle(1, COLORS.bitterLime);
-    makeText(this, 160, 24, chapter2Done ? 'BAB II SELESAI' : chapterDone ? 'BAB I SELESAI' : 'JALAN KE AVELORIA', { originX: 0.5, color: COLORS.bitterLime });
-    makeText(this, 160, 44, chapter2Done ? 'Dua catatan. Satu keputusan.\nAzie menelusuri lambang kuil.' : chapterDone ? 'Dua dentang. Satu waktu.\nPenyelidikan baru dimulai.' : 'Mournfang surut ke dalam hutan.\nJalan ke timur kembali terbuka.', { originX: 0.5, lineSpacing: 5 });
-    makeText(this, 160, 76, chapter2Done ? 'Whispers of Fate\nBersambung di Bab III' : chapterDone ? 'The Nameless Wanderer\nBersambung — Whispers of Fate' : 'Gerbang kerajaan menunggu.\nSimpan perjalanan sebelum masuk.', { originX: 0.5, lineSpacing: 3, color: COLORS.paperDim });
-    const menu = new MenuList(this, { x: 160, y: 106, width: 200, rowHeight: 13,
-      items: [...(!chapterDone ? [{ id: 'aveloria', label: 'Masuk Aveloria' }] : []), ...(canStartChapter2 ? [{ id: 'chapter2', label: 'Mulai Bab II' }] : []), { id: 'explore', label: chapterDone ? 'Jelajahi Aveloria' : 'Jelajahi kembali' }, { id: 'save', label: 'Simpan/Muat' }, { id: 'settings', label: 'Pengaturan' }, { id: 'title', label: 'Ke Judul' }],
+    veil(ui, 0.9, COLORS.night);
+    const cx = ui.dw / 2;
+    ui.text(cx, 96, chapter2Done ? 'BAB II SELESAI' : chapterDone ? 'BAB I SELESAI' : 'JALAN KE AVELORIA', { family: 'display', weight: '700', size: TYPE.display, originX: 0.5, color: COLORS.bitterLime, depth: 3 });
+    ui.motif(cx, 142, 150, 12, 3);
+    ui.text(cx, 168, chapter2Done ? 'Dua catatan. Satu keputusan.\nAzie menelusuri lambang kuil.' : chapterDone ? 'Dua dentang. Satu waktu.\nPenyelidikan baru dimulai.' : 'Mournfang surut ke dalam hutan.\nJalan ke timur kembali terbuka.', { size: TYPE.body + 2, originX: 0.5, align: 'center', leading: 8, depth: 3 });
+    ui.text(cx, 236, chapter2Done ? 'Whispers of Fate  ·  bersambung' : chapterDone ? 'The Nameless Wanderer  ·  bersambung ke Whispers of Fate' : 'Gerbang kerajaan menunggu. Simpan perjalanan sebelum masuk.', { size: TYPE.small, originX: 0.5, color: COLORS.paperDim, depth: 3 });
+    this.menu = new MenuList(this, { ui, x: cx, y: 274, width: 260, rowHeight: 36, align: 'center', depth: 4, size: TYPE.body + 1, initialId: focusId,
+      items: [...(!chapterDone ? [{ id: 'aveloria', label: 'Masuk Aveloria' }] : []), ...(canStartChapter2 ? [{ id: 'chapter2', label: 'Mulai Bab II' }] : []), { id: 'explore', label: chapterDone ? 'Jelajahi Aveloria' : 'Jelajahi kembali' }, { id: 'save', label: 'Simpan / Muat' }, { id: 'settings', label: 'Pengaturan' }, { id: 'title', label: 'Ke Judul' }],
       onConfirm: item => {
         if (this.closing) return;
         if (item.id === 'save') services.router.openOverlay(this, SCENE_KEYS.SaveLoad);
@@ -49,12 +66,8 @@ export class SliceEndScene extends Phaser.Scene {
         }
         else { this.closing = true; this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud); services.router.goto(this, SCENE_KEYS.Title); }
       } });
-    this.releaseInput = services.input.pushLayer('slice-end', event => {
-      if (this.closing) return;
-      if (event.intent === 'back') this.resumeWorld(); else menu.handleIntent(event);
-    });
-    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
   }
+
   private resumeWorld(): void {
     if (this.closing) return;
     this.closing = true;

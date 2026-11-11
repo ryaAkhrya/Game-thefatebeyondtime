@@ -103,7 +103,7 @@ describe.each(battle.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas battl
   });
 });
 
-describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksplorasi %s (salinan web)', (_id, a) => {
+describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksplorasi %s (salinan runtime lama + jalur normalisasi)', (_id, a) => {
   const cols = a.atlasSize[0] / a.frameSize[0];
   const rows = a.atlasSize[1] / a.frameSize[1];
 
@@ -111,13 +111,28 @@ describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksp
     expect(existsSync(resolve(ROOT, a.sourceImage))).toBe(true);
     const src = pngInfo(resolve(ROOT, a.sourceImage));
     expect([src.width, src.height]).toEqual([...a.atlasSize]);
-    const pub = resolve(PUBLIC, a.publicPath!.replace(/^assets\//, 'assets/'));
+    const pub = resolve(PUBLIC, a.rawPublicPath!);
     expect(existsSync(pub)).toBe(true);
     const copy = readPng(pub);
     expect([copy.width, copy.height]).toEqual([...a.atlasSize]);
     const json = JSON.parse(readFileSync(resolve(ROOT, a.sourceJson), 'utf8'));
     expect(json.atlas_size ?? [copy.width, copy.height]).toEqual([...a.atlasSize]);
     expect(json.frame_size ?? json.authored_grid).toEqual([...a.frameSize]);
+  });
+
+  it('game memuat salinan ternormalisasi (publicPath), salinan lama (rawPublicPath) tetap ada', () => {
+    expect(a.publicPath).toBe(a.rawPublicPath!.replace('assets/characters/', 'assets/characters/normalized/'));
+    expect(existsSync(resolve(PUBLIC, a.publicPath!))).toBe(true);
+    expect(existsSync(resolve(PUBLIC, a.publicPath!.replace(/\.png$/, '.json')))).toBe(true);
+    const norm = pngInfo(resolve(PUBLIC, a.publicPath!));
+    expect([norm.width, norm.height]).toEqual([...a.atlasSize]);
+    expect(norm.colorType).toBe(6);
+  });
+
+  it('salinan lama identik byte dengan sumber (PNG+JSON); C01 hanya PNG-nya dibersihkan dari piksel liar (JSON identik)', () => {
+    const raw = (ext: string): Buffer => readFileSync(resolve(PUBLIC, a.rawPublicPath!.replace(/\.png$/, '.' + ext)));
+    expect(raw('json')).toEqual(readFileSync(resolve(ROOT, a.sourceJson)));
+    if (a.id !== 'C01_YARIC_EXPLORE') expect(raw('png')).toEqual(readFileSync(resolve(ROOT, a.sourceImage)));
   });
 
   it('grid: jumlah frame, rect sejajar sel, 4 arah x N frame; animasi idle/walk 4 arah ada', () => {
@@ -140,8 +155,8 @@ describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksp
     }
   });
 
-  it('transparan; tidak ada piksel menyentuh tepi sel; tidak ada piksel liar di bawah kaki (y >= 44 pada frame samping kosong)', () => {
-    const png = readPng(resolve(PUBLIC, a.publicPath!));
+  it('salinan LAMA: transparan; tidak ada piksel menyentuh tepi sel; tidak ada piksel liar di bawah kaki (y >= 44 pada frame samping kosong)', () => {
+    const png = readPng(resolve(PUBLIC, a.rawPublicPath!));
     expect(png.data[3]).toBe(0);
     const [fw, fh] = a.frameSize as unknown as [number, number];
     for (let r = 0; r < rows; r++) {
@@ -166,9 +181,11 @@ describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksp
     }
   });
 
-  it('Yaric: baris kiri dan kanan berbeda (arah hadap benar, bukan salinan)', () => {
+  it('Yaric (salinan lama dan ternormalisasi): baris kiri dan kanan berbeda (arah hadap benar, bukan salinan piksel yang sama)', () => {
     if (a.id !== 'C01_YARIC_EXPLORE') return;
-    const png = readPng(resolve(PUBLIC, a.publicPath!));
+    for (const path of [a.rawPublicPath!, a.publicPath!]) checkLeftRightDiffer(readPng(resolve(PUBLIC, path)));
+  });
+  const checkLeftRightDiffer = (png: ReturnType<typeof readPng>): void => {
     const [fw, fh] = a.frameSize as unknown as [number, number];
     let same = 0;
     let total = 0;
@@ -182,7 +199,7 @@ describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksp
         }
       }
     expect(same / total).toBeLessThan(0.3);
-  });
+  };
 });
 
 describe('typed IDs', () => {

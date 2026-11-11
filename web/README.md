@@ -1,5 +1,7 @@
 # WEB APP — THE FATE: BEYOND TIME
 
+**Polish Sprint 1:** kanvas Phaser = piksel perangkat; dunia/battle zoom bulat; UI di ruang desain 960x540 (`src/ui/kit/ui.ts`), font Cinzel + Source Sans 3. Suite baru: `E2E_SUITES=sprint1.mjs`. Aset turunan: `node scripts/prepare-ui-assets.mjs`, `node scripts/normalize-exploration-sprites.mjs` (ikut `npm run assets:prepare`). Laporan: `../docs/production/POLISH_SPRINT1_REPORT.md`.
+
 Phase 6: Bab II playable dari ending Bab I hingga laporan ke Velthia. Liora, Hutan 2, Zira, Torvan dalam party, dua battle wajib dan boss Veyrath terhubung; save Bab I tetap valid. Art dan angka balancing DRAFT, audio AWAITING_COMPOSER. QA aktual: `../docs/production/PHASE6_REPORT.md`.
 
 ## Riwayat Phase 5

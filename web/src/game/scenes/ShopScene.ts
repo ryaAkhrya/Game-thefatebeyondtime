@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
-import { MenuList } from '../../ui/components/MenuList';
-import { configureUiCamera, makeText } from '../../ui/styles/theme';
+import { MenuList, type MenuItem } from '../../ui/components/MenuList';
+import { menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
+import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { ITEMS } from '../rpg/definitions';
@@ -8,55 +9,88 @@ import { trade, type Shop } from '../rpg/actions';
 import { getServices } from '../systems/Services';
 import { tradeWithDerrria } from '../rpg/derrria';
 
-/** Reusable shop overlay. Only a QA harness invokes it in Phase 3; no merchant enters the story. */
+const WIN: WindowSpec = { x: 120, y: 56, w: 720, h: 428, title: '' };
+
+/** Overlay toko. Daftar barang + harga di kiri, rincian dan stok di kanan. */
 export class ShopScene extends Phaser.Scene {
+  private ui!: Ui;
   private shop!: Shop;
   private returnTo: SceneKey = SCENE_KEYS.Title;
   private mode: 'buy' | 'sell' = 'buy';
   private menu?: MenuList;
-  private detail!: Phaser.GameObjects.Text;
-  private heading!: Phaser.GameObjects.Text;
-  private message!: Phaser.GameObjects.Text;
+  private messageText = '';
+  private message?: Phaser.GameObjects.Text;
+  private detailObjs: Phaser.GameObjects.GameObject[] = [];
   private releaseInput?: () => void;
+
   constructor() { super(SCENE_KEYS.Shop); }
-  init(data: { shop: Shop; returnTo: SceneKey }): void { this.shop = structuredClone(data.shop); this.returnTo = data.returnTo; this.mode = 'buy'; this.menu = undefined; }
+
+  init(data: { shop: Shop; returnTo: SceneKey }): void {
+    this.shop = structuredClone(data.shop); this.returnTo = data.returnTo; this.mode = 'buy'; this.menu = undefined; this.messageText = '';
+  }
+
   create(): void {
-    configureUiCamera(this);
-    this.add.rectangle(0, 0, 320, 180, COLORS.ink).setOrigin(0);
-    this.add.rectangle(6, 5, 308, 170, COLORS.deepPlum).setOrigin(0).setStrokeStyle(1, COLORS.bitterLime);
-    this.heading = makeText(this, 14, 12, '', { color: COLORS.bitterLime });
-    makeText(this, 14, 28, 'Kiri/Kanan: Beli/Jual  Enter: transaksi 1', { size: 6, color: COLORS.paperDim });
-    this.detail = makeText(this, 156, 45, '', { wrapWidth: 150, lineSpacing: 2 });
-    this.message = makeText(this, 14, 146, '', { wrapWidth: 290, lineSpacing: 1, color: COLORS.bitterLime });
-    makeText(this, 14, 167, 'Esc: kembali', { size: 6, color: COLORS.paperDim });
+    this.ui = new Ui(this);
     this.render();
+    this.ui.fadeIn();
+    bindRelayout(this, () => this.render(this.menu?.focusedItem.id));
     const services = getServices(this);
     this.releaseInput = services.input.pushLayer('shop', e => {
       if (e.intent === 'back') services.router.closeOverlay(this, this.returnTo);
-      else if (e.intent === 'left' || e.intent === 'right') { this.mode = this.mode === 'buy' ? 'sell' : 'buy'; this.render(); }
+      else if (e.intent === 'left' || e.intent === 'right') { this.mode = this.mode === 'buy' ? 'sell' : 'buy'; this.messageText = ''; this.redraw(); }
       else this.menu?.handleIntent(e);
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
   }
-  private render(focusId?: string): void {
-    this.menu?.destroy(); const state = getServices(this).gameState.snapshot()!;
-    this.heading.setText(`${this.mode === 'buy' ? 'BELI' : 'JUAL'}  /  Emas ${state.rpg.gold}`);
-    const ids = this.mode === 'buy' ? Object.keys(this.shop.stock) : Object.keys(state.items).filter(id => state.items[id]! > 0);
-    const items = ids.map(id => { const preview = trade(state, this.shop, this.mode, id); return { id, label: ITEMS[id]!.name, disabled: !preview.ok, disabledHint: preview.ok ? undefined : preview.message }; });
-    if (!items.length) items.push({ id: 'empty', label: 'Kosong', disabled: true, disabledHint: 'Tidak ada barang.' });
-    const describe = (id: string): void => {
-      const item = ITEMS[id];
-      this.detail.setText(item ? `${item.description}\n\nHarga: ${this.mode === 'buy' ? item.buy : item.sell} emas\nStok: ${this.shop.stock[id] ?? 0}\nDi tas: ${state.items[id] ?? 0}` : 'Tidak ada barang.');
-    };
-    this.menu = new MenuList(this, { x: 76, y: 43, width: 136, rowHeight: 18, items, onFocusChange: item => describe(item.id), onDisabledConfirm: item => this.message.setText(item.disabledHint ?? ''),
-      onConfirm: item => {
-        const services = getServices(this), result = this.shop.id === 'derrria'
-          ? tradeWithDerrria(services.gameState.snapshot()!, this.mode, item.id)
-          : trade(services.gameState.snapshot()!, this.shop, this.mode, item.id);
-        if (result.ok) { services.gameState.load(result.data); this.shop = result.shop; if (this.shop.id === 'derrria') services.checkpoints.requestAutosave(); }
-        this.message.setText(result.message); this.render(item.id);
-      } });
-    if (focusId) this.menu.focusId(focusId); describe(this.menu.focusedItem.id);
+
+  private redraw(focusId?: string): void {
+    this.menu?.destroy();
+    this.children.removeAll(true);
+    this.render(focusId);
   }
+
+  private render(focusId?: string): void {
+    const ui = this.ui;
+    this.detailObjs = [];
+    const state = getServices(this).gameState.snapshot()!;
+    veil(ui, 0.97);
+    const body = menuWindow(ui, { ...WIN, title: this.shop.name || 'Toko', aside: `${this.mode === 'buy' ? '[ Beli ]    Jual' : 'Beli    [ Jual ]'}      ${state.rpg.gold} emas` });
+    this.message = ui.text(body.bodyX, WIN.y + WIN.h - 58, this.messageText, { size: TYPE.small, color: COLORS.bitterLime, depth: 3, width: body.bodyW });
+    windowHint(ui, WIN, '←  →  Beli / Jual        Enter  transaksi satu barang        Esc  kembali');
+    const ids = this.mode === 'buy' ? Object.keys(this.shop.stock) : Object.keys(state.items).filter(id => state.items[id]! > 0);
+    const items: MenuItem[] = ids.map(id => {
+      const preview = trade(state, this.shop, this.mode, id);
+      const def = ITEMS[id]!;
+      return { id, label: def.name, right: `${this.mode === 'buy' ? def.buy : def.sell} emas`, disabled: !preview.ok, disabledHint: preview.ok ? undefined : preview.message,
+        tone: def.kind === 'consumable' ? COLORS.bitterLime : def.kind === 'equipment' ? COLORS.rose : COLORS.plumMist };
+    });
+    if (!items.length) items.push({ id: 'empty', label: 'Kosong', disabled: true, disabledHint: 'Tidak ada barang.' });
+    const dx = body.bodyX + 332;
+    const describe = (id: string): void => {
+      this.detailObjs.forEach(o => o.destroy()); this.detailObjs = [];
+      const item = ITEMS[id];
+      const t = (x: number, y: number, v: string, o: Parameters<Ui['text']>[3] = {}): void => { this.detailObjs.push(ui.text(x, y, v, { depth: 3, ...o })); };
+      if (!item) { t(dx, body.bodyY + 4, 'Tidak ada barang.', { color: COLORS.paperDim }); return; }
+      t(dx, body.bodyY + 4, item.name, { family: 'display', weight: '700', size: TYPE.heading + 3 });
+      t(dx, body.bodyY + 42, item.description, { width: body.bodyW - 332, size: TYPE.body + 0.5, leading: 7 });
+      const y = body.bodyY + 160;
+      t(dx, y, 'Harga', { color: COLORS.paperDim }); t(dx + 150, y, `${this.mode === 'buy' ? item.buy : item.sell} emas`, { weight: '600' });
+      t(dx, y + 26, 'Stok toko', { color: COLORS.paperDim }); t(dx + 150, y + 26, `${this.shop.stock[id] ?? 0}`, { weight: '600' });
+      t(dx, y + 52, 'Di tas', { color: COLORS.paperDim }); t(dx + 150, y + 52, `${state.items[id] ?? 0}`, { weight: '600' });
+    };
+    this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 308, rowHeight: 38, maxRows: 8, depth: 4, size: TYPE.body + 0.5, items, initialId: focusId,
+      onFocusChange: item => describe(item.id),
+      onDisabledConfirm: item => { this.messageText = item.disabledHint ?? ''; this.message?.setText(this.messageText); },
+      onConfirm: item => {
+        const services = getServices(this);
+        const snap = services.gameState.snapshot()!;
+        const result = this.shop.id === 'derrria' ? tradeWithDerrria(snap, this.mode, item.id) : trade(snap, this.shop, this.mode, item.id);
+        if (result.ok) { services.gameState.load(result.data); this.shop = result.shop; if (this.shop.id === 'derrria') services.checkpoints.requestAutosave(); }
+        this.messageText = result.message;
+        this.redraw(item.id);
+      } });
+    describe(this.menu.focusedItem.id);
+  }
+
   debugState(): unknown { return structuredClone(this.shop); }
 }

@@ -1,0 +1,639 @@
+{
+  "generatedBy": "web/scripts/prepare-ui-assets.mjs",
+  "status": "DRAFT",
+  "items": [
+    {
+      "id": "C01_ANGRY",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_ANGRY.png",
+      "out": "assets/portraits_hd/C01_ANGRY.png",
+      "status": "DRAFT",
+      "size": [
+        303,
+        352
+      ],
+      "sourceSize": [
+        537,
+        623
+      ]
+    },
+    {
+      "id": "C01_CONFUSED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+      "out": "assets/portraits_hd/C01_CONFUSED.png",
+      "status": "DRAFT",
+      "size": [
+        304,
+        352
+      ],
+      "sourceSize": [
+        522,
+        605
+      ]
+    },
+    {
+      "id": "C01_DETERMINED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_DETERMINED.png",
+      "out": "assets/portraits_hd/C01_DETERMINED.png",
+      "status": "DRAFT",
+      "size": [
+        302,
+        352
+      ],
+      "sourceSize": [
+        536,
+        624
+      ]
+    },
+    {
+      "id": "C01_EMBARRASSED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_EMBARRASSED.png",
+      "out": "assets/portraits_hd/C01_EMBARRASSED.png",
+      "status": "DRAFT",
+      "size": [
+        314,
+        352
+      ],
+      "sourceSize": [
+        557,
+        624
+      ]
+    },
+    {
+      "id": "C01_HAPPY",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_HAPPY.png",
+      "out": "assets/portraits_hd/C01_HAPPY.png",
+      "status": "DRAFT",
+      "size": [
+        302,
+        352
+      ],
+      "sourceSize": [
+        536,
+        624
+      ]
+    },
+    {
+      "id": "C01_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C01_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        302,
+        352
+      ],
+      "sourceSize": [
+        523,
+        610
+      ]
+    },
+    {
+      "id": "C01_SAD",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_SAD.png",
+      "out": "assets/portraits_hd/C01_SAD.png",
+      "status": "DRAFT",
+      "size": [
+        321,
+        352
+      ],
+      "sourceSize": [
+        553,
+        607
+      ]
+    },
+    {
+      "id": "C01_SURPRISED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C01_Yaric/C01_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits_hd/C01_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        318,
+        352
+      ],
+      "sourceSize": [
+        559,
+        618
+      ]
+    },
+    {
+      "id": "C02_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C02_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        302,
+        352
+      ],
+      "sourceSize": [
+        519,
+        604
+      ]
+    },
+    {
+      "id": "C02_STERN",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_STERN.png",
+      "out": "assets/portraits_hd/C02_STERN.png",
+      "status": "DRAFT",
+      "size": [
+        330,
+        352
+      ],
+      "sourceSize": [
+        568,
+        605
+      ]
+    },
+    {
+      "id": "C02_AMUSED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_AMUSED.png",
+      "out": "assets/portraits_hd/C02_AMUSED.png",
+      "status": "DRAFT",
+      "size": [
+        334,
+        352
+      ],
+      "sourceSize": [
+        590,
+        621
+      ]
+    },
+    {
+      "id": "C02_WORRIED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_WORRIED.png",
+      "out": "assets/portraits_hd/C02_WORRIED.png",
+      "status": "DRAFT",
+      "size": [
+        303,
+        352
+      ],
+      "sourceSize": [
+        535,
+        621
+      ]
+    },
+    {
+      "id": "C02_SURPRISED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits_hd/C02_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        317,
+        352
+      ],
+      "sourceSize": [
+        558,
+        620
+      ]
+    },
+    {
+      "id": "C02_VULNERABLE",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_VULNERABLE.png",
+      "out": "assets/portraits_hd/C02_VULNERABLE.png",
+      "status": "DRAFT",
+      "size": [
+        326,
+        352
+      ],
+      "sourceSize": [
+        559,
+        604
+      ]
+    },
+    {
+      "id": "C03_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C03_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        285,
+        352
+      ],
+      "sourceSize": [
+        475,
+        587
+      ]
+    },
+    {
+      "id": "C03_DETERMINED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_DETERMINED.png",
+      "out": "assets/portraits_hd/C03_DETERMINED.png",
+      "status": "DRAFT",
+      "size": [
+        305,
+        352
+      ],
+      "sourceSize": [
+        507,
+        585
+      ]
+    },
+    {
+      "id": "C03_MISCHIEVOUS",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_MISCHIEVOUS.png",
+      "out": "assets/portraits_hd/C03_MISCHIEVOUS.png",
+      "status": "DRAFT",
+      "size": [
+        307,
+        352
+      ],
+      "sourceSize": [
+        523,
+        599
+      ]
+    },
+    {
+      "id": "C03_CURIOUS",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_CURIOUS.png",
+      "out": "assets/portraits_hd/C03_CURIOUS.png",
+      "status": "DRAFT",
+      "size": [
+        299,
+        352
+      ],
+      "sourceSize": [
+        499,
+        587
+      ]
+    },
+    {
+      "id": "C03_SAD",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_SAD.png",
+      "out": "assets/portraits_hd/C03_SAD.png",
+      "status": "DRAFT",
+      "size": [
+        298,
+        352
+      ],
+      "sourceSize": [
+        492,
+        581
+      ]
+    },
+    {
+      "id": "C03_SURPRISED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits_hd/C03_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        299,
+        352
+      ],
+      "sourceSize": [
+        509,
+        599
+      ]
+    },
+    {
+      "id": "C03_SOLEMN",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_SOLEMN.png",
+      "out": "assets/portraits_hd/C03_SOLEMN.png",
+      "status": "DRAFT",
+      "size": [
+        321,
+        352
+      ],
+      "sourceSize": [
+        537,
+        589
+      ]
+    },
+    {
+      "id": "C03_UPSET",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_UPSET.png",
+      "out": "assets/portraits_hd/C03_UPSET.png",
+      "status": "DRAFT",
+      "size": [
+        309,
+        352
+      ],
+      "sourceSize": [
+        514,
+        585
+      ]
+    },
+    {
+      "id": "C05_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C05_Azie/C05_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C05_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        281,
+        352
+      ],
+      "sourceSize": [
+        484,
+        607
+      ]
+    },
+    {
+      "id": "C05_WORRIED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C05_Azie/C05_EXPRESSION_WORRIED.png",
+      "out": "assets/portraits_hd/C05_WORRIED.png",
+      "status": "DRAFT",
+      "size": [
+        285,
+        352
+      ],
+      "sourceSize": [
+        490,
+        605
+      ]
+    },
+    {
+      "id": "C05_SKEPTICAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C05_Azie/C05_EXPRESSION_SKEPTICAL.png",
+      "out": "assets/portraits_hd/C05_SKEPTICAL.png",
+      "status": "DRAFT",
+      "size": [
+        281,
+        352
+      ],
+      "sourceSize": [
+        487,
+        610
+      ]
+    },
+    {
+      "id": "C06_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C06_Talric/C06_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C06_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        329,
+        352
+      ],
+      "sourceSize": [
+        550,
+        589
+      ]
+    },
+    {
+      "id": "C06_SUSPICIOUS",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C06_Talric/C06_EXPRESSION_SUSPICIOUS.png",
+      "out": "assets/portraits_hd/C06_SUSPICIOUS.png",
+      "status": "DRAFT",
+      "size": [
+        327,
+        352
+      ],
+      "sourceSize": [
+        548,
+        589
+      ]
+    },
+    {
+      "id": "C06_ALARMED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C06_Talric/C06_EXPRESSION_ALARMED.png",
+      "out": "assets/portraits_hd/C06_ALARMED.png",
+      "status": "DRAFT",
+      "size": [
+        321,
+        352
+      ],
+      "sourceSize": [
+        550,
+        603
+      ]
+    },
+    {
+      "id": "C07_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C07_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        250,
+        352
+      ],
+      "sourceSize": [
+        432,
+        609
+      ]
+    },
+    {
+      "id": "C07_CAUTIOUS",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_CAUTIOUS.png",
+      "out": "assets/portraits_hd/C07_CAUTIOUS.png",
+      "status": "DRAFT",
+      "size": [
+        250,
+        352
+      ],
+      "sourceSize": [
+        439,
+        617
+      ]
+    },
+    {
+      "id": "C07_HAPPY",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_HAPPY.png",
+      "out": "assets/portraits_hd/C07_HAPPY.png",
+      "status": "DRAFT",
+      "size": [
+        250,
+        352
+      ],
+      "sourceSize": [
+        433,
+        609
+      ]
+    },
+    {
+      "id": "C07_SAD",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_SAD.png",
+      "out": "assets/portraits_hd/C07_SAD.png",
+      "status": "DRAFT",
+      "size": [
+        251,
+        352
+      ],
+      "sourceSize": [
+        439,
+        616
+      ]
+    },
+    {
+      "id": "C08_CONCERNED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_CONCERNED.png",
+      "out": "assets/portraits_hd/C08_CONCERNED.png",
+      "status": "DRAFT",
+      "size": [
+        251,
+        352
+      ],
+      "sourceSize": [
+        442,
+        620
+      ]
+    },
+    {
+      "id": "C08_HAPPY",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_HAPPY.png",
+      "out": "assets/portraits_hd/C08_HAPPY.png",
+      "status": "DRAFT",
+      "size": [
+        255,
+        352
+      ],
+      "sourceSize": [
+        442,
+        611
+      ]
+    },
+    {
+      "id": "C08_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C08_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        255,
+        352
+      ],
+      "sourceSize": [
+        443,
+        612
+      ]
+    },
+    {
+      "id": "C08_SURPRISED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C08_Nambo/C08_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits_hd/C08_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        252,
+        352
+      ],
+      "sourceSize": [
+        446,
+        622
+      ]
+    },
+    {
+      "id": "C09_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C09_Derrria/C09_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C09_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        249,
+        352
+      ],
+      "sourceSize": [
+        438,
+        620
+      ]
+    },
+    {
+      "id": "C09_AMUSED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C09_Derrria/C09_EXPRESSION_AMUSED.png",
+      "out": "assets/portraits_hd/C09_AMUSED.png",
+      "status": "DRAFT",
+      "size": [
+        244,
+        352
+      ],
+      "sourceSize": [
+        429,
+        619
+      ]
+    },
+    {
+      "id": "C09_WORRIED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C09_Derrria/C09_EXPRESSION_WORRIED.png",
+      "out": "assets/portraits_hd/C09_WORRIED.png",
+      "status": "DRAFT",
+      "size": [
+        245,
+        352
+      ],
+      "sourceSize": [
+        433,
+        623
+      ]
+    },
+    {
+      "id": "title_yaric.png",
+      "kind": "title_silhouette_source",
+      "source": "assets/characters/C01_Yaric/C01_TURNAROUND_SIDE.png",
+      "out": "assets/title/title_yaric.png",
+      "status": "DRAFT",
+      "size": [
+        240,
+        760
+      ],
+      "sourceSize": [
+        315,
+        999
+      ],
+      "note": "Crop turnaround/weapon REFERENCE diperkecil; hanya dipakai sebagai siluet bernada gelap di Title Screen, bukan art final."
+    },
+    {
+      "id": "title_velthia.png",
+      "kind": "title_silhouette_source",
+      "source": "assets/characters/C02_Velthia/C02_TURNAROUND_SIDE.png",
+      "out": "assets/title/title_velthia.png",
+      "status": "DRAFT",
+      "size": [
+        276,
+        760
+      ],
+      "sourceSize": [
+        370,
+        1017
+      ],
+      "note": "Crop turnaround/weapon REFERENCE diperkecil; hanya dipakai sebagai siluet bernada gelap di Title Screen, bukan art final."
+    },
+    {
+      "id": "title_greatsword.png",
+      "kind": "title_silhouette_source",
+      "source": "assets/characters/C01_Yaric/C01_WEAPON_GREATSWORD.png",
+      "out": "assets/title/title_greatsword.png",
+      "status": "DRAFT",
+      "size": [
+        377,
+        760
+      ],
+      "sourceSize": [
+        755,
+        1523
+      ],
+      "note": "Crop turnaround/weapon REFERENCE diperkecil; hanya dipakai sebagai siluet bernada gelap di Title Screen, bukan art final."
+    }
+  ]
+}

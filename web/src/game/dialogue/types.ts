@@ -81,5 +81,5 @@ export function portraitKey(speaker: string, expression: string | undefined): st
 }
 
 export function portraitUrl(key: string): string {
-  return `assets/portraits/${key}.png`;
+  return `assets/portraits_hd/${key}.png`;
 }

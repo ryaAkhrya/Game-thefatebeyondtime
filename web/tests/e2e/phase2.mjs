@@ -30,7 +30,9 @@ try {
   for (const [width, height, settings] of [[1366, 768, { screen_shake: false, reduced_flashes: true }], [1920, 1080, { screen_shake: true, reduced_flashes: false }]]) {
     const { page, context } = await encounter(width, height, settings);
     let b = await battle(page);
-    check(`${width}: enemy left / player right / stable foot origin`, b.sprites.M01.x === 78 && b.sprites.C01.x === 244 && b.sprites.C01.originY === 95 / 96);
+    // Panggung kini memakai zoom bulat dan pecahan lebar/tinggi (bukan koordinat 320x180): musuh kiri, party kanan, kaki sejajar.
+    const home = { m: b.sprites.M01.x, c: b.sprites.C01.x, f: b.sprites.C01.footY, w: b.stage.w, h: b.stage.h };
+    check(`${width}: enemy left / player right / stable foot origin`, home.m === Math.round(0.244 * home.w) && home.c === Math.round(0.76 * home.w) && b.sprites.C01.originY === 95 / 96 && home.f === Math.round(0.70 * home.h) && b.sprites.M01.footY === home.f);
     let layout = await page.evaluate(() => window.__tfbt.layoutIssues());
     check(`${width}: idle text layout`, layout.length === 0, layout.join(';'));
     await shot(page, `idle_${width}`);
@@ -49,7 +51,7 @@ try {
     check(`${width}: vfx still deals damage with reduced effects`, b.actors[1].hp === 82 && b.actors[0].mp === 8);
     const frameNames = b.history.filter(h => h.actor === 'C01' && h.turn === 1).map(h => h.frame);
     check(`${width}: heavy sword windup and recovery, no spin loop`, frameNames.join(',') === 'anticipation,attack_windup,attack_contact,followthrough,recovery');
-    check(`${width}: no pivot or position drift after impact`, b.sprites.C01.x === 244 && b.sprites.C01.footY === 130 && b.sprites.M01.x === 78 && b.sprites.M01.footY === 130);
+    check(`${width}: no pivot or position drift after impact`, b.sprites.C01.x === home.c && b.sprites.C01.footY === home.f && b.sprites.M01.x === home.m && b.sprites.M01.footY === home.f);
     await command(page, 'ground_slam'); await command(page, 'ground_slam');
     b = await battle(page); check(`${width}: three casts spend exactly 12 MP`, b.actors[0].mp === 0 && b.actors[1].hp === 22);
     const turn = b.turn;

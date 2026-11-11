@@ -1,83 +1,121 @@
 import Phaser from 'phaser';
 import { COLORS, css } from '../../game/config/palette';
 import { DialogueRunner } from '../../game/dialogue/DialogueRunner';
-import { DISPLAY_NAMES, portraitKey, type DialogueScript } from '../../game/dialogue/types';
+import { portraitKey, type DialogueScript } from '../../game/dialogue/types';
+import { speakerLabel } from '../../game/dialogue/speaker';
 import type { Services } from '../../game/systems/Services';
-import { makeText } from '../styles/theme';
 import { SCENE_KEYS } from '../../game/data/ids';
+import { UNKNOWN_LABEL, isNameKnown } from '../../game/story/identity';
+import { FONT, TYPE, Ui } from '../kit/ui';
 
 /**
- * Layout (ruang UI 320x180). Semua angka ada di sini agar UI mudah direvisi tanpa menyentuh DialogueRunner
- * maupun data dialog.
+ * Tata letak dialog (satuan desain 960x540). Semua angka di sini agar UI mudah direvisi tanpa menyentuh
+ * DialogueRunner maupun data dialog. Panel rendah di bawah layar, bukan kotak besar: dunia tetap terlihat.
+ * Portrait (potongan dada, latar transparan) tumbuh keluar dari tepi atas panel.
  */
 export const DIALOGUE_LAYOUT = {
-  boxX: 8,
-  boxY: 120,
-  boxW: 304,
-  boxH: 54,
-  portraitPanel: { x: 11, y: 123, w: 56, h: 48 },
-  portraitFootX: 39, // tengah portrait
-  portraitFootY: 171, // bawah portrait (menonjol ke atas kotak)
-  portraitScale: 0.5, // tekstur 128 px tinggi -> 64 unit UI
-  textXWithPortrait: 76,
-  textXWithout: 16,
-  textY: 125,
-  nameY: 110,
-  charsWithPortrait: 28,
-  charsWithout: 36,
-  linesPerPage: 4,
+  panelX: 72,
+  panelW: 816,
+  panelH: 124,
+  panelBottom: 516,
+  portraitCenterX: 170,
+  portraitHeight: 232,
+  textXWithPortrait: 280,
+  textXWithout: 112,
+  textRight: 864,
+  nameY: 12,
+  bodyYNamed: 36,
+  bodyYUnnamed: 22,
+  linesPerPage: 3,
+  fontSize: TYPE.dialogue,
 } as const;
 
 const L = DIALOGUE_LAYOUT;
 
-/** Kotak dialog JRPG: portrait + ekspresi, nama pembicara, typewriter sesuai Text Speed, halaman, pilihan. */
+/** Ukur lebar teks pada ukuran desain (tidak bergantung skala layar) sehingga halaman identik di semua resolusi. */
+let measureCtx: CanvasRenderingContext2D | null = null;
+function measure(text: string, size: number, italic: boolean): number {
+  measureCtx ??= document.createElement('canvas').getContext('2d');
+  if (!measureCtx) return text.length * size * 0.5;
+  measureCtx.font = `${italic ? 'italic ' : ''}400 ${size}px ${FONT.body}`;
+  return measureCtx.measureText(text).width;
+}
+
+/** Word-wrap berbasis lebar sebenarnya (font proporsional). Deterministik pada satu font; tidak memotong kata. */
+export function wrapMeasured(text: string, maxWidth: number, size: number, italic = false): string[] {
+  const out: string[] = [];
+  for (const para of text.split('\n')) {
+    const words = para.split(/\s+/).filter(w => w.length > 0);
+    if (words.length === 0) { out.push(''); continue; }
+    let line = '';
+    for (const word of words) {
+      const trial = line ? `${line} ${word}` : word;
+      if (measure(trial, size, italic) <= maxWidth) { line = trial; continue; }
+      if (line) { out.push(line); line = ''; }
+      let rest = word;
+      while (measure(rest, size, italic) > maxWidth && rest.length > 1) {
+        let n = rest.length - 1;
+        while (n > 1 && measure(rest.slice(0, n), size, italic) > maxWidth) n--;
+        out.push(rest.slice(0, n));
+        rest = rest.slice(n);
+      }
+      line = rest;
+    }
+    if (line) out.push(line);
+  }
+  return out;
+}
+
+/** Dialog JRPG: portrait + ekspresi, nama pembicara, typewriter sesuai Text Speed, halaman, pilihan. */
 export class DialogueBox {
   private runner: DialogueRunner | null = null;
   private releaseInput: (() => void) | null = null;
   private resolve: (() => void) | null = null;
   private lastVersion = -1;
+  private readonly ui: Ui;
 
-  private readonly bg: Phaser.GameObjects.Rectangle;
-  private readonly panel: Phaser.GameObjects.Rectangle;
-  private readonly portrait: Phaser.GameObjects.Image;
-  private readonly nameBg: Phaser.GameObjects.Rectangle;
-  private readonly nameText: Phaser.GameObjects.Text;
-  private readonly body: Phaser.GameObjects.Text;
-  private readonly indicator: Phaser.GameObjects.Triangle;
-  private readonly choiceBar: Phaser.GameObjects.Rectangle;
-  private readonly choiceTexts: Phaser.GameObjects.Text[] = [];
-  private readonly all: Phaser.GameObjects.GameObject[] = [];
+  private chrome: Phaser.GameObjects.GameObject[] = [];
+  private portrait!: Phaser.GameObjects.Image;
+  private nameText!: Phaser.GameObjects.Text;
+  private body!: Phaser.GameObjects.Text;
+  private indicator!: Phaser.GameObjects.Text;
+  private choiceBar!: Phaser.GameObjects.Rectangle;
+  private choiceTexts: Phaser.GameObjects.Text[] = [];
   private blink = 0;
+  private hasPortraitNow = false;
+  private shown = false;
 
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly services: Services,
   ) {
-    const depth = 100;
-    this.bg = scene.add.rectangle(L.boxX, L.boxY, L.boxW, L.boxH, COLORS.deepPlum, 0.97).setOrigin(0, 0).setStrokeStyle(1, COLORS.bitterLime);
-    this.panel = scene.add
-      .rectangle(L.portraitPanel.x, L.portraitPanel.y, L.portraitPanel.w, L.portraitPanel.h, COLORS.ink, 0.75)
-      .setOrigin(0, 0)
-      .setStrokeStyle(1, COLORS.plumLine);
-    this.portrait = scene.add.image(L.portraitFootX, L.portraitFootY, '__DEFAULT').setOrigin(0.5, 1).setScale(L.portraitScale);
-    this.nameBg = scene.add.rectangle(0, L.nameY, 10, 11, COLORS.bitterLime).setOrigin(0, 0);
-    this.nameText = makeText(scene, 0, L.nameY + 2, '', { color: COLORS.ink });
-    this.body = makeText(scene, L.textXWithout, L.textY, '', { lineSpacing: 4 });
-    this.indicator = scene.add.triangle(L.boxX + L.boxW - 12, L.boxY + L.boxH - 9, 0, 0, 7, 0, 3.5, 5, COLORS.bitterLime).setOrigin(0, 0);
-    this.choiceBar = scene.add.rectangle(0, 0, 10, 11, COLORS.bitterLime).setOrigin(0, 0);
-    for (let i = 0; i < 3; i++) this.choiceTexts.push(makeText(scene, 0, 0, '', { color: COLORS.paper }));
-    this.all.push(this.bg, this.panel, this.portrait, this.nameBg, this.nameText, this.body, this.indicator, this.choiceBar, ...this.choiceTexts);
-    this.bg.setDepth(depth);
-    this.panel.setDepth(depth + 1);
-    this.portrait.setDepth(depth + 2);
-    this.nameBg.setDepth(depth + 3);
-    this.nameText.setDepth(depth + 4);
-    this.body.setDepth(depth + 3);
-    this.indicator.setDepth(depth + 3);
-    this.choiceBar.setDepth(depth + 3);
-    this.choiceTexts.forEach((t) => t.setDepth(depth + 4));
-    this.hide();
+    this.ui = new Ui(scene);
+    this.build();
     scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.releaseInput?.(); this.releaseInput = null; this.runner = null; this.resolve = null; });
+  }
+
+  /** (Re)membuat seluruh objek tampilan. Dipanggil juga saat kanvas berubah ukuran; state runner dipertahankan. */
+  build(): void {
+    const ui = this.ui;
+    const depth = 100;
+    const top = L.panelBottom - L.panelH;
+    this.chrome = ui.panel(L.panelX, top, L.panelW, L.panelH, { fill: COLORS.night, alpha: 0.9, line: COLORS.plumLine, depth });
+    // garis tipis lime pendek di sudut kiri atas: satu-satunya ornamen, menandai kotak dialog aktif
+    this.chrome.push(ui.rect(L.panelX, top, 28, ui.hair / ui.s * 2, COLORS.bitterLime, 1, depth + 1));
+    this.portrait = this.scene.add.image(0, 0, '__DEFAULT').setOrigin(0.5, 1).setDepth(depth + 2).setVisible(false);
+    this.nameText = ui.text(0, 0, '', { family: 'display', weight: '700', size: TYPE.heading - 2, color: COLORS.bitterLime, depth: depth + 3 });
+    this.body = ui.text(0, 0, '', { size: L.fontSize, depth: depth + 3, leading: 6 });
+    this.indicator = ui.text(L.panelX + L.panelW - 22, L.panelBottom - 20, '▾', { size: 14, color: COLORS.bitterLime, originX: 0.5, originY: 0.5, depth: depth + 3 });
+    this.choiceBar = ui.rect(0, 0, 10, 10, COLORS.plumLift, 0.95, depth + 3).setVisible(false);
+    this.choiceTexts = [0, 1, 2].map(() => ui.text(0, 0, '', { size: L.fontSize - 0.5, depth: depth + 4, originY: 0.5 }));
+    this.all().forEach((o) => (o as Phaser.GameObjects.Components.Visible & Phaser.GameObjects.GameObject).setVisible(false));
+    this.shown = false;
+    this.hasPortraitNow = false;
+    if (this.runner) { this.lastVersion = -1; this.refresh(); }
+  }
+
+  private all(): Phaser.GameObjects.GameObject[] {
+    return [...this.chrome, this.portrait, this.nameText, this.body, this.indicator, this.choiceBar, ...this.choiceTexts];
   }
 
   get active(): boolean {
@@ -100,18 +138,21 @@ export class DialogueBox {
     };
   }
 
+  /** Lebar area teks (satuan desain) tergantung ada tidaknya portrait. */
+  private textWidth(portrait: boolean): number {
+    return L.textRight - (portrait ? L.textXWithPortrait : L.textXWithout);
+  }
+
   /** Memutar skrip dialog; promise selesai saat baris terakhir ditutup pemain. */
   play(script: DialogueScript): Promise<void> {
     if (this.runner) return Promise.reject(new Error('DialogueBox sudah aktif'));
     const runner = new DialogueRunner(script, {
       getTextSpeed: () => this.services.settings.get('text_speed'),
-      charsWithPortrait: L.charsWithPortrait,
-      charsWithoutPortrait: L.charsWithout,
       linesPerPage: L.linesPerPage,
+      wrap: (text, portrait, kind) => wrapMeasured(text, this.textWidth(portrait) * 0.965, L.fontSize, kind === 'thought'),
     });
     this.runner = runner;
     this.lastVersion = -1;
-    this.show();
     runner.start();
     this.releaseInput = this.services.input.pushLayer('dialogue', (e) => {
       if (e.intent === 'confirm') {
@@ -135,7 +176,7 @@ export class DialogueBox {
     if (r.version !== this.lastVersion) this.refresh();
     else if (r.state === 'typing') this.body.setText(r.visibleText);
     this.blink += deltaMs;
-    this.indicator.setVisible(r.canAdvance && Math.floor(this.blink / 350) % 2 === 0);
+    this.indicator.setVisible(r.canAdvance && Math.floor(this.blink / 450) % 2 === 0);
   }
 
   private finish(): void {
@@ -148,65 +189,68 @@ export class DialogueBox {
     res?.();
   }
 
-  private show(): void {
-    this.bg.setVisible(true);
-  }
-
   private hide(): void {
-    for (const o of this.all) (o as Phaser.GameObjects.Components.Visible & Phaser.GameObjects.GameObject).setVisible(false);
+    for (const o of this.all()) (o as Phaser.GameObjects.Components.Visible & Phaser.GameObjects.GameObject).setVisible(false);
+    this.shown = false;
   }
 
   private refresh(): void {
     const r = this.runner;
     if (!r) return;
+    const ui = this.ui;
     this.lastVersion = r.version;
-    this.bg.setVisible(true);
+    if (!this.shown) { this.chrome.forEach((o) => (o as Phaser.GameObjects.Rectangle).setVisible(true)); this.shown = true; }
     const line = r.currentLine;
     const choice = r.choice;
+    const known = isNameKnown(this.services.gameState.snapshot()?.flags);
+    const top = L.panelBottom - L.panelH;
 
-    // portrait + nama
+    // portrait: potongan dada yang tumbuh dari tepi atas panel
     const key = line ? portraitKey(line.speaker, line.expression) : null;
     const hasPortrait = !!key && this.scene.textures.exists(key);
-    this.panel.setVisible(hasPortrait);
+    this.hasPortraitNow = hasPortrait;
     this.portrait.setVisible(hasPortrait);
-    if (hasPortrait && key) this.portrait.setTexture(key);
-    const textX = hasPortrait ? L.textXWithPortrait : L.textXWithout;
-    const label = line ? (line.label ?? DISPLAY_NAMES[line.speaker] ?? '') : '';
-    const showName = label.length > 0;
-    this.nameBg.setVisible(showName);
-    this.nameText.setVisible(showName);
-    if (showName) {
-      const nx = hasPortrait ? L.textXWithPortrait : L.textXWithout;
-      this.nameText.setText(label).setPosition(nx + 4, L.nameY + 2);
-      this.nameBg.setPosition(nx, L.nameY).setSize(label.length * 8 + 8, 11);
-      this.nameBg.displayWidth = label.length * 8 + 8;
+    if (hasPortrait && key) {
+      this.portrait.setTexture(key);
+      const src = this.scene.textures.get(key).getSourceImage() as HTMLImageElement;
+      this.portrait.setScale(ui.u(L.portraitHeight) / src.height).setPosition(ui.u(L.portraitCenterX), ui.u(L.panelBottom - 1));
     }
+    const textX = hasPortrait ? L.textXWithPortrait : L.textXWithout;
 
-    // isi
+    const label = line ? speakerLabel(line, known) : '';
+    const showName = label.length > 0 && !choice;
+    this.nameText.setVisible(showName);
+    if (showName) this.nameText.setText(label).setPosition(ui.u(textX), ui.u(top + L.nameY)).setColor(css(label === UNKNOWN_LABEL ? COLORS.paperDim : COLORS.bitterLime));
+
     if (choice) {
       this.body.setVisible(false);
       this.indicator.setVisible(false);
-      const baseX = L.textXWithout + 6;
-      this.choiceBar.setVisible(true);
+      this.portrait.setVisible(false);
+      const baseX = L.textXWithout;
+      const rowH = 30;
+      const y0 = top + 16;
       choice.options.forEach((opt, i) => {
         const t = this.choiceTexts[i]!;
-        t.setVisible(true).setText(opt.text).setPosition(baseX + 4, L.textY + 4 + i * 13);
-        t.setColor(css(i === choice.index ? COLORS.ink : COLORS.paper));
+        const focus = i === choice.index;
+        t.setVisible(true).setText(opt.text).setPosition(ui.u(baseX + 16), ui.u(y0 + i * rowH + rowH / 2 - 1));
+        t.setColor(css(COLORS.paper)).setFontStyle(focus ? '600' : '400');
       });
       for (let i = choice.options.length; i < this.choiceTexts.length; i++) this.choiceTexts[i]!.setVisible(false);
-      const sel = this.choiceTexts[choice.index]!;
-      this.choiceBar.setPosition(baseX, sel.y - 1).setSize(Math.max(...choice.options.map((o) => o.text.length)) * 8 + 8, 11);
-      this.choiceBar.displayWidth = Math.max(...choice.options.map((o) => o.text.length)) * 8 + 8;
-      this.nameBg.setVisible(false);
-      this.nameText.setVisible(false);
-      this.portrait.setVisible(false);
-      this.panel.setVisible(false);
+      const widest = Math.max(...this.choiceTexts.slice(0, choice.options.length).map((t) => t.width)) / ui.s;
+      this.choiceBar.setVisible(true).setPosition(ui.u(baseX), ui.u(y0 + choice.index * rowH)).setSize(ui.u(widest + 36), ui.u(rowH - 2));
+      this.choiceBar.setDisplaySize(ui.u(widest + 36), ui.u(rowH - 2));
     } else {
       this.choiceBar.setVisible(false);
       this.choiceTexts.forEach((t) => t.setVisible(false));
-      this.body.setVisible(true).setPosition(textX, L.textY).setText(r.visibleText);
-      this.body.setColor(css(line?.kind === 'system' ? COLORS.bitterLime : COLORS.paper));
+      const thought = line?.kind === 'thought';
+      this.body.setVisible(true).setPosition(ui.u(textX), ui.u(top + (showName ? L.bodyYNamed : L.bodyYUnnamed))).setText(r.visibleText);
+      this.body.setColor(css(line?.kind === 'system' ? COLORS.bitterLime : thought ? COLORS.paperDim : COLORS.paper));
+      this.body.setFontStyle(thought ? 'italic 400' : '400');
     }
   }
-}
 
+  /** Dipakai HUD: apakah portrait sedang tampil (untuk tata letak prompt). */
+  get portraitVisible(): boolean {
+    return this.hasPortraitNow;
+  }
+}

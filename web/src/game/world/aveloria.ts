@@ -142,7 +142,7 @@ export function drawAveloria(scene: Phaser.Scene): { gate: Phaser.GameObjects.Gr
   // Signs and crates show where people work, without gold/clock ornament spam.
   rect(688, 936, 4, 28, 0x594d40); rect(676, 932, 32, 16, 0xb1a283);
   for (const [x, y] of [[760, 1020], [784, 1020], [1032, 880]]) { rect(x!, y!, 20, 20, 0x806348); rect(x! + 2, y! + 2, 16, 2, 0xa0835d); }
-  const label = (x: number, y: number, text: string): void => { scene.add.text(x, y, text, { fontFamily: '"Press Start 2P"', fontSize: '8px', color: '#e1d9bd', backgroundColor: '#3b4240', padding: { x: 4, y: 4 } }).setDepth(-500); };
+  const label = (x: number, y: number, text: string): void => { scene.add.text(x, y, text, { fontFamily: "'Source Sans 3', sans-serif", fontStyle: '600', fontSize: '9px', color: '#e1d9bd', backgroundColor: '#3b4240', padding: { x: 4, y: 2 }, resolution: Math.max(2, scene.cameras.main.zoom) }).setDepth(-500); };
   label(600, 1088, 'AVELORIA'); label(280, 816, 'PASAR'); label(868, 624, 'ARSIP'); label(560, 568, 'ISTANA'); label(544, 152, 'RUANG PERTEMUAN');
   const gate = scene.add.graphics().setDepth(1160); gate.fillStyle(0x423f38); gate.fillRect(576, 1144, 128, 24); gate.fillStyle(0x8e8067); for (let x = 584; x < 704; x += 16) gate.fillRect(x, 1144, 4, 24);
   const bell = scene.add.graphics().setPosition(824, 452).setDepth(545); bell.fillStyle(0xa69a76); bell.fillRect(-8, 0, 16, 12); bell.fillRect(-12, 12, 24, 4); bell.fillStyle(0x423e34); bell.fillRect(-2, 16, 4, 4);

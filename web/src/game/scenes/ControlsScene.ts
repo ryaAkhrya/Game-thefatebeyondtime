@@ -1,13 +1,16 @@
 import Phaser from 'phaser';
-import { UI_HEIGHT, UI_WIDTH } from '../config/constants';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { CONTROL_LEGEND } from '../core/InputManager';
 import { getServices } from '../systems/Services';
-import { makeText, configureUiCamera } from '../../ui/styles/theme';
+import { menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
+import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
+
+const WIN: WindowSpec = { x: 180, y: 92, w: 600, h: 356, title: 'Panduan Kontrol' };
 
 /** Panduan Kontrol (overlay). Daftar tombol diambil dari KEY_BINDINGS/CONTROL_LEGEND, bukan ditulis ulang. */
 export class ControlsScene extends Phaser.Scene {
+  private ui!: Ui;
   private returnTo: SceneKey = SCENE_KEYS.Title;
   private releaseInput?: () => void;
   private closing = false;
@@ -22,35 +25,35 @@ export class ControlsScene extends Phaser.Scene {
   }
 
   create(): void {
-    configureUiCamera(this);
+    this.ui = new Ui(this);
     const services = getServices(this);
-
-    this.add.rectangle(0, 0, UI_WIDTH, UI_HEIGHT, COLORS.ink).setOrigin(0, 0);
-    this.add.rectangle(0, 0, UI_WIDTH, 21, COLORS.deepPlum).setOrigin(0, 0);
-    this.add.rectangle(0, 21, UI_WIDTH, 1, COLORS.plumLine).setOrigin(0, 0);
-    makeText(this, 16, 7, 'PANDUAN KONTROL', { color: COLORS.bitterLime });
-
-    CONTROL_LEGEND.forEach((row, i) => {
-      const y = 38 + i * 26;
-      this.add.rectangle(16, y - 2, 128, 14, COLORS.deepPlum).setOrigin(0, 0);
-      makeText(this, 22, y + 1, row.keys, { color: COLORS.bitterLime });
-      makeText(this, 152, y + 1, row.labelId);
-    });
-
-    makeText(this, 16, 140, 'Mouse tidak diperlukan. Seluruh game dimainkan dengan keyboard.', {
-      color: COLORS.paperDim,
-      wrapWidth: UI_WIDTH - 32,
-      lineSpacing: 3,
-    });
-
-    // Tombol Kembali tunggal, fokus selalu terlihat.
-    this.add.rectangle(UI_WIDTH - 72, 167, 64, 11, COLORS.bitterLime).setOrigin(0, 0);
-    makeText(this, UI_WIDTH - 40, 169, 'Kembali', { originX: 0.5, color: COLORS.ink });
-
+    this.build();
+    this.ui.fadeIn();
+    bindRelayout(this, () => this.build());
     this.releaseInput = services.input.pushLayer('controls', (e) => {
       if (e.intent === 'back' || e.intent === 'confirm') this.close(services.router);
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
+  }
+
+  private build(): void {
+    const ui = this.ui;
+    veil(ui, 0.97);
+    const body = menuWindow(ui, WIN);
+    CONTROL_LEGEND.forEach((row, i) => {
+      const y = body.bodyY + 6 + i * 52;
+      // tutup tombol: kotak kecil per tombol
+      let x = body.bodyX;
+      for (const key of row.keys.split(' / ').flatMap(k => k.split('/'))) {
+        const label = ui.text(x + 10, y + 13, key.trim(), { size: TYPE.small, weight: '600', color: COLORS.bitterLime, originY: 0.5, depth: 4 });
+        const w = label.width / ui.s + 20;
+        ui.panel(x, y, w, 26, { fill: COLORS.night, alpha: 0.9, line: COLORS.plumLine, depth: 3 });
+        x += w + 8;
+      }
+      ui.text(body.bodyX + 300, y + 13, row.labelId, { size: TYPE.body, originY: 0.5, depth: 3 });
+    });
+    ui.text(body.bodyX, WIN.y + WIN.h - 86, 'Mouse tidak diperlukan. Seluruh game dimainkan dengan keyboard.', { size: TYPE.small, color: COLORS.paperDim, depth: 3 });
+    windowHint(ui, WIN, 'Enter / Esc  kembali');
   }
 
   private close(router: ReturnType<typeof getServices>['router']): void {

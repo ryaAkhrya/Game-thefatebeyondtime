@@ -1,25 +1,28 @@
 import Phaser from 'phaser';
-import { UI_HEIGHT, UI_WIDTH } from '../config/constants';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { getServices } from '../systems/Services';
 import { MenuList } from '../../ui/components/MenuList';
-import { configureUiCamera, makeText } from '../../ui/styles/theme';
+import { veil } from '../../ui/components/frame';
+import { Ui, TYPE, bindRelayout } from '../../ui/kit/ui';
+import { AREA_LABEL, formatPlaytime } from '../../ui/labels';
 
-type PauseAction = 'resume' | 'status' | 'inventory' | 'equipment' | 'skills' | 'save' | 'settings' | 'title';
+type PauseAction = 'resume' | 'journal' | 'status' | 'inventory' | 'equipment' | 'skills' | 'save' | 'settings' | 'title';
 
 /**
- * Menu Jeda (overlay di atas dunia). Esc dari dunia membukanya; Pengaturan memakai jalur overlay yang sama
- * dengan Title, jadi nilainya identik. Layar RPG dan save tersedia di dunia; selama battle hanya menu aman yang aktif.
+ * Menu Jeda (overlay di atas dunia/battle). Laci sempit di kiri, dunia tetap terlihat di kanan; di kanan bawah
+ * hanya konteks singkat (lokasi, waktu). Pengaturan memakai jalur overlay yang sama dengan Title.
  */
 export class PauseScene extends Phaser.Scene {
   private returnTo: SceneKey = SCENE_KEYS.World;
+  private ui!: Ui;
   private menu?: MenuList;
-  private extra: Phaser.GameObjects.GameObject[] = [];
   private mode: 'main' | 'confirm' = 'main';
   private releaseInput?: () => void;
   private closing = false;
-  private hint!: Phaser.GameObjects.Text;
+  private hint?: Phaser.GameObjects.Text;
+  private hintText = '';
+  private focusId?: string;
 
   constructor() {
     super(SCENE_KEYS.Pause);
@@ -29,24 +32,21 @@ export class PauseScene extends Phaser.Scene {
     this.returnTo = data.returnTo ?? SCENE_KEYS.World;
     this.mode = 'main';
     this.closing = false;
-    this.extra = [];
     this.menu = undefined;
+    this.hintText = '';
+    this.focusId = undefined;
   }
 
   create(): void {
-    configureUiCamera(this);
+    this.ui = new Ui(this);
     const { input } = getServices(this);
-
-    this.add.rectangle(0, 0, UI_WIDTH, UI_HEIGHT, COLORS.ink, 0.62).setOrigin(0, 0);
-    this.add.rectangle(36, 20, 248, 140, COLORS.deepPlum).setOrigin(0, 0).setStrokeStyle(1, COLORS.bitterLime);
-    makeText(this, 160, 27, 'JEDA', { originX: 0.5, color: COLORS.bitterLime });
-    this.hint = makeText(this, 160, 147, 'Esc: kembali', { originX: 0.5, size: 6, color: COLORS.paperDim });
-    this.showMain();
-
+    this.build();
+    this.ui.fadeIn();
+    bindRelayout(this, () => { this.focusId = this.menu?.focusedItem.id; this.build(); });
     this.releaseInput = input.pushLayer('pause', (e) => {
       if (this.closing) return;
       if (e.intent === 'back') {
-        if (this.mode === 'confirm') this.showMain();
+        if (this.mode === 'confirm') this.toggleConfirm();
         else this.resume();
         return;
       }
@@ -55,58 +55,74 @@ export class PauseScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
   }
 
-  private clearMenu(): void {
-    this.menu?.destroy();
-    this.extra.forEach((o) => o.destroy());
-    this.extra = [];
+  private build(): void {
+    const ui = this.ui;
+    veil(ui, 0.62);
+    // laci kiri
+    ui.rect(0, 0, 312, ui.dh, COLORS.night, 0.94, 1);
+    ui.rect(311, 0, 1, ui.dh, COLORS.plumLine, 1, 2);
+    ui.text(48, 44, 'JEDA', { family: 'display', weight: '700', size: TYPE.display, color: COLORS.bitterLime, depth: 3 });
+    ui.motif(48 + 64, 92, 128, 10, 3);
+    this.hint = ui.text(48, ui.dh - 60, this.hintText, { size: TYPE.small, color: COLORS.paperDim, depth: 3, width: 230 });
+    this.info();
+    if (this.mode === 'confirm') this.confirmView(); else this.mainView();
   }
 
-  private showMain(): void {
-    this.clearMenu();
-    this.mode = 'main';
+  /** Konteks singkat di kanan bawah: lokasi dan waktu. */
+  private info(): void {
+    const ui = this.ui;
+    const state = getServices(this).gameState.snapshot();
+    if (!state) return;
+    const x = ui.dw - 56;
+    ui.text(x, ui.dh - 92, AREA_LABEL[state.area] ?? '', { family: 'display', weight: '600', size: TYPE.heading + 3, originX: 1, depth: 3 });
+    ui.text(x, ui.dh - 60, `Bab ${state.chapter}   ·   ${formatPlaytime(state.playtimeSec)}`, { size: TYPE.small, originX: 1, color: COLORS.paperDim, depth: 3 });
+  }
+
+  private mainView(): void {
+    const ui = this.ui;
     const items: { id: PauseAction; label: string }[] = [
       { id: 'resume', label: 'Lanjutkan' },
+      { id: 'journal', label: 'Jurnal' },
       { id: 'status', label: 'Status' },
       { id: 'inventory', label: 'Inventaris' },
       { id: 'equipment', label: 'Perlengkapan' },
       { id: 'skills', label: 'Jurus' },
-      { id: 'save', label: 'Simpan/Muat' },
+      { id: 'save', label: 'Simpan / Muat' },
       { id: 'settings', label: 'Pengaturan' },
       { id: 'title', label: 'Kembali ke Judul' },
     ];
+    const inBattle = this.returnTo === SCENE_KEYS.Battle;
     this.menu = new MenuList(this, {
-      x: 160,
-      y: 43,
-      width: 216,
-      rowHeight: 12,
-      items: items.map(item => ({ ...item, disabled: this.returnTo === SCENE_KEYS.Battle && ['status', 'inventory', 'equipment', 'skills', 'save'].includes(item.id), disabledHint: 'Selesaikan pertarungan dahulu.' })),
-      onFocusChange: item => this.hint.setText(item.disabled ? item.disabledHint ?? '' : 'Esc: kembali'),
-      onDisabledConfirm: item => this.hint.setText(item.disabledHint ?? ''),
+      ui, x: 36, y: 124, width: 240, rowHeight: 38, depth: 4, initialId: this.focusId, size: 15,
+      items: items.map(item => ({ ...item, disabled: inBattle && ['journal', 'status', 'inventory', 'equipment', 'skills', 'save'].includes(item.id), disabledHint: 'Selesaikan pertarungan dahulu.' })),
+      onFocusChange: item => this.setHint(item.disabled ? item.disabledHint ?? '' : ''),
+      onDisabledConfirm: item => this.setHint(item.disabledHint ?? ''),
       onConfirm: (item) => this.act(item.id as PauseAction),
     });
   }
 
-  private showConfirm(): void {
-    this.clearMenu();
-    this.mode = 'confirm';
-    this.extra.push(
-      makeText(this, 160, 62, 'Kembali ke judul?', { originX: 0.5 }),
-      makeText(this, 160, 74, 'Simpan dulu bila perlu.', { originX: 0.5, color: COLORS.paperDim }),
-    );
+  private confirmView(): void {
+    const ui = this.ui;
+    ui.text(48, 140, 'Kembali ke judul?', { family: 'display', weight: '600', size: TYPE.heading + 1, depth: 4 });
+    ui.text(48, 172, 'Progres yang belum disimpan\nakan hilang.', { size: TYPE.body, color: COLORS.paperDim, depth: 4 });
     this.menu = new MenuList(this, {
-      x: 160,
-      y: 94,
-      width: 160,
-      rowHeight: 14,
-      items: [
-        { id: 'cancel', label: 'Batal' },
-        { id: 'yes', label: 'Ya, kembali' },
-      ],
-      onConfirm: (item) => {
-        if (item.id === 'cancel') this.showMain();
-        else this.toTitle();
-      },
+      ui, x: 36, y: 232, width: 240, rowHeight: 38, depth: 4, size: 15,
+      items: [{ id: 'cancel', label: 'Batal' }, { id: 'yes', label: 'Ya, kembali' }],
+      onConfirm: (item) => { if (item.id === 'cancel') this.toggleConfirm(); else this.toTitle(); },
     });
+  }
+
+  private setHint(t: string): void {
+    this.hintText = t;
+    this.hint?.setText(t);
+  }
+
+  private toggleConfirm(): void {
+    this.mode = this.mode === 'confirm' ? 'main' : 'confirm';
+    this.menu?.destroy();
+    this.children.removeAll(true);
+    this.focusId = undefined;
+    this.build();
   }
 
   private act(a: PauseAction): void {
@@ -114,8 +130,9 @@ export class PauseScene extends Phaser.Scene {
     if (a === 'resume') this.resume();
     else if (a === 'settings') router.openOverlay(this, SCENE_KEYS.Settings);
     else if (a === 'save') router.openOverlay(this, SCENE_KEYS.SaveLoad);
+    else if (a === 'journal') router.openOverlay(this, SCENE_KEYS.Journal);
     else if (a === 'status' || a === 'inventory' || a === 'equipment' || a === 'skills') router.openOverlay(this, SCENE_KEYS.RpgMenu, { kind: a });
-    else this.showConfirm();
+    else this.toggleConfirm();
   }
 
   private resume(): void {

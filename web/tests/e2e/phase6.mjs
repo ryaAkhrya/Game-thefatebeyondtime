@@ -76,7 +76,7 @@ try {
     await walk(page, 280, 560); const shadow = await dialogueUntil(page, async () => !!(await state(page)).flags['c2.shadow_seen']); await waitWorld(page);
     check(`${width}: shadow cue follows forest entry`, shadow.includes('C2-04-L001'));
     await move(page, 352, 552, 'up'); await interact(page, 'forest2_marker'); await finishCityDialogue(page); await waitWorld(page);
-    await walk(page, 684, 544); await faceCity(page, 'up'); await interact(page, 'torvan'); const torvan = await finishCityDialogue(page); await waitWorld(page);
+    await walk(page, 684, 538); await faceCity(page, 'up'); await interact(page, 'torvan'); const torvan = await finishCityDialogue(page); await waitWorld(page);
     check(`${width}: Torvan joins only after full dialogue`, torvan.filter(d => d.line?.startsWith('C2-05-L')).length === 20 && (await state(page)).party.join() === 'C01,C03');
     await shot(page, `${width}_duo_world`);
     await openPause(page); await openMenu(page, 'status'); await press(page, 'ArrowRight');

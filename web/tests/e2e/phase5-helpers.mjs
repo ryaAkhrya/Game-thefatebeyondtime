@@ -55,12 +55,13 @@ export async function aveloriaJourney(page, check, shot, { prefix = 'chapter1', 
   await waitWorld(page);
   await walk(page, 1312, 400); await faceCity(page, 'right'); await interact(page, 'slice_exit');
   await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-  await openMenu(page, 'aveloria', 'world');
+  // Sesudah memilih Masuk Aveloria, dialog vista dapat langsung mengambil alih layer (tidak ada jendela 'world' yang dapat diandalkan).
+  await selectMenu(page, 'aveloria'); await press(page, 'Enter');
   await page.waitForFunction(() => window.__tfbt.world()?.area === 'aveloria');
   await page.waitForFunction(() => window.__tfbt.world()?.dialogue?.script === 'C1-06-VISTA');
   const vista = await finishCityDialogue(page, { check, shot, prefix }); await waitWorld(page);
   check(`${prefix}: forest checkpoint leads to first Aveloria vista and a safe city spawn`, vista.some(l => l.script === 'C1-06-VISTA') && (await state(page)).area === 'aveloria' && (await state(page)).flags['c1.aveloria_vista']);
-  check(`${prefix}: city is a safe zone with four original named NPC atlases and four working residents`, await page.evaluate(() => { const c = window.__tfbt.world().city; return c.safeZone && Object.keys(c.npcs).length === 4 && c.npcs.velthia.texture === 'C02_CITY_EXPLORE' && c.npcs.azie.originY === 46 / 48 && c.citizens.length === 4 && !window.__tfbt.battle(); }));
+  check(`${prefix}: city is a safe zone with four original named NPC atlases and four working residents`, await page.evaluate(() => { const c = window.__tfbt.world().city; return c.safeZone && Object.keys(c.npcs).length === 4 && c.npcs.velthia.texture === 'C02_CITY_EXPLORE' && c.npcs.azie.originY === 47 / 48 && c.citizens.length === 4 && !window.__tfbt.battle(); }));
   await layout(page, check, `${prefix}: city HUD layout`); await shot(page, `${prefix}_gate`);
   const beforeWall = await world(page); await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(700); await page.keyboard.up('ArrowLeft');
   const stopped = await world(page);
@@ -123,7 +124,7 @@ export async function aveloriaJourney(page, check, shot, { prefix = 'chapter1', 
   await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot3');
   check(`${prefix}: ending Save/Load is visibly above the opaque ending`, await page.evaluate(() => window.__tfbt.visibleScenes().at(-1) === 'SaveLoadScene'));
   await shot(page, `${prefix}_ending_save`); await back(page, 'slice-end');
-  await openMenu(page, 'settings', 'settings');
+  await openMenu(page, 'settings', 'settings').catch(async error => { throw Error(`${error.message} | diag ${JSON.stringify(await page.evaluate(() => ({ layer: window.__tfbt.inputLayer(), focus: window.__tfbt.focus(), active: window.__tfbt.activeScenes(), visible: window.__tfbt.visibleScenes(), router: window.__tfbt.router() })))}`); });
   check(`${prefix}: ending Settings is visibly above the opaque ending`, await page.evaluate(() => window.__tfbt.visibleScenes().at(-1) === 'SettingsScene'));
   await shot(page, `${prefix}_ending_settings`); await back(page, 'slice-end'); await press(page, 'Escape'); await waitWorld(page);
   await refreshContinue(page);

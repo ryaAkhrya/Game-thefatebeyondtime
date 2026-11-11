@@ -18,6 +18,7 @@ import { loadForest2, loadLiora } from '../world/chapter2Maps';
 import { Chapter2View } from '../world/Chapter2View';
 import { FOREST2_SPAWN, LIORA_SPAWN, RETURN_SPAWN } from '../story/chapter2Flags';
 import { joinTorvan, restChapter2Party } from '../rpg/party';
+import { DISPLAY_EVENT, getDisplay } from '../systems/DisplayController';
 
 const WALK_SPEED = 88; // px/detik (2,75 petak/detik)
 const MAX_DT = 50; // ms; batas langkah waktu supaya tidak ada lompatan saat tab melambat
@@ -83,6 +84,12 @@ export class WorldScene extends Phaser.Scene {
     const { map } = this.loaded;
 
     this.cameras.main.setBackgroundColor(0x1d1625);
+    // Dunia memakai zoom kamera BILANGAN BULAT (pixel art rata); kanvas = piksel perangkat.
+    this.cameras.main.setZoom(getDisplay(this).worldZoom);
+    this.cameras.main.setRoundPixels(true);
+    const onDisplay = (): void => { this.cameras.main.setZoom(getDisplay(this).worldZoom); };
+    this.game.events.on(DISPLAY_EVENT, onDisplay);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game.events.off(DISPLAY_EVENT, onDisplay));
 
     // ---- dasar peta (fallback polos bila gambar gagal dimuat) ----
     if (map.id === 'aveloria' || map.id === 'liora' || map.id === 'forest_2') { /* ground is drawn with area view below */ }
@@ -234,7 +241,11 @@ export class WorldScene extends Phaser.Scene {
       return;
     }
     this.target = findInteractable({ x: this.player.x, y: this.player.y }, this.player.facing, this.interactables);
-    this.hud.showPrompt(this.target ? `E  ${this.target.verb}` : null);
+    if (!this.target) { this.hud.showPrompt(null); return; }
+    // petunjuk kecil melayang di atas objek (koordinat piksel kanvas)
+    const cam = this.cameras.main;
+    const t = this.target;
+    this.hud.showPrompt(t.verb, { x: (t.x + t.w / 2 - cam.worldView.x) * cam.zoom, y: (Math.min(t.y, this.player.y - 54) - cam.worldView.y) * cam.zoom - 6 }); // di atas kepala pemain, tidak menutup wajah
   }
 
   private tryInteract(): void {
@@ -522,7 +533,7 @@ export class WorldScene extends Phaser.Scene {
   // ---------------------------------------------------------- sprite helper
 
   private makeWalker(key: string, x: number, y: number, facing: Facing, cols: 4 | 6, tag: 'c01' | 'c08'): Walker {
-    const shadow = this.add.ellipse(x, y - 1, 18, 6, 0x10161a, 0.38).setDepth(y - 1);
+    const shadow = this.add.ellipse(x, y - 1, 20, 6, 0x10161a, 0.38).setDepth(y - 1);
     const sprite = this.add.sprite(x, y, key, DIR_ROW[facing] * cols).setOrigin(0.5, 47 / 48).setDepth(y);
     sprite.setData('tag', tag);
     return { sprite, shadow, x, y, facing };
@@ -573,8 +584,10 @@ export class WorldScene extends Phaser.Scene {
       objective: this.story.objective(),
       target: this.target?.id ?? null,
       prompt: this.target?.verb ?? null,
-      cam: { x: Math.round(cam.scrollX), y: Math.round(cam.scrollY), w: cam.width, h: cam.height, bw: this.loaded.map.width, bh: this.loaded.map.height },
+      // Kamera = bidang dunia yang terlihat (worldView), bukan scroll mentah: zoom bulat membuat keduanya berbeda.
+      cam: { x: Math.round(cam.worldView.x), y: Math.round(cam.worldView.y), w: Math.round(cam.worldView.width), h: Math.round(cam.worldView.height), zoom: cam.zoom, bw: this.loaded.map.width, bh: this.loaded.map.height },
       dialogue: this.hud?.dialogue.debug ?? null,
+      player: { texture: this.player.sprite.texture.key, frame: this.player.sprite.frame.name, originX: this.player.sprite.originX, originY: this.player.sprite.originY, displayWidth: this.player.sprite.displayWidth, displayHeight: this.player.sprite.displayHeight, y: this.player.sprite.y, shadowY: this.player.shadow.y },
       nambo: this.nambo ? { x: Math.round(this.nambo.x), y: Math.round(this.nambo.y), facing: this.nambo.facing } : null,
       bossVisible: !!this.bossSprite?.visible,
       city: this.city?.debug() ?? null,

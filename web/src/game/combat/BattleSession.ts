@@ -5,6 +5,7 @@ import { HOLLOWLING_REWARD } from '../rpg/definitions';
 import { BRIAROOT_STATS, DUO_REWARD, FIRST_HOLLOWLING_FLAG, MOURNFANG_FLAG, MOURNFANG_REWARD, MOURNFANG_STATS,
   PATROL_REWARD, VEYRATH_REWARD, VEYRATH_STATS, WISPLET_STATS, type EncounterId } from './encounters';
 import { C2 } from '../story/chapter2Flags';
+import { TRUE_NAME, UNKNOWN_SELF, isNameKnown } from '../story/identity';
 
 export { FIRST_HOLLOWLING_FLAG } from './encounters';
 
@@ -25,6 +26,7 @@ export class BattleSession {
   private createEngine(): BattleEngine {
     const stats = effectiveStats(this.checkpoint);
     const yaric = actor('C01', 'player', stats);
+    yaric.name = isNameKnown(this.checkpoint.flags) ? TRUE_NAME : UNKNOWN_SELF; // nama hanya tampil setelah identitas terungkap
     yaric.hp = this.checkpoint.vitals?.hp ?? stats.HP;
     yaric.mp = this.checkpoint.vitals?.mp ?? stats.MP;
     yaric.skills = [...this.checkpoint.rpg.characters.C01!.unlockedSkills];

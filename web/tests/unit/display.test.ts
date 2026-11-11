@@ -1,44 +1,64 @@
 import { describe, expect, it } from 'vitest';
-import { checkDesktopSupport, computeScale } from '../../src/game/systems/DisplayScale';
+import { checkDesktopSupport, computeDisplay } from '../../src/game/systems/DisplayScale';
 import { visibleChars } from '../../src/game/utils/typewriter';
 import { TEXT_SPEED_MS_PER_CHAR } from '../../src/game/data/settingsSchema';
 
-describe('computeScale 16:9', () => {
-  it('1920x1080 pixel perfect = 3x (640x360 internal) tepat tanpa letterbox', () => {
-    const r = computeScale(1920, 1080, 'pixel_perfect', 1);
-    expect(r).toMatchObject({ cssWidth: 1920, cssHeight: 1080, deviceZoom: 3, integer: true });
+describe('computeDisplay 16:9 (kanvas = piksel perangkat, zoom dunia bulat)', () => {
+  it('1920x1080 fit: kanvas 1920x1080, zoom dunia 3 (view 640x360), skala UI 2', () => {
+    const r = computeDisplay(1920, 1080, 'fit', 1);
+    expect(r).toMatchObject({ pixelWidth: 1920, pixelHeight: 1080, cssWidth: 1920, cssHeight: 1080, worldZoom: 3, battleZoom: 4, uiScale: 2 });
   });
 
-  it('1366x768 pixel perfect = 2x (1280x720, letterbox, zoom 2x) bukan zoom pecahan', () => {
-    const r = computeScale(1366, 768, 'pixel_perfect', 1);
-    expect(r).toMatchObject({ cssWidth: 1280, cssHeight: 720, deviceZoom: 2 });
+  it('1366x768 fit: kanvas penuh viewport 1:1, zoom dunia BULAT 2 (tanpa skala 2,13x), skala UI pecahan hanya untuk teks', () => {
+    const r = computeDisplay(1366, 768, 'fit', 1);
+    expect(r.pixelHeight).toBe(768);
+    expect(Math.abs(r.pixelWidth / r.pixelHeight - 16 / 9)).toBeLessThan(0.01);
+    expect(r.pixelWidth).toBeLessThanOrEqual(1366);
+    expect(Number.isInteger(r.worldZoom)).toBe(true);
+    expect(r.worldZoom).toBe(2);
+    expect(Number.isInteger(r.battleZoom)).toBe(true);
+    expect(r.uiScale).toBeCloseTo(768 / 540, 5);
   });
 
-  it('1366x768 fit mengisi viewport, rasio 16:9, tidak melebihi viewport', () => {
-    const r = computeScale(1366, 768, 'fit', 1);
-    expect(r.cssWidth).toBeLessThanOrEqual(1366);
-    expect(r.cssHeight).toBeLessThanOrEqual(768);
-    expect(Math.abs(r.cssWidth / r.cssHeight - 16 / 9)).toBeLessThan(0.01);
-    expect(r.cssHeight).toBeGreaterThanOrEqual(766); // memenuhi tinggi
+  it('1366x768 pixel perfect = 1280x720 (kelipatan 2x), letterbox, tepat zoom 2', () => {
+    const r = computeDisplay(1366, 768, 'pixel_perfect', 1);
+    expect(r).toMatchObject({ pixelWidth: 1280, pixelHeight: 720, worldZoom: 2, cssWidth: 1280, cssHeight: 720 });
+  });
+
+  it('1920x1080 pixel perfect = 3x tepat tanpa letterbox', () => {
+    expect(computeDisplay(1920, 1080, 'pixel_perfect', 1)).toMatchObject({ pixelWidth: 1920, pixelHeight: 1080, worldZoom: 3 });
+  });
+
+  it('zoom dunia dan battle selalu bilangan bulat pada berbagai viewport/DPR', () => {
+    for (const [w, h, dpr] of [[1280, 720, 1], [1366, 768, 1], [1440, 900, 1], [1600, 900, 1], [1536, 864, 1.25], [1920, 1080, 1], [2560, 1440, 1], [3840, 2160, 1], [1000, 600, 1], [800, 450, 1]] as const) {
+      for (const mode of ['fit', 'pixel_perfect'] as const) {
+        const r = computeDisplay(w, h, mode, dpr);
+        expect(Number.isInteger(r.worldZoom) && r.worldZoom >= 1, `${w}x${h}@${dpr} ${mode} world`).toBe(true);
+        expect(Number.isInteger(r.battleZoom) && r.battleZoom >= 2, `${w}x${h}@${dpr} ${mode} battle`).toBe(true);
+        expect(Number.isInteger(r.pixelWidth) && Number.isInteger(r.pixelHeight)).toBe(true);
+        expect(r.pixelWidth).toBeLessThanOrEqual(Math.floor(w * dpr));
+        expect(r.pixelHeight).toBeLessThanOrEqual(Math.floor(h * dpr));
+      }
+    }
+  });
+
+  it('DPR 1,25: backing store = piksel perangkat dan CSS 1:1 dengannya', () => {
+    const r = computeDisplay(1536, 864, 'fit', 1.25); // 1920x1080 perangkat
+    expect(r).toMatchObject({ pixelWidth: 1920, pixelHeight: 1080, worldZoom: 3 });
+    expect(r.cssWidth * 1.25).toBeCloseTo(1920, 5);
   });
 
   it('jendela ultrawide: dibatasi tinggi, tidak di-stretch', () => {
-    const r = computeScale(2560, 720, 'fit', 1);
-    expect(r.cssHeight).toBeLessThanOrEqual(720);
-    expect(Math.abs(r.cssWidth / r.cssHeight - 16 / 9)).toBeLessThan(0.01);
-  });
-
-  it('DPR 1.25 pixel perfect memakai zoom bilangan bulat dalam piksel perangkat', () => {
-    const r = computeScale(1536, 864, 'pixel_perfect', 1.25); // 1920x1080 perangkat
-    expect(r.deviceZoom).toBe(3);
-    expect(r.cssWidth).toBe(1536);
+    const r = computeDisplay(2560, 720, 'fit', 1);
+    expect(r.pixelHeight).toBeLessThanOrEqual(720);
+    expect(Math.abs(r.pixelWidth / r.pixelHeight - 16 / 9)).toBeLessThan(0.01);
   });
 
   it('viewport sangat kecil tidak menghasilkan ukuran 0 atau NaN', () => {
     for (const mode of ['fit', 'pixel_perfect'] as const) {
-      const r = computeScale(100, 50, mode, 1);
-      expect(r.cssWidth).toBeGreaterThan(0);
-      expect(Number.isFinite(r.cssHeight)).toBe(true);
+      const r = computeDisplay(100, 50, mode, 1);
+      expect(r.pixelWidth).toBeGreaterThan(0);
+      expect(Number.isFinite(r.uiScale) && r.uiScale > 0).toBe(true);
     }
   });
 });

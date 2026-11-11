@@ -27,6 +27,19 @@ export const C2_SHADOW = chapter2Script('C2-04');
 export const C2_STONE: DialogueScript = { id: 'C2-04-STONE', nodes: [
   { ...c2Draft('C2-04-X001', 'Lambangnya sama seperti yang ditunjukkan Zira. Tetapi bekas goresnya lebih baru.', 'C01', 'CONFUSED'), kind: 'thought', source: 'CHAPTER_II_SCRIPT' },
 ] };
+/**
+ * DRAFT_IMPL (Polish Sprint 1): momen pengenalan nama. Bukan naskah approved dan bukan nama terukir pada sarung pedang (O-15 ditunda).
+ * Satu suara menyebut satu kata di batu penanda pertama; pemain baru melihat label nama setelah bagian pertama selesai
+ * (flag identity.name_known). Tidak menyebut Yudis, reinkarnasi atau memori masa lalu Velthia.
+ */
+export const C2_NAME_ECHO: DialogueScript = { id: 'C2-04-NAME-ECHO', nodes: [
+  c2Draft('C2-04-X002', 'Ujung jarinya menyentuh goresan terdalam pada batu. Di kepalanya, sebuah suara menyebut satu kata, pelan, seperti memanggil dari seberang ruangan.'),
+  c2Draft('C2-04-X003', '...Yaric.', 'SYSTEM', undefined, 'Suara'),
+  { ...c2Draft('C2-04-X004', 'Yaric...?', 'C01', 'CONFUSED'), kind: 'thought' },
+] };
+export const C2_NAME_FOUND: DialogueScript = { id: 'C2-04-NAME-FOUND', nodes: [
+  { ...c2Draft('C2-04-X005', 'Itu namaku. Aku tidak tahu dari mana aku tahu, tetapi rasanya benar.', 'C01', 'NEUTRAL'), kind: 'thought' },
+] };
 export const C2_TORVAN = chapter2Script('C2-05');
 C2_TORVAN.nodes.splice(17, 0, { type: 'choice', id: 'C2-05-CHOICE', speaker: 'C01', options: [
   { id: 'careful', text: 'Ikut, tapi jangan bikin repot.', expression: 'DETERMINED' },

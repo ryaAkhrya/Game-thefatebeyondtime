@@ -43,7 +43,7 @@ body {
   text-align: center;
   background: var(--ink);
   color: var(--paper);
-  font-family: 'Press Start 2P', monospace;
+  font-family: 'Source Sans 3', 'Segoe UI', system-ui, sans-serif;
   font-size: 12px;
   line-height: 1.7;
 }
