@@ -19,11 +19,13 @@ import { Chapter2View } from '../world/Chapter2View';
 import { FOREST2_SPAWN, LIORA_SPAWN, RETURN_SPAWN } from '../story/chapter2Flags';
 import { joinTorvan, restChapter2Party } from '../rpg/party';
 import { DISPLAY_EVENT, getDisplay } from '../systems/DisplayController';
+import { SPRINT_SPEED, WALK_SPEED } from '../world/movement';
+import { playState, registerCharacterAnims, type AnimState, type CharacterAnimMeta } from '../world/CharacterAnims';
 
-const WALK_SPEED = 88; // px/detik (2,75 petak/detik)
+
 const MAX_DT = 50; // ms; batas langkah waktu supaya tidak ada lompatan saat tab melambat
 const DIR_ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
-const DECAL_TYPES = new Set(['flowers', 'mushrooms']);
+const DECAL_TYPES = new Set(['flowers', 'flowers_y', 'flowers_v', 'mushrooms', 'mushrooms_b']);
 
 interface Walker {
   sprite: Phaser.GameObjects.Sprite;
@@ -31,6 +33,7 @@ interface Walker {
   x: number;
   y: number;
   facing: Facing;
+  state: AnimState;
 }
 
 /**
@@ -54,6 +57,7 @@ export class WorldScene extends Phaser.Scene {
   private leaving = false;
   private wrapCount = 0;
   private wasMoving = false;
+  private sprinting = false;
   private target: Interactable | null = null;
   private actionLog: string[] = [];
   private city?: AveloriaView;
@@ -118,7 +122,8 @@ export class WorldScene extends Phaser.Scene {
       else this.updateNamboBlocker();
     }
     if (map.id === 'forest_edge' && !gameState.hasFlag(MOURNFANG_FLAG)) {
-      this.bossSprite = this.add.sprite(972, 400, BATTLE_TEXTURE.B01, 0).setOrigin(0.5, 92 / 96).setFlipX(true).setDepth(400);
+      // Mournfang V4: 160x128, pivot [77,124], menghadap kanan -> flip agar menghadap barat (ke arah pemain)
+      this.bossSprite = this.add.sprite(972, 400, BATTLE_TEXTURE.B01, 0).setOrigin(77 / 160, 124 / 128).setFlipX(true).setDepth(400);
     }
 
     // ---- keadaan dinamis dari flag ----
@@ -185,20 +190,26 @@ export class WorldScene extends Phaser.Scene {
     let moved = 0;
     const canMove = !this.busy && input.topLayerId === 'world';
     const dir = canMove ? input.getMoveDirection() : null;
+    const prevX = this.player.x;
+    const prevY = this.player.y;
+    this.sprinting = false;
     if (dir) {
       this.player.facing = dir;
+      this.sprinting = input.isSprintHeld();
+      const speed = this.sprinting ? SPRINT_SPEED : WALK_SPEED;
       const vx = dir === 'left' ? -1 : dir === 'right' ? 1 : 0;
       const vy = dir === 'up' ? -1 : dir === 'down' ? 1 : 0;
-      const r = moveWithCollision(this.loaded.collision, this.player.x, this.player.y, vx * WALK_SPEED * dt, vy * WALK_SPEED * dt);
+      const r = moveWithCollision(this.loaded.collision, this.player.x, this.player.y, vx * speed * dt, vy * speed * dt);
       this.player.x = r.x;
       this.player.y = r.y;
       moved = r.moved;
     }
+    if (moved <= 0) this.sprinting = false;
     this.handleWrap();
-    this.syncWalker(this.player, moved > 0);
-    if (this.nambo) this.syncWalker(this.nambo, false, true);
+    this.syncWalker(this.player, moved > 0 ? (this.sprinting ? 'sprint' : 'walk') : 'idle');
+    if (this.nambo) this.syncWalker(this.nambo, this.nambo.state === 'walk' ? 'walk' : 'idle', true);
     this.city?.update(_time, this.busy);
-    this.chapter2?.update(this.player, moved > 0, delta);
+    this.chapter2?.update(this.player, moved > 0, delta, this.sprinting);
     const dialogue = this.hud.dialogue.debug;
     if (this.city && dialogue && dialogue.line !== this.cityLine) {
       this.cityLine = dialogue.line;
@@ -207,7 +218,7 @@ export class WorldScene extends Phaser.Scene {
     }
 
     // ---- pemicu & prompt ----
-    if (!this.busy) this.checkTriggers();
+    if (!this.busy) this.checkTriggers(prevX, prevY);
     this.updatePrompt();
     this.services.gameState.setPosition(this.player.x, this.player.y, this.player.facing, this.loaded.map.id as AreaId);
     this.services.checkpoints.setSafe(!this.busy && !this.hud.dialogue.active);
@@ -256,25 +267,39 @@ export class WorldScene extends Phaser.Scene {
     if (actions.length > 0) void this.runActions(actions);
   }
 
-  private checkTriggers(): void {
-    const fx = this.player.x;
-    const fy = this.player.y - 2;
+  /**
+   * Pemicu diperiksa sepanjang jalur frame ini (langkah <= 2 px), bukan hanya titik akhir: pada kecepatan lari satu frame
+   * dapat melewati beberapa piksel, sehingga pemicu tipis tidak boleh terlewati.
+   */
+  private checkTriggers(fromX = this.player.x, fromY = this.player.y): void {
+    const toX = this.player.x;
+    const toY = this.player.y;
+    const steps = Math.max(1, Math.ceil(Math.hypot(toX - fromX, toY - fromY) / 2));
     const inside = new Set<string>();
-    for (const t of this.loaded.map.triggers) {
-      if (pointIn(t, fx, fy)) inside.add(t.id);
+    const firstHit: { id: string; sampleX: number; sampleY: number }[] = [];
+    for (let i = 1; i <= steps; i++) {
+      const fx = fromX + ((toX - fromX) * i) / steps;
+      const fy = fromY + ((toY - fromY) * i) / steps - 2;
+      for (const t of this.loaded.map.triggers) {
+        if (!pointIn(t, fx, fy)) continue;
+        if (!inside.has(t.id)) { inside.add(t.id); firstHit.push({ id: t.id, sampleX: fx, sampleY: fy }); }
+      }
     }
-    for (const id of inside) {
-      if (this.insideTriggers.has(id)) continue; // hanya saat MASUK
-      const t = this.loaded.map.triggers.find((x) => x.id === id)!;
-      const actions = this.story.trigger(id, { copy: t.copy, wrapCount: this.wrapCount });
-      this.actionLog.push(`trigger:${id}`);
+    // Keadaan akhir menentukan apakah masih di dalam (untuk "hanya saat MASUK" pada frame berikutnya).
+    const endInside = new Set<string>();
+    for (const t of this.loaded.map.triggers) if (pointIn(t, toX, toY - 2)) endInside.add(t.id);
+    for (const hit of firstHit) {
+      if (this.insideTriggers.has(hit.id)) continue; // hanya saat MASUK
+      const t = this.loaded.map.triggers.find((x) => x.id === hit.id)!;
+      const actions = this.story.trigger(hit.id, { copy: t.copy, wrapCount: this.wrapCount });
+      this.actionLog.push(`trigger:${hit.id}`);
       if (actions.length > 0) {
-        this.insideTriggers = inside;
+        this.insideTriggers = endInside;
         void this.runActions(actions);
         return;
       }
     }
-    this.insideTriggers = inside;
+    this.insideTriggers = endInside;
   }
 
   // -------------------------------------------------------------- aksi cerita
@@ -519,9 +544,10 @@ export class WorldScene extends Phaser.Scene {
         targets: n,
         y: 458,
         duration: 650,
-        onUpdate: () => this.syncWalker(n, true, true),
+        onUpdate: () => { n.state = 'walk'; this.syncWalker(n, 'walk', true); },
         onComplete: () => {
           n.facing = 'down';
+          n.state = 'idle';
           this.updateNamboBlocker();
           this.syncNamboInteractable();
           resolve();
@@ -536,31 +562,24 @@ export class WorldScene extends Phaser.Scene {
     const shadow = this.add.ellipse(x, y - 1, 20, 6, 0x10161a, 0.38).setDepth(y - 1);
     const sprite = this.add.sprite(x, y, key, DIR_ROW[facing] * cols).setOrigin(0.5, 47 / 48).setDepth(y);
     sprite.setData('tag', tag);
-    return { sprite, shadow, x, y, facing };
+    return { sprite, shadow, x, y, facing, state: 'idle' };
   }
 
+  /** Animasi Yaric dan Nambo dari data atlas (`anims` di JSON); atlas tanpa data memakai definisi lama. */
   private createAnimations(): void {
-    const mk = (key: string, sheet: string, frames: number[], fps: number): void => {
-      if (this.anims.exists(key)) return;
-      this.anims.create({ key, frames: frames.map((frame) => ({ key: sheet, frame })), frameRate: fps, repeat: -1 });
-    };
-    for (const [dir, row] of Object.entries(DIR_ROW)) {
-      mk(`c01_idle_${dir}`, SPRITE_KEYS.yaric, [row * 4], 1);
-      mk(`c01_walk_${dir}`, SPRITE_KEYS.yaric, [0, 1, 2, 3].map((i) => row * 4 + i), 7);
-      mk(`c08_idle_${dir}`, SPRITE_KEYS.nambo, [row * 6, row * 6 + 1], 2);
-      mk(`c08_walk_${dir}`, SPRITE_KEYS.nambo, [2, 3, 4, 5].map((i) => row * 6 + i), 7);
-    }
+    const meta = (key: string): CharacterAnimMeta | undefined => this.cache.json.get(`${key}:meta`) as CharacterAnimMeta | undefined;
+    registerCharacterAnims(this, SPRITE_KEYS.yaric, 'c01', meta(SPRITE_KEYS.yaric), 4);
+    registerCharacterAnims(this, SPRITE_KEYS.nambo, 'c08', meta(SPRITE_KEYS.nambo), 6);
   }
 
-  private syncWalker(w: Walker, walking: boolean, isNpc = false): void {
+  private syncWalker(w: Walker, state: AnimState, isNpc = false): void {
     const tag = w.sprite.getData('tag') as string;
-    const key = `${tag}_${walking ? 'walk' : 'idle'}_${w.facing}`;
-    if (w.sprite.anims.currentAnim?.key !== key) w.sprite.anims.play(key, true);
+    w.state = state;
+    playState(w.sprite, tag, state, w.facing, isNpc);
     const rx = Math.round(w.x);
     const ry = Math.round(w.y);
     w.sprite.setPosition(rx, ry).setDepth(ry);
     w.shadow.setPosition(rx, ry - 1).setDepth(ry - 1);
-    void isNpc;
   }
 
   // ----------------------------------------------------------------- debug
@@ -597,6 +616,10 @@ export class WorldScene extends Phaser.Scene {
       chestOpen: [...this.propSprites.entries()].some(([id, img]) => id.startsWith('chest') && img.frame.name === 'chest_open'),
       log: this.actionLog.slice(-60),
       moving: this.wasMoving,
+      sprinting: this.sprinting,
+      standable: this.loaded.collision.canStand(footBox(this.player.x, this.player.y)),
+      moveState: this.player.state,
+      anim: this.player.sprite.anims.currentAnim?.key ?? null,
     };
   }
 

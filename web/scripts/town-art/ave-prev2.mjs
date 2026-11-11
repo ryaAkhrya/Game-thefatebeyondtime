@@ -1,0 +1,2 @@
+import * as P from './ave-props.mjs';
+export function allSprites() { return [P.avTreeRound(), P.avTreeTall(), P.avOak(), P.avBush(), P.avHedgeBed(), P.avPlanter(), P.avBench(), P.avLamp(), P.avSignpost(), P.avRoadsign(), P.avWell(), P.avStallBack(), P.avStallFront(), P.avProduce(), P.avCratesStack(), P.avBarrel(), P.avSacks(), P.avCart(), P.avDesk(80,'d80',3), P.avDesk(40,'d40',5), P.avShelf('sa','books',4), P.avShelf('sb','scroll',9), P.avCouncilTable(), P.avChair(), P.avLadder()]; }

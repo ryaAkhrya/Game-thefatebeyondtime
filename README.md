@@ -1,3 +1,7 @@
+# POLISH SPRINT 2 (12 November 2026)
+
+Dunia hutan/kota dibangun ulang, Mournfang kini terlihat jelas (atlas V4), Yaric arah atas diperbaiki, Nambo/Torvan/Velthia diautor ulang, idle berbasis data untuk karakter utama, dan **Shift = lari**. Status PARTIAL (sprite pendukung masih prototipe): [POLISH_SPRINT2_REPORT.md](docs/production/POLISH_SPRINT2_REPORT.md); standar: [CHAPTER12_VISUAL_QUALITY_STANDARD.md](docs/production/CHAPTER12_VISUAL_QUALITY_STANDARD.md). Bab III belum dimulai.
+
 # POLISH SPRINT 1 (11 November 2026)
 
 UI/UX, Title Screen, tipografi tajam (kanvas = piksel perangkat), banner tujuan dihapus (tujuan di Jurnal), nama Yaric anonim sampai momen pengenalan di Bab II, dan sprite eksplorasi ternormalisasi. Status, bukti, screenshot dan batasan: [POLISH_SPRINT1_REPORT.md](docs/production/POLISH_SPRINT1_REPORT.md). Phase 6 (Bab II) tetap playable; Sprint 2 dan Bab III belum dimulai.

@@ -45,6 +45,7 @@ export type IntentHandler = (e: IntentEvent) => void;
 
 interface KeyEventLike {
   code: string;
+  shiftKey?: boolean;
   repeat?: boolean;
   ctrlKey?: boolean;
   altKey?: boolean;
@@ -64,6 +65,7 @@ export class InputManager {
   private heldOrder: string[] = [];
   private suppressed = new Set<string>();
   private enabled = true;
+  private shift = false;
   private readonly gestureListeners: Array<() => void> = [];
   private gestureFired = false;
 
@@ -127,6 +129,7 @@ export class InputManager {
   }
 
   private releaseAll(): void {
+    this.shift = false;
     this.held.clear();
     this.heldOrder = [];
     this.suppressed.clear();
@@ -136,6 +139,14 @@ export class InputManager {
    * Arah gerak yang sedang ditahan (4 arah, tanpa diagonal): tombol arah terbaru yang ditahan dan tidak
    * sedang ditekan sejak sebelum layer berganti. null bila tidak ada, input dimatikan, atau tombol disuppress.
    */
+  /**
+   * Shift ditahan = lari (Sprint 2). Shift bukan intent: tidak pernah memicu menu, melewati dialog atau aksi battle;
+   * hanya dibaca oleh gerak dunia. Hilang saat jendela kehilangan fokus atau input dimatikan.
+   */
+  isSprintHeld(): boolean {
+    return this.enabled && this.shift;
+  }
+
   getMoveDirection(): 'up' | 'down' | 'left' | 'right' | null {
     if (!this.enabled) return null;
     for (let i = this.heldOrder.length - 1; i >= 0; i--) {
@@ -149,6 +160,8 @@ export class InputManager {
 
   private handleKeyDown(ev: KeyEventLike): void {
     if (!this.enabled) return;
+    if (ev.code === 'ShiftLeft' || ev.code === 'ShiftRight') { this.shift = true; return; }
+    if (ev.shiftKey !== undefined) this.shift = ev.shiftKey;
     if (ev.ctrlKey || ev.altKey || ev.metaKey) return; // jangan ganggu shortcut browser
     const intent = KEY_BINDINGS[ev.code];
     if (!intent) return;
@@ -171,6 +184,8 @@ export class InputManager {
   }
 
   private handleKeyUp(ev: KeyEventLike): void {
+    if (ev.code === 'ShiftLeft' || ev.code === 'ShiftRight') this.shift = false;
+    else if (ev.shiftKey !== undefined) this.shift = ev.shiftKey;
     this.held.delete(ev.code);
     this.heldOrder = this.heldOrder.filter((c) => c !== ev.code);
     this.suppressed.delete(ev.code);

@@ -1,5 +1,9 @@
 # SESSION HANDOFF — FOR CLAUDE CODE (v2.0, diperbarui setelah Phase 0)
 
+## Polish Sprint 2 handoff terkini
+
+Animasi: `world/CharacterAnims.ts` (data `anims` di JSON atlas `characters/final/`), sprint: `world/movement.ts` + `InputManager.isSprintHeld`. Atlas final dimuat lewat `assetManifest` `finalPath`; boss: `bossAtlas()` + `B01_BATTLE_V4`. Lingkungan: generator `scripts/gen-*-art.mjs`, tata letak `data/maps/*.mjs`, daftar atlas `data/environmentAssets.ts`. QA: `tests/e2e/sprint2.mjs`, `visual-helpers.mjs` (`battleSpriteVisibility`), hook `__tfbt.battleProbe/battleHide/frameBounds/qa.forest1Late`. Skrip aset Python butuh Pillow+numpy (`npm run assets:sprites`), `npm run assets:sprint2` untuk lingkungan. Tidak ada commit/push. Detail: `POLISH_SPRINT2_REPORT.md`.
+
 ## Polish Sprint 1 handoff terkini
 
 UI memakai `src/ui/kit/ui.ts` (ruang desain 960x540, ukuran dibulatkan ke piksel perangkat; scene UI memakai `bindRelayout`). Dunia/battle: zoom bulat (`DisplayScale.computeDisplay`). Nama Yaric: `story/identity.ts` (`isNameKnown`, `speakerLabel`); reveal DRAFT_IMPL di `Chapter2Story` (batu penanda pertama). Tujuan hanya di `JournalScene` (`story/journal.ts`). Sprite eksplorasi memuat `characters/normalized/`. QA: `tests/e2e/sprint1.mjs`, hook `__tfbt.sceneTexts/frameBounds/display/router`, `qa.chapter2/bossBattle`. Tidak ada commit/push. Sprint 2 dan Bab III menunggu instruksi baru. Detail: `POLISH_SPRINT1_REPORT.md`.

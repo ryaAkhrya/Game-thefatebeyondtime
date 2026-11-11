@@ -106,7 +106,7 @@ try {
       await shot(page, `yaric_${dir}`, tag);
     }
     const bounds = await page.evaluate(rowsMap => Array.from({ length: 16 }, (_, i) => ({ i, ...window.__tfbt.frameBounds('C01_YARIC_EXPLORE', i) })), rows);
-    check(`${tag}: browser meminta atlas Yaric yang sudah dinormalisasi (bukan salinan mentah)`, requested.some(u => /characters\/normalized\/C01_explore\.png/.test(u)) && !requested.some(u => /characters\/C01_explore\.png/.test(u)), requested.filter(u => /explore/.test(u)).join(' '));
+    check(`${tag}: browser meminta atlas Yaric yang sudah dinormalisasi (bukan salinan mentah)`, requested.some(u => /characters\/(normalized|final)\/C01_explore\.png/.test(u)) && !requested.some(u => /characters\/C01_explore\.png/.test(u)), requested.filter(u => /explore/.test(u)).join(' '));
     check(`${tag}: 16 frame Yaric dalam tekstur yang dimuat: kaki di baris 46, tinggi seragam 46 px di empat arah`, bounds.every(b => b.bottom === 46 && b.height >= 45 && b.height <= 46), JSON.stringify(bounds.filter(b => b.bottom !== 46 || b.height < 45)));
     check(`${tag}: tidak ada piksel buram di baris pertama (rambut tidak terpotong tepi frame) atau di luar kotak 32x48`, bounds.every(b => b.top >= 1), JSON.stringify(bounds.filter(b => b.top < 1)));
 

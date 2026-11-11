@@ -3,6 +3,9 @@ import type { ForestMap } from '../data/maps/forest1.map.mjs';
 import { CollisionMap, type Rect } from './Collision';
 import type { LoadedMap } from './forest1';
 import { FOREST2_SPAWN, LIORA_SPAWN } from '../story/chapter2Flags';
+import { FOREST2_EXTRA_SOLIDS } from '../data/maps/forest2.map.mjs';
+import { LIORA_ITEMS, decorSolids } from '../data/maps/town.layout.mjs';
+import { drawTown } from './townArt';
 
 /** DRAFT layout: a lived-in village and an observed, branching woodland. 32 px map grid. */
 const VILLAGE_SOLIDS: Rect[] = [
@@ -10,6 +13,7 @@ const VILLAGE_SOLIDS: Rect[] = [
   { x: 160, y: 400, w: 144, h: 112 }, { x: 664, y: 408, w: 144, h: 104 },
   { x: 504, y: 304, w: 96, h: 32 }, // Zira's frame-repair bench
   { x: 344, y: 408, w: 48, h: 32 }, // drying rack, off the main path
+  ...decorSolids(LIORA_ITEMS), // dekorasi baru Liora (sumur, pagar, kebun, jemuran...) dengan jejak sesuai dasar visualnya
 ];
 const FOREST_SOLIDS: Rect[] = [
   { x: 344, y: 512, w: 24, h: 16 }, // old marker: can be read from the southern trail
@@ -75,27 +79,17 @@ export function buildForest2(): ForestMap {
 }
 export function loadForest2(): LoadedMap {
   const map = buildForest2();
-  return { map, footRects: FOREST_SOLIDS, interactables: map.interactables.map(i => ({ ...i })),
-    collision: new CollisionMap(map.width, map.height, map.walkable, FOREST_SOLIDS) };
+  const solids: Rect[] = [...FOREST_SOLIDS, ...FOREST2_EXTRA_SOLIDS]; // + kaki prop dekoratif Hutan 2 (forest2.map.mjs)
+  return { map, footRects: solids, interactables: map.interactables.map(i => ({ ...i })),
+    collision: new CollisionMap(map.width, map.height, map.walkable, solids) };
 }
 
 /** Small code-native environment DRAFT. Geometry and landmarks are shared with the collision data above. */
 export function drawChapter2Ground(scene: Phaser.Scene, area: 'liora' | 'forest_2'): void {
+  if (area === 'liora') { drawTown(scene, 'liora'); return; } // art Liora: tanah hasil baking + sprite atlas (gen-town-art.mjs)
   const g = scene.add.graphics().setDepth(-1000);
   const rect = (x: number, y: number, w: number, h: number, c: number): void => { g.fillStyle(c); g.fillRect(x, y, w, h); };
-  if (area === 'liora') {
-    rect(0, 0, 960, 704, 0x455b42); rect(96, 96, 768, 552, 0x77765b);
-    rect(448, 96, 64, 552, 0x9b8d6b); rect(96, 288, 768, 72, 0x8d8063);
-    for (const s of VILLAGE_SOLIDS.slice(0, 4)) {
-      rect(s.x, s.y, s.w, s.h, 0xb69b73); rect(s.x - 8, s.y - 24, s.w + 16, 56, 0x6f5f49);
-      for (let x = s.x; x < s.x + s.w; x += 24) rect(x, s.y - 20, 16, 2, 0x89765a);
-      rect(s.x + s.w / 2 - 10, s.y + s.h - 24, 20, 24, 0x5d5041);
-    }
-    rect(504, 304, 96, 32, 0x6b543f); rect(512, 296, 72, 8, 0xc1ad82);
-    rect(344, 408, 48, 32, 0x6e5543); for (let x = 344; x < 392; x += 8) rect(x, 400, 4, 8, 0xbba777);
-    for (const [x, y] of [[120, 560], [816, 560], [120, 120], [840, 120]] as const) { rect(x, y, 32, 40, 0x526a46); rect(x + 4, y - 20, 24, 24, 0x637b50); }
-    rect(432, 592, 4, 32, 0x574b3c); rect(408, 588, 52, 12, 0xc2ac7f);
-  } else {
+  {
     rect(0, 0, 1280, 768, 0x263f36);
     rect(96, 480, 768, 160, 0x59684d); rect(608, 336, 256, 304, 0x59684d); rect(768, 208, 416, 240, 0x59684d);
     rect(112, 536, 744, 48, 0x756e55); rect(704, 352, 64, 232, 0x756e55); rect(768, 280, 400, 48, 0x756e55);
@@ -110,6 +104,5 @@ export function drawChapter2Ground(scene: Phaser.Scene, area: 'liora' | 'forest_
     rect(1072, 272, 48, 32, 0x5d5546); rect(1128, 320, 40, 32, 0x696358);
   }
   const label = (x: number, y: number, value: string): void => { scene.add.text(x, y, value, { fontFamily: "'Source Sans 3', sans-serif", fontStyle: '600', fontSize: '9px', color: '#e1d9bd', backgroundColor: '#3b4240', padding: { x: 4, y: 2 }, resolution: Math.max(2, scene.cameras.main.zoom) }).setDepth(-500); };
-  if (area === 'liora') { label(416, 112, 'HUTAN 2'); label(412, 608, 'AVELORIA'); label(496, 260, 'ZIRA'); }
-  else { label(128, 488, 'LIORA'); label(792, 304, 'BERISTIRAHAT'); label(1064, 424, 'JALAN LAMA'); }
+  label(128, 488, 'LIORA'); label(792, 304, 'BERISTIRAHAT'); label(1064, 424, 'JALAN LAMA');
 }

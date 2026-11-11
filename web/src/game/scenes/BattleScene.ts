@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { BattlePanel } from '../../ui/components/BattlePanel';
 import { Ui, TYPE } from '../../ui/kit/ui';
-import { BATTLE_TEXTURE, draftPosePlayback, mournfangPlayback, type BattleAtlas, type PoseAtlas } from '../combat/BattleAtlas';
+import { BATTLE_TEXTURE, bossAtlas, draftPosePlayback, type BattleAtlas, type PoseAtlas } from '../combat/BattleAtlas';
 import { enemyAI, intentHint, type Command, type PendingAction } from '../combat/BattleEngine';
 import { BattleSession } from '../combat/BattleSession';
 import { COLORS } from '../config/palette';
@@ -64,7 +64,7 @@ export class BattleScene extends Phaser.Scene {
     this.session = new BattleSession(this.services.gameState, this.encounter);
     this.known = isNameKnown(this.services.gameState.snapshot()?.flags);
     this.selfName = this.known ? 'Yaric' : 'Kau';
-    this.bossPlayback = this.encounter === 'mournfang' ? mournfangPlayback(this.cache.json.get(`${BATTLE_TEXTURE.B01}:meta`) as PoseAtlas) : undefined;
+    this.bossPlayback = this.encounter === 'mournfang' ? bossAtlas(this.cache.json.get(`${BATTLE_TEXTURE.B01}:meta`)) : undefined;
     this.draftPlayback = {};
     for (const id of ['C03', 'M02', 'M03', 'B02'] as const) this.draftPlayback[id] = draftPosePlayback(this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`) as PoseAtlas);
     this.closing = false; this.locked = true; this.history = []; this.impacts = []; this.idle = {}; this.targetId = null; this.stageObjs = []; this.shadows = {};
@@ -163,6 +163,7 @@ export class BattleScene extends Phaser.Scene {
     // bayangan di garis tanah masing-masing
     const first = this.session.enemyIds[0]!;
     this.enemyShadow?.setPosition(this.homes[first]!.x, (enemyIds.length === 1 ? GROUND.enemySingle : GROUND.enemyTwo[0]) * h + 2);
+    if (this.session.enemyIds.includes('B01')) this.enemyShadow?.setSize(116, 7); // bayangan boss selebar tubuhnya
     this.shadows.C01?.setPosition(this.homes.C01!.x, GROUND.C01 * h + 2);
     this.shadows.C03?.setPosition(this.homes.C03?.x ?? 0, GROUND.C03 * h + 2);
   }
@@ -299,7 +300,8 @@ export class BattleScene extends Phaser.Scene {
         const defaultTarget = side === 'player' ? actors.find(a => a.side === 'enemy' && a.hp > 0)!.id
           : p.command === 'knight_thrust' && actors.some(a => a.id === 'C03' && a.hp > 0) ? 'C03' : actors.find(a => a.side === 'player' && a.hp > 0)!.id;
         const target = this.sprites[p.targetId ?? defaultTarget]!;
-        const x = id === 'C01' ? target.x + 88 : id === 'C03' ? target.x + 94 : target.x - 76;
+        const standOff = id === 'B01' ? 112 : 76; // boss besar berhenti lebih jauh agar tubuhnya tidak menimpa target
+        const x = id === 'C01' ? target.x + 88 : id === 'C03' ? target.x + 94 : target.x - standOff;
         await this.approach(id, x, 120);
         await this.play(id, [this.meta(id).event.frame_key], impact);
       }
@@ -357,6 +359,20 @@ export class BattleScene extends Phaser.Scene {
       }
     }
   }
+
+  /**
+   * Probe visibilitas untuk QA: kotak sprite pada layar (piksel kanvas) beserta status render. Dipakai uji browser yang
+   * membandingkan tangkapan layar dengan/tanpa sprite (bukti piksel nyata, bukan sekadar objek ada di memori).
+   */
+  qaProbe(id: string): { x: number; y: number; w: number; h: number; visible: boolean; alpha: number; depth: number; frame: string; texture: string } | null {
+    const s = this.sprites?.[id];
+    if (!s) return null;
+    const cam = this.cameras.main;
+    const b = s.getBounds();
+    return { x: (b.x - cam.worldView.x) * cam.zoom, y: (b.y - cam.worldView.y) * cam.zoom, w: b.width * cam.zoom, h: b.height * cam.zoom,
+      visible: s.visible, alpha: s.alpha, depth: s.depth, frame: String(s.frame.name), texture: s.texture.key };
+  }
+  qaHide(id: string, hidden: boolean): void { this.sprites[id]?.setVisible(!hidden); }
 
   debugState(): Record<string, unknown> {
     return { ...this.session.engine.snapshot(), encounter: this.encounter, locked: this.locked, phase: this.phase, menu: this.panel.mode,

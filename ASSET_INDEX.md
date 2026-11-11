@@ -1,5 +1,17 @@
 # Asset index v3.3 — per file
 
+## Polish Sprint 2 – aset final karakter, boss, dan lingkungan (semua DRAFT / NEEDS_REVIEW)
+
+Catatan rinci per bagian: `docs/production/sprint2/{yaric,cast,mournfang,forest-world,town-world}.md`. Standar teknis: `docs/production/CHAPTER12_VISUAL_QUALITY_STANDARD.md`. Sumber di `assets/` tidak diubah; semua keluaran dapat dibuat ulang (skrip deterministik, hash identik antar-run).
+
+- **Atlas eksplorasi final** `web/public/assets/characters/final/Cxx_explore.{png,json}` (manifest `finalPath`, di atas `publicPath` ternormalisasi Sprint 1). JSON membawa `cols` dan `anims` (idle/walk/sprint per arah). Dibuat oleh `web/scripts/author-yaric-sprites.py` (C01) dan `web/scripts/author_cast_build.py` + `author_cast_sprites.py` + `sprite-data/*.txt` (C02, C03, C05, C06, C07, C08, C09). `python -I web/scripts/<skrip>` dari root repo; butuh Pillow + numpy.
+  - **C01 Yaric** (4 kol x 14 baris, 56 frame): mahkota rambut tampak belakang digambar ulang (kubah berkontur; 1 baris badan dihapus agar tinggi 46 tetap), idle 4 frame/arah (ping-pong), sprint 6 frame/arah. Idle/sprint adalah turunan prosedural dari 4 frame jalan asli (bukan siklus lari gambar tangan); kiri/kanan masih cermin dengan 6 baris ganda dari Sprint 1. Perlu redraw artist.
+  - **C08 Nambo, C03 Torvan, C02 Velthia** (6 kol): frame berdiri dilukis tangan sebagai peta piksel (`sprite-data/Cxx_maps.txt`) dari turnaround resmi (goggles/syal/jaket bertali Nambo; rambut pirang/jubah/tongkat ranting Torvan; bob tembaga/gaun plum Velthia). Jalan dan idle diturunkan dari frame berdiri lewat geseran lapisan baris/kolom. Kiri = cermin kanan (perban/gesper terbalik). Wajah samping minimal.
+  - **C05 Azie, C06 Talric, C07 Zira, C09 Derrria** (9 kol): atlas prototipe kasar lama dipertahankan (kolom 0-5 byte-identik) + idle turunan 3 frame (kolom 6-8). BELUM diautor ulang.
+- **Mournfang V4** `web/public/assets/battle/B01_BATTLE_V4.{png,json}` (1600x128, 10 frame 160x128, pivot [77,124], menghadap kanan, 27 warna, outline plum #1D1625): pixelization terkendali dari `assets/bosses/B01_Mournfang/B01_NEW_CONCEPT_DRAFT.png` + tengkorak/rahang/taring digambar ulang dengan tracing (`web/scripts/author-mournfang.py`). Hanya `idle_a` pose asli; sembilan frame lain = rekomposisi lapisan (pergeseran/shear baris, tanpa rotasi/skala). Atlas lama `B01_BATTLE_ATLAS_DRAFT.*` tetap utuh.
+- **Lingkungan** `web/public/assets/environment/{forest1,forest_edge,forest2,town}/` (dasar peta PNG + atlas prop/bangunan dengan pivot): dibuat oleh `gen-forest-art.mjs`, `gen-forest-edge-art.mjs`, `gen-forest2-art.mjs`, `gen-town-art.mjs` (pustaka `scripts/lib/`, `scripts/town-art/`). Dilukis oleh kode tanpa aset luar; bukan hasil seniman. Tata letak: `data/maps/{forest1,forestEdge,forest2,town.layout}.map.mjs`.
+- Total aset baru Sprint 2 ≈1 MB (dasar peta 45-122 KB, atlas 25-48 KB).
+
 ## Polish Sprint 1 – aset UI turunan (portrait HD dan siluet Title)
 
 Dibuat oleh `web/scripts/prepare-ui-assets.mjs` (Edge headless canvas; sumber di `assets/` TIDAK diubah). Manifes: `web/public/assets/ui.generated.json`. Semua DRAFT.

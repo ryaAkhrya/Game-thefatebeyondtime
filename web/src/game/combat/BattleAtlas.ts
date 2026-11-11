@@ -31,3 +31,13 @@ export function draftPosePlayback(source: PoseAtlas): BattleAtlas {
     hit_recoil: pose('hit', 220), hit_recover: pose('idle', 180), death_start: pose('hit', 240), defeated: pose('defeated', 650),
   } };
 }
+
+/**
+ * Atlas boss yang dipakai BattleScene. Atlas v4 (Sprint 2) sudah memuat semua kunci frame dan durasi sendiri; atlas lama
+ * (empat pose DRAFT) diadaptasi lewat mournfangPlayback.
+ */
+export function bossAtlas(meta: unknown): BattleAtlas {
+  const m = meta as Partial<BattleAtlas> & Partial<PoseAtlas>;
+  if (m.frames && 'idle_a' in m.frames && m.frame_size) return m as BattleAtlas;
+  return mournfangPlayback(meta as PoseAtlas);
+}

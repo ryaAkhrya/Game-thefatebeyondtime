@@ -44,7 +44,7 @@ try {
     await shot(page, `world_${width}`); await layout(page, `forest continuation ${width}`);
     await openPause(page); await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot1'); await back(page, 'pause'); await back(page, 'world');
     await enterBoss(page); let b = await battle(page);
-    check(`${width}: source B01 pose atlas loads with correct facing and stable origin`, b.encounter === 'mournfang' && b.sprites.B01.x === Math.round(0.244 * b.stage.w) && b.sprites.B01.originY === 92 / 96 && b.sprites.B01.footY === b.sprites.C01.footY);
+    check(`${width}: source B01 pose atlas loads with correct facing and stable origin`, b.encounter === 'mournfang' && b.sprites.B01.x === Math.round(0.244 * b.stage.w) && b.sprites.B01.originY === 124 / 128 && b.sprites.B01.footY === b.sprites.C01.footY);
     const auto = await page.evaluate(() => localStorage.getItem('tfbt.save.v1.auto'));
     check(`${width}: pre-boss autosave is full HP/MP outside encounter trigger`, await page.evaluate(() => { const d = JSON.parse(localStorage.getItem('tfbt.save.v1.auto')).data; return d.position.x === 704 && d.position.y === 400 && d.area === 'forest_edge' && d.vitals.hp === 108 && d.vitals.mp === 14 && !d.flags['boss.mournfang']; }));
     await command(page, 'attack'); const injured = (await battle(page)).actors[0].hp; await command(page, 'potion'); b = await battle(page);

@@ -23,6 +23,10 @@ export interface AtlasAsset {
   publicPath: string | null;
   /** Hanya atlas eksplorasi: salinan runtime LAMA (identik byte dengan sumber; C01 = sumber minus piksel liar). Tidak dimuat game; dipakai tes/skrip. */
   rawPublicPath?: string;
+  /** Atlas final Sprint 2 (idle/sprint/koreksi). Bila ada, game memuat ini; publicPath tetap turunan ternormalisasi Sprint 1. */
+  finalPath?: string;
+  /** Ukuran frame atlas final bila berbeda dari sumber (mis. boss 160x128). */
+  finalFrameSize?: readonly [number, number];
   imported: boolean;
   notes: string;
 }
@@ -41,7 +45,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     sourceImage: `assets/${folder}/${id}_${kind === 'exploration_atlas' ? 'EXPLORATION' : 'BATTLE'}_ATLAS_DRAFT.png`,
     sourceJson: `assets/${folder}/${id}_${kind === 'exploration_atlas' ? 'EXPLORATION' : 'BATTLE'}_ATLAS_DRAFT.json`,
     frameSize: frameSize as [number, number], atlasSize: atlasSize as [number, number], frameCount: frameCount as number,
-    publicPath: `assets/${out}`, ...(kind === 'exploration_atlas' ? { rawPublicPath: `assets/${(out as string).replace('/normalized/', '/')}` } : {}), imported: true,
+    publicPath: `assets/${out}`, ...(kind === 'exploration_atlas' ? { rawPublicPath: `assets/${(out as string).replace('/normalized/', '/')}`, finalPath: `assets/characters/final/${id}_explore.png` } : {}), imported: true,
     notes: kind === 'exploration_atlas'
       ? 'Runtime = normalized derivative (feet baseline y=46, one x offset per direction); raw copy stays byte-identical to the DRAFT source. Crude prototype, not final art.'
       : 'Original DRAFT grid atlas copied byte-identically. Battle has four authored key poses, not a finished animation.',
@@ -51,7 +55,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     sourceImage: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.png`,
     sourceJson: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.json`,
     frameSize: [32, 48], atlasSize: [192, 192], frameCount: 24,
-    publicPath: `assets/characters/normalized/${id}_explore.png`, rawPublicPath: `assets/characters/${id}_explore.png`, imported: true,
+    publicPath: `assets/characters/normalized/${id}_explore.png`, rawPublicPath: `assets/characters/${id}_explore.png`, finalPath: `assets/characters/final/${id}_explore.png`, imported: true,
     notes: 'Runtime = normalized derivative (scripts/normalize-exploration-sprites.mjs: feet baseline y=46, one x offset per direction); raw copy stays byte-identical to the DRAFT source. No new face/costume, no combat kit. Not final art.',
   })),
   {
@@ -60,6 +64,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     sourceJson: 'assets/bosses/B01_Mournfang/B01_BATTLE_ATLAS_DRAFT.json',
     frameSize: [96, 96], atlasSize: [384, 96], frameCount: 4,
     publicPath: 'assets/battle/B01_BATTLE_ATLAS_DRAFT.png', imported: true,
+    finalPath: 'assets/battle/B01_BATTLE_V4.png', finalFrameSize: [160, 128],
     notes: 'Four original grid-authored key poses only, NOT finished animation. Runtime holds/reuses poses; no redraw or reference crop. Source JSON says DRAFT; registry review remains NEEDS_REVIEW.',
   },
   {
@@ -122,6 +127,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     atlasSize: [128, 192],
     frameCount: 16,
     publicPath: 'assets/characters/normalized/C01_explore.png',
+    finalPath: 'assets/characters/final/C01_explore.png',
     rawPublicPath: 'assets/characters/C01_explore.png',
     imported: true,
     notes: 'Eksplorasi 4 arah x 4 frame (baris: depan, kiri, kanan, belakang). v3.3 tidak memiliki atlas eksplorasi. Runtime = turunan ternormalisasi scripts/normalize-exploration-sprites.mjs (kaki y=46, kiri/kanan diregangkan ke tinggi depan, kanan = cermin kiri) dari salinan lama; salinan lama (rawPublicPath) = hasil scripts/prepare-assets.mjs (piksel liar y>=44 pada frame kiri/kanan dihapus).',
@@ -138,6 +144,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     atlasSize: [192, 192],
     frameCount: 24,
     publicPath: 'assets/characters/normalized/C08_explore.png',
+    finalPath: 'assets/characters/final/C08_explore.png',
     rawPublicPath: 'assets/characters/C08_explore.png',
     imported: true,
     notes: 'Runtime = turunan ternormalisasi (kaki y=46). Prototipe DRAFT berkualitas rendah (belum ada versi lebih baru). Baris: depan, kiri, kanan, belakang x 6 frame. Wajah/kostum belum diverifikasi terhadap potret; jangan digambar ulang tanpa persetujuan.',

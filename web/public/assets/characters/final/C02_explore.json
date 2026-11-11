@@ -1,0 +1,637 @@
+{
+  "entity_id": "C02",
+  "status": "DRAFT",
+  "review": "NEEDS_REVIEW",
+  "generated_by": "web/scripts/author_cast_build.py (+ web/scripts/author_cast_sprites.py, sprite-data/C02_maps.txt)",
+  "sprint": "Polish Sprint 2",
+  "frame_size": [
+    32,
+    48
+  ],
+  "atlas_size": [
+    192,
+    192
+  ],
+  "cols": 6,
+  "grid": {
+    "cols": 6,
+    "rows": 4,
+    "row_order": [
+      "front(down)",
+      "left",
+      "right",
+      "back(up)"
+    ],
+    "col_order": [
+      "stand",
+      "walk_A",
+      "walk_B",
+      "idle_1",
+      "idle_2",
+      "idle_3"
+    ]
+  },
+  "pivot": [
+    16,
+    46
+  ],
+  "baseline_y": 46,
+  "frames": {
+    "front_0": {
+      "rect": [
+        0,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 1,
+        "x1": 29,
+        "y1": 46,
+        "w": 28,
+        "h": 46,
+        "foot_cx": 16.0
+      }
+    },
+    "front_1": {
+      "rect": [
+        32,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 2,
+        "x1": 30,
+        "y1": 46,
+        "w": 29,
+        "h": 45,
+        "foot_cx": 17.03
+      }
+    },
+    "front_2": {
+      "rect": [
+        64,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 1,
+        "y0": 2,
+        "x1": 29,
+        "y1": 46,
+        "w": 29,
+        "h": 45,
+        "foot_cx": 14.97
+      }
+    },
+    "front_3": {
+      "rect": [
+        96,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 2,
+        "x1": 29,
+        "y1": 46,
+        "w": 28,
+        "h": 45,
+        "foot_cx": 16.0
+      }
+    },
+    "front_4": {
+      "rect": [
+        128,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 1,
+        "x1": 30,
+        "y1": 46,
+        "w": 29,
+        "h": 46,
+        "foot_cx": 16.96
+      }
+    },
+    "front_5": {
+      "rect": [
+        160,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 1,
+        "y0": 2,
+        "x1": 29,
+        "y1": 46,
+        "w": 29,
+        "h": 45,
+        "foot_cx": 15.04
+      }
+    },
+    "left_0": {
+      "rect": [
+        0,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 1,
+        "x1": 27,
+        "y1": 46,
+        "w": 24,
+        "h": 46,
+        "foot_cx": 15.9
+      }
+    },
+    "left_1": {
+      "rect": [
+        32,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 3,
+        "y0": 2,
+        "x1": 27,
+        "y1": 46,
+        "w": 25,
+        "h": 45,
+        "foot_cx": 14.85
+      }
+    },
+    "left_2": {
+      "rect": [
+        64,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 2,
+        "x1": 28,
+        "y1": 46,
+        "w": 25,
+        "h": 45,
+        "foot_cx": 16.95
+      }
+    },
+    "left_3": {
+      "rect": [
+        96,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 2,
+        "x1": 27,
+        "y1": 46,
+        "w": 24,
+        "h": 45,
+        "foot_cx": 15.9
+      }
+    },
+    "left_4": {
+      "rect": [
+        128,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 3,
+        "y0": 1,
+        "x1": 27,
+        "y1": 46,
+        "w": 25,
+        "h": 46,
+        "foot_cx": 14.95
+      }
+    },
+    "left_5": {
+      "rect": [
+        160,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 2,
+        "x1": 28,
+        "y1": 46,
+        "w": 25,
+        "h": 45,
+        "foot_cx": 16.85
+      }
+    },
+    "right_0": {
+      "rect": [
+        0,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 1,
+        "x1": 27,
+        "y1": 46,
+        "w": 24,
+        "h": 46,
+        "foot_cx": 16.1
+      }
+    },
+    "right_1": {
+      "rect": [
+        32,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 2,
+        "x1": 28,
+        "y1": 46,
+        "w": 25,
+        "h": 45,
+        "foot_cx": 17.15
+      }
+    },
+    "right_2": {
+      "rect": [
+        64,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 3,
+        "y0": 2,
+        "x1": 27,
+        "y1": 46,
+        "w": 25,
+        "h": 45,
+        "foot_cx": 15.05
+      }
+    },
+    "right_3": {
+      "rect": [
+        96,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 2,
+        "x1": 27,
+        "y1": 46,
+        "w": 24,
+        "h": 45,
+        "foot_cx": 16.1
+      }
+    },
+    "right_4": {
+      "rect": [
+        128,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 4,
+        "y0": 1,
+        "x1": 28,
+        "y1": 46,
+        "w": 25,
+        "h": 46,
+        "foot_cx": 17.05
+      }
+    },
+    "right_5": {
+      "rect": [
+        160,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 3,
+        "y0": 2,
+        "x1": 27,
+        "y1": 46,
+        "w": 25,
+        "h": 45,
+        "foot_cx": 15.15
+      }
+    },
+    "back_0": {
+      "rect": [
+        0,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 1,
+        "x1": 29,
+        "y1": 46,
+        "w": 28,
+        "h": 46,
+        "foot_cx": 16.0
+      }
+    },
+    "back_1": {
+      "rect": [
+        32,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 2,
+        "x1": 30,
+        "y1": 46,
+        "w": 29,
+        "h": 45,
+        "foot_cx": 17.03
+      }
+    },
+    "back_2": {
+      "rect": [
+        64,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 1,
+        "y0": 2,
+        "x1": 29,
+        "y1": 46,
+        "w": 29,
+        "h": 45,
+        "foot_cx": 14.97
+      }
+    },
+    "back_3": {
+      "rect": [
+        96,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 2,
+        "x1": 29,
+        "y1": 46,
+        "w": 28,
+        "h": 45,
+        "foot_cx": 16.0
+      }
+    },
+    "back_4": {
+      "rect": [
+        128,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 2,
+        "y0": 1,
+        "x1": 30,
+        "y1": 46,
+        "w": 29,
+        "h": 46,
+        "foot_cx": 16.96
+      }
+    },
+    "back_5": {
+      "rect": [
+        160,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ],
+      "bbox": {
+        "x0": 1,
+        "y0": 2,
+        "x1": 29,
+        "y1": 46,
+        "w": 29,
+        "h": 45,
+        "foot_cx": 15.04
+      }
+    }
+  },
+  "anims": {
+    "down": {
+      "idle": {
+        "frames": [
+          0,
+          3,
+          4,
+          5
+        ],
+        "fps": 3
+      },
+      "walk": {
+        "frames": [
+          0,
+          1,
+          0,
+          2
+        ],
+        "fps": 7
+      }
+    },
+    "left": {
+      "idle": {
+        "frames": [
+          6,
+          9,
+          10,
+          11
+        ],
+        "fps": 3
+      },
+      "walk": {
+        "frames": [
+          6,
+          7,
+          6,
+          8
+        ],
+        "fps": 7
+      }
+    },
+    "right": {
+      "idle": {
+        "frames": [
+          12,
+          15,
+          16,
+          17
+        ],
+        "fps": 3
+      },
+      "walk": {
+        "frames": [
+          12,
+          13,
+          12,
+          14
+        ],
+        "fps": 7
+      }
+    },
+    "up": {
+      "idle": {
+        "frames": [
+          18,
+          21,
+          22,
+          23
+        ],
+        "fps": 3
+      },
+      "walk": {
+        "frames": [
+          18,
+          19,
+          18,
+          20
+        ],
+        "fps": 7
+      }
+    }
+  },
+  "notes": [
+    "Polish Sprint 2: atlas eksplorasi Velthia baru. Berdiri down/up/right dilukis tangan (web/scripts/sprite-data/C02_maps.txt) dari C02_TURNAROUND_FRONT/SIDE/BACK (bob coklat-tembaga, anting emas, kerah tinggi plum, jubah berlis emas, gaun plum+panel krem, hem emas).",
+    "left = cermin right. Proporsi chibi-dewasa: kepala 12 baris, gaun sampai lantai; sepatu hanya ujungnya mengintip.",
+    "Jalan: badan bob 1 px, hem rok bergoyang 1 px bergantian, ujung sepatu bergantian (depan/belakang: satu ujung disembunyikan; samping: ujung maju/mundur 2 px). Tidak ada ayunan lengan (lengan tertutup jubah).",
+    "Idle sangat tertahan: kepala+kerah turun 1 px (napas), hem bergoyang 1 px; tidak ada gerak lain. Outline 1 px otomatis, alpha keras."
+  ],
+  "frames_needing_artist_redraw": [
+    "Semua frame DRAFT turunan tangan + algoritma. Lengan/tangan hampir tak terlihat (tangan kanan viewer saja); belahan rok/kaki tidak terlihat sehingga langkah hanya tersirat lewat hem/ujung sepatu.",
+    "Tampak samping disederhanakan (bahu terbuka, jubah belakang sebagai satu massa plum)."
+  ]
+}

@@ -1,5 +1,15 @@
 # TASKS — STATUS SEBENARNYA
 
+## Polish Sprint 2 — dunia, karakter, animasi, sprint (12 November 2026)
+
+- [x] P0 Mournfang: atlas V4 dari konsep resmi, terbukti terlihat pada piksel render (35% kotak berubah); monster lain diverifikasi sama.
+- [x] Yaric arah atas: mahkota rambut digambar ulang; 56 frame (walk/idle/sprint) kaki y=46 tanpa clipping.
+- [x] Nambo/Torvan/Velthia diautor ulang dari turnaround; Azie/Talric/Zira/Derrria hanya idle turunan (masih prototipe).
+- [x] Hutan 1, Tepi Hutan, Hutan 2, Aveloria, Liora dibangun ulang (generator deterministik); peta cerita tidak berubah.
+- [x] Idle berbasis data + sprint Shift (1,65x, collision per langkah, pemicu disapu).
+- [x] 676 unit; Edge produksi 722 (84+197+37+54+38+75+55+105+77); Chrome Sprint 2 77 + Phase 4 38. PARTIAL kualitas visual: lihat `docs/production/POLISH_SPRINT2_REPORT.md` bagian L.
+- [ ] Review manusia; seniman untuk backlog L; Bab III menunggu instruksi baru.
+
 ## Polish Sprint 1 — UI/UX, Title, identitas Yaric, sprite (11 November 2026)
 
 - [x] Kanvas = piksel perangkat, zoom dunia/battle bulat, UI 960x540 tajam (Cinzel + Source Sans 3); Fit/Pixel Perfect/resize berfungsi.

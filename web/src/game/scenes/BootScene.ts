@@ -4,6 +4,7 @@ import { SCENE_KEYS } from '../data/ids';
 import { ENV, PORTRAIT_EXPRESSIONS } from '../data/assetPaths';
 import { portraitUrl } from '../dialogue/types';
 import { TITLE_ART_KEYS } from '../data/assetPaths';
+import { ENV_ATLASES, ENV_IMAGES } from '../data/environmentAssets';
 import { MUSIC_REGISTRY } from '../data/musicRegistry';
 import { BATTLE_SFX } from '../data/battleSfxRegistry';
 import { getServices } from '../systems/Services';
@@ -32,13 +33,17 @@ export class BootScene extends Phaser.Scene {
     }
     for (const cue of BATTLE_SFX) if (cue.status === 'READY') this.load.audio(cue.id, `assets/audio/${cue.file}`);
     for (const a of assets.loadable()) {
-      this.load.spritesheet(a.id, a.publicPath!, { frameWidth: a.frameSize[0], frameHeight: a.frameSize[1] });
-      if (a.kind !== 'exploration_atlas') this.load.json(`${a.id}:meta`, a.publicPath!.replace(/\.png$/, '.json'));
+      this.load.spritesheet(a.id, a.finalPath ?? a.publicPath!, { frameWidth: (a.finalFrameSize ?? a.frameSize)[0], frameHeight: (a.finalFrameSize ?? a.frameSize)[1] });
+      // Atlas eksplorasi juga membawa meta (cols + anims) untuk sistem animasi berbasis data.
+      this.load.json(`${a.id}:meta`, (a.finalPath ?? a.publicPath!).replace(/\.png$/, '.json'));
     }
     // Lingkungan Hutan 1 (DRAFT dev art) dan portrait ekspresi. Kegagalan memuat tidak fatal (lihat loaderror).
     this.load.image(ENV.groundKey, ENV.groundUrl);
     this.load.atlas(ENV.propsKey, ENV.propsUrl, ENV.propsJsonUrl);
     this.load.json(ENV.propsMetaKey, ENV.propsJsonUrl);
+    // Aset lingkungan Sprint 2 (hutan, kota): daftar ada di data/environmentAssets.ts. Atlas JSON (rect+pivot) juga dimuat sebagai meta.
+    for (const a of ENV_ATLASES) { this.load.atlas(a.key, a.image, a.json); this.load.json(`${a.key}:meta`, a.json); }
+    for (const i of ENV_IMAGES) this.load.image(i.key, i.url);
     // Portrait resolusi tinggi (tinggi 352 px, diturunkan dari PNG ekspresi) untuk dialog yang digambar 1:1 pada resolusi perangkat.
     for (const [speaker, list] of Object.entries(PORTRAIT_EXPRESSIONS)) {
       for (const ex of list) this.load.image(`${speaker}_${ex}`, portraitUrl(`${speaker}_${ex}`));

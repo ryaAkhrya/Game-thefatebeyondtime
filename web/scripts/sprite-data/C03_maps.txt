@@ -1,0 +1,202 @@
+# Torvan (C03) - peta tangan berdiri (interior tanpa outline), dilukis dari C03_TURNAROUND_FRONT/SIDE/BACK
+# + C03_WEAPON_TWIG_STAFF.  Rambut pirang acak + ahoge, plester pipi, syal/cowl coklat, kemeja krem gulung lengan,
+# rompi coklat tua, tas selempang, celana cargo gombrong bermanset, sepatu coklat, tongkat ranting (lapisan terpisah *_staff).
+@H=E8B04C
+@h=B97E32
+@l=F7D27A
+@S=F6C08E
+@s=D48E62
+@E=2E1C18
+@B=F0E2CE
+@M=7A2A2A
+@m=F4E8E0
+@Q=6B4636
+@q=4A3024
+@V=4A3226
+@v=2E1C16
+@W=D9C3A0
+@w=B09878
+@T=3A2519
+@Y=D9A441
+@R=8A5A38
+@r=60402A
+@P=5A3F32
+@p=3E2A22
+@K=8E5A36
+@k=64402A
+@N=A47C48
+@n=6E4E2C
+
+[front]
+y02 H2 s=-2
+y03 H4h1H6l1
+y04 H1H4l1H5h1H3l1
+y05 H2l1H4h1H4l1H2h1
+y06 h1H3l1H5h1H4l1H2
+y07 H2h1H4l1H4H1h1H3h1
+y08 H3h1H2l1H3h1H1l1H2h1H2
+y09 H3S3H2l1H2S3H1h1H2
+y10 H2h1S10h1H2
+y11 H2h1S1E2S4E2S1h1H2
+y12 H1h1H1S10H1h1H1
+y13 h1H1S1B2S1M4S2H1h1
+y14 h1H1S1B2S1M2S2H1h1
+y15 s1S6s1
+y16 q3Q6q3
+y17 q1Q4q1Q8q1Q4q1
+y18 W2Q3q1Q5q2Q5q1Q3W2
+y19 W4w1V2Q2q1Q4q1Q2V2w1W4
+y20 W4w1V3q1W6q1V3w1W4
+y21 W4w1V3W8V3w1W4
+y22 W3w1v1V3W8V3v1w1W3
+y23 w1W2w1v1V3W8V3v1w1W2w1
+y24 .1S2s1v1T6Y2T6v1s1S2.1
+y25 .1T3v1V2W6r5v1v1T3.1
+y26 .1T3v1V2W6R6v1T3.1
+y27 .1T3v1V2W6R6v1T3.1
+y28 .1S2s1v1V2W6r1R4r1v1s1S2.1
+y29 .2S1s1v1P14v1s1S1.2
+y30 v1P12v1
+y31 P2p1P8p1P2
+y32 P3p1P6p1P3
+y33 P14
+y34 P5p1.2p1P5
+y35 P5p1.2p1P5
+y36 p1P5p1.2p1P5p1
+y37 p1P5p1.2p1P5p1
+y38 k7.2k7
+y39 p5.4p5
+y40 T4.4T4
+y41 T4.4T4
+y42 k6.4k6
+y43 K5k1.4k1K5
+y44 K6.4K6
+y45 T6.4T6
+# diagonal tali tas (kiri atas -> kanan bawah) di atas kemeja
+p 13 20 T
+p 14 21 T
+p 15 22 T
+p 16 23 T
+p 17 23 T
+p 18 24 T
+
+[front_staff]
+# tongkat ranting di sisi kanan viewer (tangan kiri Torvan), berdiri di tanah
+v 27 15 45 N
+p 27 14 n
+p 28 13 N
+p 26 13 N
+
+[side]
+# menghadap KANAN
+y02 H2 x=12
+y03 H4h1H6 x=10
+y04 H1H4l1H5h1H2 x=9
+y05 H2l1H5h1H4l1H2 x=8
+y06 h1H4l1H5h1H4l1H1 x=8
+y07 H3h1H5l1H5h1 x=9
+y08 H3h1H6h1H3l1S1 x=9
+y09 H4h1H5h1H1S3 x=9
+y10 H4h1H4h1H1S4 x=9
+y11 H3h1H4h1H1S3E1S1 x=9
+y12 H2h1H4h1H2S3S1S1 x=9
+y13 H2h1H3h1H1s1B2S1M1S1 x=10
+y14 H2h1H1s1B2S1M1S1 x=14
+y15 h1s1S4 x=17
+y16 q2Q8q2 x=11
+y17 q1Q3q1Q8q1 x=9
+y18 Q3V2q1Q5q1Q2q1 x=8
+y19 .1Q1q1v1V4q1Q2W3q1 x=8
+y20 .1Q1q1v1V5W5Q1 x=8
+y21 .1Q1q1v1V5W6 x=8
+y22 .1Q1q1v1V2w1W2w1W5 x=8
+y23 .1q1q1v1V2w1W2w1W5 x=8
+y24 .1Q1q1T3S3s1T5 x=7
+y25 .1Q1q1R4T3W5 x=7
+y26 .1Q1q1R4T3W5 x=7
+y27 .1Q1q1r4T3W5 x=7
+y28 Q1q1.1R4S2s1W5 x=8
+y29 q1.2r4S1s1P6 x=8
+y30 v1P9v1 x=11
+y31 P1p1P7p1P1 x=11
+y32 P2p1P4p1P2 x=12
+y33 P3p1P2p1P3 x=12
+y34 p1P6p1 x=12
+y35 p1P6p1 x=12
+y36 p1P7p1 x=12
+y37 p1P7p1 x=12
+y38 k9 x=12
+y39 p6 x=13
+y40 T5 x=13
+y41 T5 x=13
+y42 k7 x=12
+y43 K6k1 x=12
+y44 K9 x=12
+y45 T10 x=12
+# tali tas diagonal
+
+[side_staff]
+# tongkat di depan tubuh (tangan dekat), berdiri di tanah
+v 24 22 45 N
+p 24 21 n
+p 25 20 N
+p 23 20 N
+
+[back]
+y02 H2 s=-2
+y03 H4h1H6l1
+y04 H1H4l1H5h1H3l1
+y05 H2l1H4h1H4l1H2h1
+y06 h1H3l1H5h1H4l1H2
+y07 H2h1H4l1H4H1h1H3h1
+y08 H3h1H2l1H3h1H1l1H2h1H2
+y09 h1H4h1H3l1H3h1H2H1h1
+y10 H2h1H4h1H3l1H3h1H2
+y11 H1h1H3l1H5h1H3h1
+y12 h1H3h1H4h1H1l1H1h1
+y13 h2H3h1H2h1H2h1
+y14 h1H2s1S2s1H2h1
+y15 q2Q4q2
+y16 q1Q10q1
+y17 q1Q4q1Q8q1Q4q1
+y18 W2Q3q1Q10q1Q3W2
+y19 W4w1V2Q2q1Q6q1Q2V2w1W4
+y20 W4w1V3q1Q4q1V3w1W4
+y21 W4w1V3V8V3w1W4
+y22 W3w1v1V3V8V3v1w1W3
+y23 w1W2w1v1V3V8V3v1w1W2w1
+y24 .1S2s1v1T14v1s1S2.1
+y25 .1T3v1V14v1T3.1
+y26 .1T3v1R6V4V4v1T3.1
+y27 .1T3v1r6V8v1T3.1
+y28 .1S2s1v1R6V8v1s1S2.1
+y29 .2S1s1v1P14v1s1S1.2
+y30 v1P12v1
+y31 P2p1P8p1P2
+y32 P3p1P6p1P3
+y33 P14
+y34 P5p1.2p1P5
+y35 P5p1.2p1P5
+y36 p1P5p1.2p1P5p1
+y37 p1P5p1.2p1P5p1
+y38 k7.2k7
+y39 p5.4p5
+y40 T4.4T4
+y41 T4.4T4
+y42 k6.4k6
+y43 K5k1.4k1K5
+y44 K6.4K6
+y45 T6.4T6
+# tali tas diagonal punggung
+p 20 19 T
+p 19 20 T
+p 18 21 T
+p 17 22 T
+p 16 23 T
+p 15 24 T
+
+[back_staff]
+v 4 15 45 N
+p 4 14 n
+p 3 13 N
+p 5 13 N

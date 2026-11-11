@@ -116,6 +116,16 @@ function boot(): void {
           services.gameState.setFlag('reward.c1_chest_potion.claimed');
           game.scene.getScene('TitleScene').scene.start('BattleScene');
         },
+        /** Hutan 1 sesudah jalur berulang, 160 px di selatan pemicu Hollowling (untuk uji trigger pada kecepatan lari). */
+        forest1Late: () => {
+          services.checkpoints.reset();
+          services.gameState.startNewGame();
+          for (const flag of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed']) services.gameState.setFlag(flag);
+          services.gameState.setPosition(832, 280, 'up', 'forest_1');
+          services.gameState.addItem('potion', 1);
+          services.gameState.setFlag('reward.c1_chest_potion.claimed');
+          game.scene.getScene('TitleScene').scene.start('WorldScene');
+        },
         mournfang: () => {
           services.checkpoints.reset();
           const data = applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data;
@@ -209,6 +219,8 @@ function boot(): void {
     },
     display: () => game.registry.get('display'),
     router: () => services.router.debug(),
+    battleProbe: (id: string) => (game.scene.isActive('BattleScene') ? (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).qaProbe(id) : null),
+    battleHide: (id: string, hidden: boolean) => { if (game.scene.isActive('BattleScene')) (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).qaHide(id, hidden); },
     /** Kotak piksel buram (alpha > 0) sebuah frame spritesheet pada tekstur yang BENAR-BENAR dimuat browser. */
     frameBounds: (key: string, index: number, fw = 32, fh = 48) => {
       const img = game.textures.get(key).getSourceImage() as HTMLImageElement;
@@ -218,8 +230,10 @@ function boot(): void {
       ctx.drawImage(img, (index % cols) * fw, Math.floor(index / cols) * fh, fw, fh, 0, 0, fw, fh);
       const d = ctx.getImageData(0, 0, fw, fh).data;
       let top = fh, bottom = -1, left = fw, right = -1;
+      let topRowWidth = 0;
       for (let y = 0; y < fh; y++) for (let x = 0; x < fw; x++) if (d[(y * fw + x) * 4 + 3]! > 0) { top = Math.min(top, y); bottom = Math.max(bottom, y); left = Math.min(left, x); right = Math.max(right, x); }
-      return { top, bottom, left, right, height: bottom - top + 1, src: img.src };
+      if (bottom >= 0) for (let x = 0; x < fw; x++) if (d[(top * fw + x) * 4 + 3]! > 0) topRowWidth++;
+      return { top, bottom, left, right, height: bottom - top + 1, topRowWidth, src: img.src };
     },
     /** Teks yang sedang terlihat pada sebuah scene (termasuk di dalam container). Hanya diagnostik QA. */
     sceneTexts: (key: string): string[] => {
