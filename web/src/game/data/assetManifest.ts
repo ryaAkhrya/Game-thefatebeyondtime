@@ -26,6 +26,30 @@ export interface AtlasAsset {
 }
 
 export const ASSET_MANIFEST: readonly AtlasAsset[] = [
+  ...[
+    ['C03', 'characters/C03_Torvan', 'exploration_atlas', [32, 48], [192, 192], 24, 'characters/C03_explore.png'],
+    ['C07', 'characters/C07_Zira', 'exploration_atlas', [32, 48], [192, 192], 24, 'characters/C07_explore.png'],
+    ['C03', 'characters/C03_Torvan', 'battle_atlas', [64, 64], [256, 64], 4, 'battle/C03_battle.png'],
+    ['M02', 'monsters/M02_Briaroot', 'battle_atlas', [64, 64], [256, 64], 4, 'battle/M02_battle.png'],
+    ['M03', 'monsters/M03_Wisplet', 'battle_atlas', [64, 64], [256, 64], 4, 'battle/M03_battle.png'],
+    ['B02', 'bosses/B02_Veyrath', 'battle_atlas', [96, 96], [384, 96], 4, 'battle/B02_battle.png'],
+  ].map(([id, folder, kind, frameSize, atlasSize, frameCount, out]): AtlasAsset => ({
+    id: `${id}_${kind === 'exploration_atlas' ? 'CH2_EXPLORE' : 'CH2_BATTLE'}`, entity: id as string,
+    kind: kind as AtlasAsset['kind'], version: 'draft', status: 'DRAFT',
+    sourceImage: `assets/${folder}/${id}_${kind === 'exploration_atlas' ? 'EXPLORATION' : 'BATTLE'}_ATLAS_DRAFT.png`,
+    sourceJson: `assets/${folder}/${id}_${kind === 'exploration_atlas' ? 'EXPLORATION' : 'BATTLE'}_ATLAS_DRAFT.json`,
+    frameSize: frameSize as [number, number], atlasSize: atlasSize as [number, number], frameCount: frameCount as number,
+    publicPath: `assets/${out}`, imported: true,
+    notes: 'Original DRAFT grid atlas copied byte-identically. Battle has four authored key poses, not a finished animation.',
+  })),
+  ...[['C02', 'Velthia'], ['C05', 'Azie'], ['C06', 'Talric'], ['C09', 'Derrria']].map(([id, name]): AtlasAsset => ({
+    id: `${id}_CITY_EXPLORE`, entity: id!, kind: 'exploration_atlas', version: 'draft', status: 'DRAFT',
+    sourceImage: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.png`,
+    sourceJson: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.json`,
+    frameSize: [32, 48], atlasSize: [192, 192], frameCount: 24,
+    publicPath: `assets/characters/${id}_explore.png`, imported: true,
+    notes: 'Original byte-identical four-direction prototype. Foot pivot 16/46; no new face/costume, no combat kit. Not final art.',
+  })),
   {
     id: 'B01_MOURNFANG_BATTLE', entity: 'B01', kind: 'battle_atlas', version: 'draft', status: 'NEEDS_REVIEW',
     sourceImage: 'assets/bosses/B01_Mournfang/B01_BATTLE_ATLAS_DRAFT.png',

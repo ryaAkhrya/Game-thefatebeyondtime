@@ -7,7 +7,8 @@ import { SAVE_SLOTS, type SaveReadResult, type SaveSlot } from '../systems/SaveR
 import { getServices } from '../systems/Services';
 
 const slotName = (slot: SaveSlot): string => slot === 'auto' ? 'Otomatis' : `Slot ${slot.at(-1)}`;
-const BEAT_LABEL = { 'C1-01': 'Terbangun', 'C1-02': 'Mencari jalan', 'C1-03': 'Jalur berulang', 'C1-04': 'Sebelum Hollowling', 'C1-04-DONE': 'Usai Hollowling', 'C1-05': 'Jejak Mournfang', 'C1-05-DONE': 'Usai Mournfang', 'SLICE-DONE': 'Menuju Aveloria' } as const;
+const BEAT_LABEL = { 'C1-01': 'Terbangun', 'C1-02': 'Mencari jalan', 'C1-03': 'Jalur berulang', 'C1-04': 'Sebelum Hollowling', 'C1-04-DONE': 'Usai Hollowling', 'C1-05': 'Jejak Mournfang', 'C1-05-DONE': 'Usai Mournfang', 'SLICE-DONE': 'Menuju Aveloria', 'C1-06': 'Gerbang Aveloria', 'C1-07': 'Laporan Azie', 'C1-08': 'Audiensi Velthia', 'C1-09': 'Lonceng menara', 'C1-DONE': 'Bab I selesai',
+  'C2-01': 'Dua catatan Azie', 'C2-02': 'Bekal Velthia', 'C2-03': 'Desa Liora', 'C2-04': 'Hutan kedua', 'C2-05': 'Torvan bergabung', 'C2-06': 'Belajar bersama', 'C2-07': 'Jalan Veyrath', 'C2-08': 'Fragmen ramalan', 'C2-09': 'Kembali melapor', 'C2-DONE': 'Bab II selesai' } as const;
 export class SaveLoadScene extends Phaser.Scene {
   private returnTo: SceneKey = SCENE_KEYS.Pause;
   private mode: 'save' | 'load' = 'save';
@@ -45,7 +46,7 @@ export class SaveLoadScene extends Phaser.Scene {
       this.detail.setText(`${slotName(slot)}\n\n${reasons[result.status]}`); return;
     }
     const d = result.data, local = new Date(result.savedAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
-    this.detail.setText(`Bab ${d.chapter} / ${d.area === 'forest_1' ? 'Hutan 1' : d.area === 'forest_edge' ? 'Tepi Hutan' : d.area}\n${BEAT_LABEL[d.storyBeat]}\nLevel ${d.rpg.characters.C01!.level}\nHP ${d.vitals!.hp}\nMP ${d.vitals!.mp}\n${local} WIB\n${Math.floor(d.playtimeSec / 60)} menit\n${result.recovered ? 'Dari cadangan.' : result.migrated ? 'Data lama terbaca.' : ''}`);
+    this.detail.setText(`Bab ${d.chapter} / ${d.area === 'forest_1' ? 'Hutan 1' : d.area === 'forest_edge' ? 'Tepi Hutan' : d.area === 'forest_2' ? 'Hutan 2' : d.area === 'liora' ? 'Liora' : d.area}\n${BEAT_LABEL[d.storyBeat]}\nYaric Lv${d.rpg.characters.C01!.level} HP${d.vitals.hp} MP${d.vitals.mp}\n${d.partyVitals ? `Torvan Lv${d.rpg.characters.C03!.level} HP${d.partyVitals.C03.hp} MP${d.partyVitals.C03.mp}\n` : ''}${local} WIB\n${Math.floor(d.playtimeSec / 60)} menit\n${result.recovered ? 'Dari cadangan.' : result.migrated ? 'Data lama terbaca.' : ''}`);
   }
   private render(focusId?: string): void {
     this.menu?.destroy(); this.heading.setText(this.mode === 'save' ? 'SIMPAN PERMAINAN' : 'MUAT PERMAINAN');

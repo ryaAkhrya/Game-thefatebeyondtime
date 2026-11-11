@@ -42,6 +42,9 @@ export class SceneRouter {
     const returnTo = from.scene.key as SceneKey;
     from.scene.pause();
     from.scene.launch(overlay, { ...data, returnTo } satisfies OverlayData);
+    // Paused scenes still render. A reused overlay must draw above its caller,
+    // including SliceEnd -> SaveLoad and Battle/Pause -> Settings.
+    from.scene.bringToTop(overlay);
     return true;
   }
 

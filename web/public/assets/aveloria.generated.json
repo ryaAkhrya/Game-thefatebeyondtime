@@ -1,0 +1,244 @@
+{
+  "generatedBy": "web/scripts/prepare-aveloria-assets.mjs",
+  "status": "DRAFT",
+  "items": [
+    {
+      "id": "C02_EXPLORE",
+      "source": "assets/characters/C02_Velthia/C02_EXPLORATION_ATLAS_DRAFT.png",
+      "out": "assets/characters/C02_explore.png",
+      "status": "DRAFT",
+      "note": "byte-identical, four directions, six frames, foot pivot 16/46; unfinished prototype"
+    },
+    {
+      "id": "C02_NEUTRAL",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C02_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        110,
+        128
+      ],
+      "sourceSize": [
+        519,
+        604
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C02_STERN",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_STERN.png",
+      "out": "assets/portraits/C02_STERN.png",
+      "status": "DRAFT",
+      "size": [
+        120,
+        128
+      ],
+      "sourceSize": [
+        568,
+        605
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C02_AMUSED",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_AMUSED.png",
+      "out": "assets/portraits/C02_AMUSED.png",
+      "status": "DRAFT",
+      "size": [
+        122,
+        128
+      ],
+      "sourceSize": [
+        590,
+        621
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C02_WORRIED",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_WORRIED.png",
+      "out": "assets/portraits/C02_WORRIED.png",
+      "status": "DRAFT",
+      "size": [
+        110,
+        128
+      ],
+      "sourceSize": [
+        535,
+        621
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C02_SURPRISED",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits/C02_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        115,
+        128
+      ],
+      "sourceSize": [
+        558,
+        620
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C05_EXPLORE",
+      "source": "assets/characters/C05_Azie/C05_EXPLORATION_ATLAS_DRAFT.png",
+      "out": "assets/characters/C05_explore.png",
+      "status": "DRAFT",
+      "note": "byte-identical, four directions, six frames, foot pivot 16/46; unfinished prototype"
+    },
+    {
+      "id": "C05_NEUTRAL",
+      "source": "assets/characters/C05_Azie/C05_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C05_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        102,
+        128
+      ],
+      "sourceSize": [
+        484,
+        607
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C05_WORRIED",
+      "source": "assets/characters/C05_Azie/C05_EXPRESSION_WORRIED.png",
+      "out": "assets/portraits/C05_WORRIED.png",
+      "status": "DRAFT",
+      "size": [
+        104,
+        128
+      ],
+      "sourceSize": [
+        490,
+        605
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C05_SKEPTICAL",
+      "source": "assets/characters/C05_Azie/C05_EXPRESSION_SKEPTICAL.png",
+      "out": "assets/portraits/C05_SKEPTICAL.png",
+      "status": "DRAFT",
+      "size": [
+        102,
+        128
+      ],
+      "sourceSize": [
+        487,
+        610
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C06_EXPLORE",
+      "source": "assets/characters/C06_Talric/C06_EXPLORATION_ATLAS_DRAFT.png",
+      "out": "assets/characters/C06_explore.png",
+      "status": "DRAFT",
+      "note": "byte-identical, four directions, six frames, foot pivot 16/46; unfinished prototype"
+    },
+    {
+      "id": "C06_NEUTRAL",
+      "source": "assets/characters/C06_Talric/C06_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C06_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        120,
+        128
+      ],
+      "sourceSize": [
+        550,
+        589
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C06_SUSPICIOUS",
+      "source": "assets/characters/C06_Talric/C06_EXPRESSION_SUSPICIOUS.png",
+      "out": "assets/portraits/C06_SUSPICIOUS.png",
+      "status": "DRAFT",
+      "size": [
+        119,
+        128
+      ],
+      "sourceSize": [
+        548,
+        589
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C06_ALARMED",
+      "source": "assets/characters/C06_Talric/C06_EXPRESSION_ALARMED.png",
+      "out": "assets/portraits/C06_ALARMED.png",
+      "status": "DRAFT",
+      "size": [
+        117,
+        128
+      ],
+      "sourceSize": [
+        550,
+        603
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C09_EXPLORE",
+      "source": "assets/characters/C09_Derrria/C09_EXPLORATION_ATLAS_DRAFT.png",
+      "out": "assets/characters/C09_explore.png",
+      "status": "DRAFT",
+      "note": "byte-identical, four directions, six frames, foot pivot 16/46; unfinished prototype"
+    },
+    {
+      "id": "C09_NEUTRAL",
+      "source": "assets/characters/C09_Derrria/C09_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C09_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        90,
+        128
+      ],
+      "sourceSize": [
+        438,
+        620
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C09_AMUSED",
+      "source": "assets/characters/C09_Derrria/C09_EXPRESSION_AMUSED.png",
+      "out": "assets/portraits/C09_AMUSED.png",
+      "status": "DRAFT",
+      "size": [
+        89,
+        128
+      ],
+      "sourceSize": [
+        429,
+        619
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    },
+    {
+      "id": "C09_WORRIED",
+      "source": "assets/characters/C09_Derrria/C09_EXPRESSION_WORRIED.png",
+      "out": "assets/portraits/C09_WORRIED.png",
+      "status": "DRAFT",
+      "size": [
+        89,
+        128
+      ],
+      "sourceSize": [
+        433,
+        623
+      ],
+      "note": "individual source PNG resized using the existing portrait pipeline; no redraw"
+    }
+  ]
+}

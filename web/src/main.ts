@@ -2,6 +2,7 @@ import '@fontsource/press-start-2p/latin-400.css';
 import './ui/styles/page.css';
 import Phaser from 'phaser';
 import { GAME_TITLE } from './game/config/constants';
+import { SCENE_KEYS } from './game/data/ids';
 import { createGameConfig } from './game/config/createGameConfig';
 import { InputManager } from './game/core/InputManager';
 import { AssetRegistry } from './game/systems/AssetRegistry';
@@ -18,7 +19,8 @@ import { probeStorage } from './game/systems/StorageAdapter';
 import { SaveCoordinator } from './game/systems/SaveCoordinator';
 import { effectiveStats, applyReward } from './game/rpg/progression';
 import { HOLLOWLING_REWARD } from './game/rpg/definitions';
-import { BOSS_CHECKPOINT, BOSS_CHECKPOINT_FLAG, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG } from './game/combat/encounters';
+import { BOSS_CHECKPOINT, BOSS_CHECKPOINT_FLAG, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFANG_FLAG, MOURNFANG_REWARD, MOURNFANG_VICTORY_SEEN } from './game/combat/encounters';
+import { CITY_FLAG } from './game/story/aveloriaFlags';
 
 function boot(): void {
   document.title = GAME_TITLE;
@@ -78,9 +80,12 @@ function boot(): void {
     new DisplayController(window, game.canvas, guard, settings, input);
   });
 
+  const visibleScenes = (): string[] => game.scene.getScenes(false)
+    .filter(s => s.sys.settings.visible && (s.sys.isActive() || s.sys.isPaused())).map(s => s.scene.key);
   // Read-only diagnostic snapshots for browser QA; no renderer objects enter serialized gameplay state.
   (window as unknown as { __tfbt?: unknown }).__tfbt = {
     activeScenes: () => game.scene.getScenes(true).map((s) => s.scene.key),
+    visibleScenes,
     inputLayer: () => input.topLayerId,
     settings: () => settings.snapshot(),
     battle: () => (game.scene.isActive('BattleScene') || game.scene.isPaused('BattleScene') ? (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).debugState() : null),
@@ -110,6 +115,22 @@ function boot(): void {
           services.gameState.load(data);
           game.scene.getScene('TitleScene').scene.start('WorldScene');
         },
+        aveloria: () => {
+          services.checkpoints.reset();
+          const data = applyReward(applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data, MOURNFANG_REWARD).data;
+          for (const flag of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed', 'c1.hollowling_victory_seen', FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN]) data.flags[flag] = true;
+          data.area = 'forest_edge'; data.position = { x: 1312, y: 400, facing: 'right' };
+          services.gameState.load(data);
+          game.scene.getScene('TitleScene').scene.start('WorldScene');
+        },
+        chapter1Complete: () => {
+          services.checkpoints.reset();
+          const data = applyReward(applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data, MOURNFANG_REWARD).data;
+          for (const flag of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed', 'c1.hollowling_victory_seen', FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, ...Object.values(CITY_FLAG)]) data.flags[flag] = true;
+          data.area = 'aveloria'; data.position = { x: 648, y: 552, facing: 'right' };
+          services.gameState.load(data);
+          game.scene.getScene('TitleScene').scene.start('WorldScene');
+        },
         shop: () => {
           const data = services.gameState.startNewGame(); data.rpg.gold = 48;
           data.items.qa_staff = 1; data.items.qa_key = 1;
@@ -122,6 +143,10 @@ function boot(): void {
     layoutIssues: () => {
       // Semua Text pada scene aktif harus berada di dalam 320x180 dan tidak saling menimpa (depth sama).
       const issues: string[] = [];
+      const overlays: Record<string, string> = { pause: SCENE_KEYS.Pause, settings: SCENE_KEYS.Settings, 'save-load': SCENE_KEYS.SaveLoad,
+        'rpg-menu': SCENE_KEYS.RpgMenu, shop: SCENE_KEYS.Shop, 'slice-end': SCENE_KEYS.SliceEnd };
+      const expectedTop = overlays[input.topLayerId ?? ''];
+      if (expectedTop && visibleScenes().at(-1) !== expectedTop) issues.push(`${expectedTop}: overlay tertutup scene lain`);
       for (const scene of game.scene.getScenes(true)) {
         if (scene.scene.key === 'WorldScene') continue; // world coordinates use a scrolling camera
         const texts = scene.children.list.filter(

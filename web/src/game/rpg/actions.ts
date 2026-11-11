@@ -5,10 +5,15 @@ import { useConsumable } from './inventory';
 
 export type RpgResult = { ok: true; data: GameStateData; message: string } | { ok: false; message: string };
 const fail = (message: string): RpgResult => ({ ok: false, message });
-export function useItem(data: GameStateData, id: string): RpgResult {
-  const stats = effectiveStats(data), effect = useConsumable(data.items, id, data.vitals ?? { hp: stats.HP, mp: stats.MP }, stats.HP);
+export function useItem(data: GameStateData, id: string, characterId = 'C01'): RpgResult {
+  if (!data.party.includes(characterId as GameStateData['party'][number])) return fail('Anggota tidak aktif.');
+  const stats = effectiveStats(data, characterId);
+  const vitals = characterId === 'C03' ? data.partyVitals?.C03 : data.vitals;
+  const effect = useConsumable(data.items, id, vitals ?? { hp: stats.HP, mp: stats.MP }, stats.HP);
   if (!effect) return fail('Barang tidak dapat dipakai saat ini.');
-  return { ok: true, data: { ...structuredClone(data), items: effect.items, vitals: effect.vitals }, message: `Pulih ${effect.healed} HP. Potion terpakai 1.` };
+  const next = structuredClone(data); next.items = effect.items;
+  if (characterId === 'C03') next.partyVitals = { C03: effect.vitals }; else next.vitals = effect.vitals;
+  return { ok: true, data: next, message: `Pulih ${effect.healed} HP. Potion terpakai 1.` };
 }
 export function equippedCount(data: GameStateData, id: string): number {
   return Object.values(data.rpg.characters).reduce((n, c) => n + Object.values(c.equipment).filter(item => item === id).length, 0);
@@ -23,8 +28,9 @@ export function equip(data: GameStateData, slot: EquipmentSlot, id: string | nul
     if ((data.items[id] ?? 0) <= reserved) return fail('Perlengkapan tidak tersedia.');
   }
   const next = structuredClone(data); next.rpg.characters[characterId]!.equipment[slot] = id;
-  const stats = effectiveStats(next);
-  if (next.vitals) { next.vitals.hp = Math.min(next.vitals.hp, stats.HP); next.vitals.mp = Math.min(next.vitals.mp, stats.MP); }
+  const stats = effectiveStats(next, characterId);
+  const vitals = characterId === 'C03' ? next.partyVitals?.C03 : next.vitals;
+  if (vitals) { vitals.hp = Math.min(vitals.hp, stats.HP); vitals.mp = Math.min(vitals.mp, stats.MP); }
   return { ok: true, data: next, message: id ? `${ITEMS[id]!.name} dipasang.` : 'Perlengkapan dilepas. Tampilan tetap.' };
 }
 export function skillUnlockReason(data: GameStateData, id: string, characterId = 'C01'): string | null {

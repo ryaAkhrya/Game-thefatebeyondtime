@@ -1,0 +1,370 @@
+{
+  "entity_id": "C06",
+  "status": "DRAFT",
+  "authored_grid": [
+    32,
+    48
+  ],
+  "atlas_size": [
+    192,
+    192
+  ],
+  "transparent": true,
+  "frames": {
+    "front_0": {
+      "rect": [
+        0,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "front_1": {
+      "rect": [
+        32,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "front_2": {
+      "rect": [
+        64,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "front_3": {
+      "rect": [
+        96,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "front_4": {
+      "rect": [
+        128,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "front_5": {
+      "rect": [
+        160,
+        0,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "left_0": {
+      "rect": [
+        0,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "left_1": {
+      "rect": [
+        32,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "left_2": {
+      "rect": [
+        64,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "left_3": {
+      "rect": [
+        96,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "left_4": {
+      "rect": [
+        128,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "left_5": {
+      "rect": [
+        160,
+        48,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "right_0": {
+      "rect": [
+        0,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "right_1": {
+      "rect": [
+        32,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "right_2": {
+      "rect": [
+        64,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "right_3": {
+      "rect": [
+        96,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "right_4": {
+      "rect": [
+        128,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "right_5": {
+      "rect": [
+        160,
+        96,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "back_0": {
+      "rect": [
+        0,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "back_1": {
+      "rect": [
+        32,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "back_2": {
+      "rect": [
+        64,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "back_3": {
+      "rect": [
+        96,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "back_4": {
+      "rect": [
+        128,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    },
+    "back_5": {
+      "rect": [
+        160,
+        144,
+        32,
+        48
+      ],
+      "pivot": [
+        16,
+        46
+      ]
+    }
+  },
+  "animations": {
+    "front_idle": {
+      "frames": [
+        "front_0",
+        "front_1"
+      ],
+      "fps": 2
+    },
+    "front_walk": {
+      "frames": [
+        "front_2",
+        "front_3",
+        "front_4",
+        "front_5"
+      ],
+      "fps": 7
+    },
+    "left_idle": {
+      "frames": [
+        "left_0",
+        "left_1"
+      ],
+      "fps": 2
+    },
+    "left_walk": {
+      "frames": [
+        "left_2",
+        "left_3",
+        "left_4",
+        "left_5"
+      ],
+      "fps": 7
+    },
+    "right_idle": {
+      "frames": [
+        "right_0",
+        "right_1"
+      ],
+      "fps": 2
+    },
+    "right_walk": {
+      "frames": [
+        "right_2",
+        "right_3",
+        "right_4",
+        "right_5"
+      ],
+      "fps": 7
+    },
+    "back_idle": {
+      "frames": [
+        "back_0",
+        "back_1"
+      ],
+      "fps": 2
+    },
+    "back_walk": {
+      "frames": [
+        "back_2",
+        "back_3",
+        "back_4",
+        "back_5"
+      ],
+      "fps": 7
+    }
+  },
+  "review": "Hand-authored low-resolution pixel prototype; visually compare against approved portrait and direction sheet at native 1x. Not production ready."
+}

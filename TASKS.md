@@ -1,5 +1,31 @@
 # TASKS — STATUS SEBENARNYA
 
+## Phase 6 otonom — Chapter II (10 November 2026)
+
+- [x] Baseline Phase 0–5: 460 unit, 484 produksi Edge, 113 Chrome, 113 dev Edge, strict TypeScript/build.
+- [x] C2-01..09: Azie/Velthia → Liora/Zira → Hutan 2/Torvan → duo battle/Veyrath → dua fragmen → laporan dan ending Bab II.
+- [x] Party dua anggota, HP/MP/EXP/equipment/jurus per anggota, target support, retry dan reward sekali; battle solo Bab I tetap didukung.
+- [x] Encounter wajib dan satu patroli M02+M03 opsional dengan cooldown 20 detik; tanpa grinding wajib.
+- [x] Save v2 kompatibel Bab I; kondisi Torvan dan cooldown tersimpan sebagai extension; tiga slot, autosave, Continue tetap digunakan.
+- [ ] Art Torvan/Zira/Veyrath dan lingkungan DRAFT, review narasi/balancing/pacing manusia, audio komposer; lihat `docs/production/PHASE6_REPORT.md` untuk QA aktual.
+- [ ] Bab III menunggu instruksi baru.
+
+## Riwayat Phase 5 — Chapter I / Aveloria (10 November 2026)
+
+- [x] Baseline aktual: 405 unit, 375 produksi Edge, 38 Chrome boss, 38 dev Edge boss; strict TypeScript/build.
+- [x] C1-06..09: vista Aveloria, Talric, arsip Azie, audiensi Velthia, dua lonceng, penyelidikan dan penutup Chapter I.
+- [x] Safe-zone kota dengan gerbang, jalan/plaza/pasar, halaman dan ruang pertemuan; collision/kamera existing.
+- [x] Empat atlas NPC DRAFT asli, portrait individual/ekspresi, pilihan keyboard, empat warga tanpa nama.
+- [x] Toko Derrria: shared inventory, emas dan stok persistent; tidak ada reward kota atau party join.
+- [x] Save v2 additive/optional, flags berurutan, posisi/NPC/malam pulih; save forest lama tetap valid.
+- [x] 460 unit/16 files dan strict TS/build; QA browser awal Aveloria 65/65 kedua resolusi.
+- [x] **Phase 5 PASS fungsional/QA otomatis:** 460 unit, 484 produksi Edge, 113 Chrome, 113 dev Edge; strict TS/build, render order dan screenshot lulus. [Laporan Phase 5](docs/production/PHASE5_REPORT.md).
+- [ ] Review manusia: visual/animasi DRAFT, dialog/chemistry, pacing, hardware nyata, audio komposer.
+- [ ] Side quest optional (backlog). Chapter II hanya setelah instruksi baru; tidak diimplementasikan pada Phase 5 ini.
+
+Bagian Phase 0–4 berikut adalah riwayat.
+
+
 **Phase 4 PASS (fungsional/QA otomatis)** (10 Nov 2026): intro sampai Mournfang dan penutup menuju Aveloria. 405 unit, 375 produksi Edge +38 Chrome +38 dev Edge, strict TS/build lulus. Bukti di `docs/production/PHASE4_REPORT.md`. Art DRAFT/NEEDS_REVIEW, human pacing belum divalidasi; Phase 5/Chapter II belum dikerjakan.
 
 ## Phase 0 — Web Foundation

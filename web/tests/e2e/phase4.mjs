@@ -6,7 +6,7 @@ import { battle, command, press, ready, selectMenu } from './battle-helpers.mjs'
 import { back, openMenu, openPause, state, waitWorld } from './phase3-helpers.mjs';
 import { fightBoss, finishBossPrelude, refreshContinue, saveSlot, walk } from './phase4-helpers.mjs';
 const BASE = process.env.E2E_URL ?? 'http://127.0.0.1:5173/';
-const out = resolve('../.dev-cache/test-artifacts'); mkdirSync(out, { recursive: true });
+const out = resolve(process.env.E2E_OUTPUT_DIR ?? '../.dev-cache/test-artifacts'); mkdirSync(out, { recursive: true });
 const results = [], errors = [], requests = [], audio = [], timings = [];
 const check = (name, ok, detail = '') => { results.push({ name, ok: !!ok, detail }); console.log(`${ok ? 'PASS' : 'FAIL'} ${name}${!ok ? ': ' + detail : ''}`); };
 const shot = (page, name) => page.screenshot({ path: resolve(out, `p4_${name}.png`) });
@@ -87,7 +87,9 @@ try {
       check('Continue after abandoning boss has no double loot/EXP/cost', await page.evaluate(() => { const d = window.__tfbt.state(); return d.rpg.characters.C01.exp === 25 && d.rpg.gold === 8 && d.items.potion === 1 && d.vitals.hp === 108; }));
       await enterBoss(page); b = await fightBoss(page); check('1920 boss can complete with no compulsory grinding', b.outcome === 'victory');
       await press(page, 'Enter'); await page.waitForFunction(() => window.__tfbt.world()?.dialogue); await finishAftermath(page);
-      await walk(page, 1304, 400); await press(page, 'ArrowRight'); await press(page, 'Enter'); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
+      await walk(page, 1312, 400); await press(page, 'ArrowRight');
+      await page.waitForFunction(() => window.__tfbt.world()?.target === 'slice_exit');
+      await press(page, 'Enter'); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
       await shot(page, 'ending_1920'); await layout(page, 'ending 1920');
       const fixed = await page.evaluate(() => window.__tfbt.world().x); await press(page, 'ArrowRight', 3);
       check('Ending input cannot move the paused world', await page.evaluate(x => window.__tfbt.world().x === x, fixed));

@@ -12,8 +12,8 @@ export function baseStatsAt(level: number, profile: ProgressionProfile = YARIC_P
 }
 export function createCharacter(profile: ProgressionProfile = YARIC_PROFILE): CharacterProgress {
   return { classId: profile.classId, level: 1, exp: 0, baseStats: baseStatsAt(1, profile), skillPoints: 0,
-    unlockedSkills: profile.id === 'C01' ? ['ground_slam'] : [],
-    equipment: { weapon: profile.id === 'C01' ? 'yaric_greatsword' : null, armor: profile.id === 'C01' ? 'travel_coat' : null } };
+    unlockedSkills: profile.id === 'C01' ? ['ground_slam'] : profile.id === 'C03' ? ['ranting_nakal', 'bukan_aku'] : [],
+    equipment: { weapon: profile.id === 'C01' ? 'yaric_greatsword' : profile.id === 'C03' ? 'twig_staff' : null, armor: profile.id === 'C01' ? 'travel_coat' : null } };
 }
 export function createRpgState(): RpgState { return { gold: 0, characters: { C01: createCharacter() } }; }
 export function effectiveStats(data: Pick<GameStateData, 'rpg'>, id = 'C01'): Stats {
@@ -49,7 +49,16 @@ export function applyReward(data: GameStateData, reward: { id: string; exp: numb
     const amount = Math.min(count, MAX_ITEMS - (next.items[id] ?? 0));
     if (amount > 0) { next.items = changeItem(next.items, id, amount)!; loot[id] = amount; }
   }
-  next.rpg.characters.C01 = gainExp(c, reward.exp, PROFILES.C01);
+  for (const id of data.party) {
+    const current = next.rpg.characters[id]!;
+    const oldStats = effectiveStats(data, id);
+    next.rpg.characters[id] = gainExp(current, reward.exp, PROFILES[id]);
+    if (id === 'C03' && next.partyVitals?.C03) {
+      const newStats = effectiveStats(next, id);
+      next.partyVitals.C03 = { hp: Math.min(newStats.HP, next.partyVitals.C03.hp + newStats.HP - oldStats.HP),
+        mp: Math.min(newStats.MP, next.partyVitals.C03.mp + newStats.MP - oldStats.MP) };
+    }
+  }
   const after = effectiveStats(next);
   next.vitals = { hp: Math.min(after.HP, (data.vitals?.hp ?? before.HP) + after.HP - before.HP), mp: Math.min(after.MP, (data.vitals?.mp ?? before.MP) + after.MP - before.MP) };
   next.rpg.gold = Math.min(MAX_GOLD, next.rpg.gold + reward.gold); next.flags[reward.id] = true;

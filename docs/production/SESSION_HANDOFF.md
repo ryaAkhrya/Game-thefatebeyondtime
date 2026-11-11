@@ -1,5 +1,30 @@
 # SESSION HANDOFF — FOR CLAUDE CODE (v2.0, diperbarui setelah Phase 0)
 
+## Phase 6 handoff terkini — Chapter II
+
+Bab II C2-01..09 playable dari ending Bab I hingga `chapter.2_complete`. `SliceEndScene` menawarkan **Mulai Bab II** hanya dari `chapter.1_complete`. `Chapter2Story` mengatur Azie → Velthia → Liora/Zira → Hutan 2 → Torvan join → M01+M02 tutorial → penanda → Veyrath → dua fragmen → Aveloria/Velthia. Tidak ada launcher Bab III. Detail QA/batasan di `PHASE6_REPORT.md`.
+
+- Data: `story/chapter2Flags.ts`, `story/Chapter2Story.ts`, `dialogue/chapter2.ts` + 97 source lines JSON, `world/chapter2Maps.ts`, `Chapter2View.ts`, `rpg/party.ts`. `WorldScene` tetap router area, `GameState` tetap schema 2, `SaveRepository` lama tetap boundary.
+- Party C01+C03 maksimal dua. `partyVitals.C03` hanya saat C03 joined; EXP/skills/equipment C03 di `rpg.characters`, item bersama. `world.lastChapter2EncounterSec` opsional untuk patroli satu kali dengan cooldown. Boss checkpoint penuh; retry rollback HP/MP/item/status. Load Bab I tanpa C03 tetap valid.
+- Asset import `web/scripts/prepare-chapter2-assets.mjs` menghasilkan `web/public/assets/chapter2.generated.json`: 6 atlas DRAFT asli dan 13 portrait turunan. C03/C07/B02 sangat kasar di sprite gameplay; review artist wajib. Tidak ada audio/composer file baru.
+- E2E runner tujuh suite; `E2E_SUITES=phase6.mjs` untuk Chapter II. Screenshot/artifacts tetap `.dev-cache/test-artifacts/`. Jangan klaim art final atau melanjutkan Bab III tanpa instruksi user.
+
+Riwayat Phase 5 dan sebelumnya ada di bawah.
+
+## Phase 5 handoff terkini — Chapter I
+
+Chapter I C1-01..09 terhubung sampai Aveloria dan `chapter.1_complete`. Kota safe zone memakai `WorldScene`, collision/camera/input/dialogue existing. Masuk dari checkpoint timur tepi hutan; menu pertama Masuk Aveloria. Talric → Azie → Velthia → kembali ke halaman → dua dentang → penutup. Chapter II tidak playable dan memerlukan instruksi baru. Status/QA aktual dan keterbatasan: `PHASE5_REPORT.md`; **PHASE 5 PASS fungsional/QA otomatis: 460 unit, 484 produksi Edge, 113 Chrome, 113 dev Edge; strict TS/build**.
+
+- Runtime baru: `world/aveloria.ts`, `AveloriaView.ts`, `story/AveloriaStory.ts`, `aveloriaFlags.ts`, `dialogue/aveloria.ts` + 43 baris source JSON C1-06..09 saja, `rpg/derrria.ts`.
+- Save v2/key lama tetap. `world.shops.derrria` optional; stock/inventory/gold satu snapshot. Flags vista → gate → archive → velthia → complete. Tidak menyimpan scene midway. Legacy v2 forest tanpa shops tetap valid; v1 masih read-only migrate. Reward/battle/RPG lama dipertahankan.
+- C02/C05/C06/C09: atlas DRAFT asli 32×48 /192×192, empat arah × enam frame, pivot16/46. Import `web/scripts/prepare-aveloria-assets.mjs`; source tidak diubah. 14 portrait individual turunan, lingkungan/warga code-native DRAFT, tidak ada redraw wajah/kostum atau battle kit NPC.
+- 460 unit/16 files strict TS/build; focused Aveloria awal 65/65 produksi Edge. Baseline Phase 0–4: 405 unit,375 Edge,38 Chrome,38 dev; log helper fail/re-run dipertahankan. Hasil final sesudah fix overlay: 484/484 produksi Edge (Title journey 196, kota 75), 113/113 Chrome, 113/113 dev Edge. Build index-DflZfrNQ.js. Semua bukti akhir diverifikasi terhadap hash build; laporan mencatat percobaan gagal/terputus.
+- E2E runner enam suite. `E2E_SUITES=phase5.mjs` untuk kota; `phase4.mjs` untuk boss. Focused suites menerima `E2E_OUTPUT_DIR`; runner menerima `E2E_PORT`, `E2E_URL` dan `E2E_CHANNEL`. Cache/artifacts tetap D:. Preview existing http://127.0.0.1:5173/.
+- Review manusia tetap diperlukan; side quest backlog. Composer handoff Aveloria ditambahkan, silent fallback tanpa file suara. Tidak ada commit/push/deploy/dependency install.
+
+Bagian handoff Phase 0–4 berikut adalah riwayat dan tunduk pada status Phase 5 di atas.
+
+
 - **Tanggal:** 10 November 2026. **Phase 4 PASS (fungsional/QA otomatis)**: 405 unit, 375 produksi Edge, 38 Chrome, 38 dev Edge, strict TS/build. Bukti/backlog di `PHASE4_REPORT.md`. Bukan seluruh Chapter I; Phase 5/Chapter II belum dimulai. Art NEEDS_REVIEW/DRAFT dan pacing manusia perlu review.
 - Proyek adalah website **PC/laptop browser only**: Phaser 4.2.1 + TypeScript + Vite, VS Code/IDE + Claude Code. **Bukan Godot / file EXE**.
 - Empat chapter, 40 beat (termasuk M-01..03) dan epilog. Source cerita **Cerita Revisi 02 APPROVED**; jangan pakai timeline lama yang memperlihatkan memori modern dalam Chapter IV.

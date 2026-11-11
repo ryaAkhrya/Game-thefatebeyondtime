@@ -1,4 +1,16 @@
-# STATUS TERKINI — Phase 4: vertical slice sampai Mournfang (10 November 2026)
+# STATUS TERKINI — Phase 6: Chapter II, Whispers of Fate (10 November 2026)
+
+Chapter II C2-01..09 kini terhubung dari ending Bab I: arsip Azie, perpisahan Velthia, Liora/Zira, Hutan 2, Torvan bergabung, battle dua anggota, Veyrath, dua fragmen, dan laporan akhir ke Velthia. Akhir Bab II berhenti sebelum Bab III. Save v2 tetap membaca slot Bab I, dengan extension opsional untuk HP/MP Torvan dan waktu encounter terakhir. Art C03/C07/B02/M02/M03 serta lingkungan baru tetap DRAFT; audio tetap AWAITING_COMPOSER. Hasil QA dan batasan aktual: [PHASE6_REPORT.md](docs/production/PHASE6_REPORT.md). Preview lokal: **http://127.0.0.1:5173/**.
+
+## Riwayat Phase 5
+
+**PHASE 5 PASS untuk fungsional/QA otomatis:** 460 unit, 484 pemeriksaan produksi Edge, 113 Chrome dan 113 dev Edge; strict TypeScript/build lulus. Bug overlay Save/Load dan Settings yang tertutup ending sudah diperbaiki dan diuji secara visual.
+
+Chapter I C1-01..09 kini terhubung dari Title: hutan, Hollowling, Mournfang, gerbang Talric, arsip Azie, audiensi Velthia, lonceng ganda dan penutup bab. Aveloria merupakan safe zone dengan jalan/plaza/pasar/halaman/ruang pertemuan, empat warga tanpa nama dan toko Derrria. Posisi, flags, inventory, emas dan stok toko ikut save v2; save forest lama tetap valid. Chapter II belum playable.
+
+Laporan QA aktual, screenshots dan keterbatasan: [PHASE5_REPORT.md](docs/production/PHASE5_REPORT.md). Preview: **http://127.0.0.1:5173/**. Dari ujung timur tepi hutan pilih **Masuk Aveloria**; dari Title seluruh alur dapat dimainkan. Art/scene direction/dialogue kerja tetap DRAFT untuk review manusia; audio AWAITING_COMPOSER. Tidak ada commit, push atau deploy.
+
+## Riwayat Phase 4 (digantikan status Phase 5 di atas)
 
 **PHASE 4 PASS (fungsional/QA otomatis):** 405 unit, 375 pemeriksaan produksi Edge, 38 Chrome dan 38 dev Edge; strict TypeScript/build lulus. Review art, balancing dan pacing manusia tetap terbuka.
 

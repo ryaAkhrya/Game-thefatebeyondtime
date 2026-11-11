@@ -1,5 +1,20 @@
 # CHANGELOG — DOKUMENTASI & KODE
 
+## Phase 6 — 10 November 2026
+
+- C2-01..09 kini playable dari ending Bab I hingga laporan Velthia dan ending Bab II. Liora/Zira, Hutan 2, batu penanda, Torvan, dua fragmen dan Veyrath terhubung ke world/scene/dialog.
+- BattleEngine/BattleScene/BattlePanel mendukung C01+C03, target support, status/HP/MP/giliran per aktor, encounter M01+M02, patroli M02+M03 opsional dengan cooldown, boss B02 dan retry/reward sekali. Battle solo Bab I tetap dipertahankan.
+- Save v2 tetap membaca slot lama; `partyVitals.C03` dan `world.lastChapter2EncounterSec` ditambahkan secara opsional. Enam atlas DRAFT dan 13 portrait diimpor dari library existing tanpa mengubah source. Lingkungan baru code-native DRAFT, audio tetap menunggu komposer.
+- QA aktual, screenshot dan keterbatasan di `PHASE6_REPORT.md`. Tidak ada Bab III, commit/push atau deploy.
+
+## Phase 5 — 10 November 2026
+
+- Sisa Chapter I: Aveloria safe zone, gerbang Talric, laporan Azie, audiensi Velthia, dua dentang yang terbaca tanpa audio, penyelidikan dan penutup.
+- Atlas/portrait original DRAFT diimpor, city renderer/collision terpisah, empat warga tanpa nama. Toko Derrria mengaktifkan shared buy/sell dengan stock persistent optional dalam save v2.
+- Flags/beat/posisi/NPC/ending mengikuti save/load existing; cutscene tidak disimpan setengah jalan. DialogueRunner/input cleanup dan Pause/Settings kota dipertahankan.
+- 460 unit/strict TypeScript/build; status dan QA aktual di `PHASE5_REPORT.md`. Tidak ada Chapter II, art final, audio otomatis, commit/push atau deploy.
+
+
 ## Phase 4 — 10 November 2026 (vertical slice sampai Mournfang)
 
 - Alur C1-01..04 berlanjut ke tepi Hutan 1, checkpoint, C1-05 Mournfang dan penutup demo menuju Aveloria; bukan Chapter I penuh. Tidak ada Phase 5/Chapter II atau NPC baru.

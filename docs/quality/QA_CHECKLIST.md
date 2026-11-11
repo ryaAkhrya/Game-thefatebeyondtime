@@ -1,5 +1,26 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 6 — Chapter II
+
+- [x] C2-01..09 dari ending Bab I, party Torvan, battle dua aktor, Veyrath, kedua fragmen dan laporan akhir diuji lewat browser dua resolusi; source 97 baris diuji unit.
+- [x] Slot Bab I lama, save duo/refresh/Continue, slot ending Bab II dan reward satu kali diuji.
+- [x] Cooldown patroli opsional, roster M02+M03, Kabur, hadiah sekali dan penanda tertutup diuji browser dua resolusi serta unit; hasil regresi ada di `../production/PHASE6_REPORT.md`.
+- [ ] Review manusia untuk art/naskah/balancing/pacing serta audio komposer; screenshot browser headless bukan approval visual final.
+
+Bagian Phase 5 dan sebelumnya di bawah adalah riwayat.
+
+## Phase 5 — Chapter I / Aveloria
+
+Baseline diulang: **405 unit +375 produksi Edge +38 Chrome boss +38 dev Edge boss**, strict TypeScript/build PASS. Dua koreksi helper baseline dan log percobaan gagal dicatat di laporan Phase 5.
+
+- [x] 460 unit/16 files: urutan event, source dialogue/ekspresi, collision/rute, compatibility v2, save slots, stock/currency rollback.
+- [x] Build awal Aveloria 65/65 focused produksi Edge, 1366×768 dan 1920×1080: gate/plaza/ending save, cutscene Pause/Settings, lonceng, portrait, shop, no replay/softlock/error JS/aset/audio.
+- [x] **Phase 5 PASS fungsional/QA otomatis:** 460 unit, 484 produksi Edge, 113 Chrome, 113 dev Edge; strict TS/build, render order dan screenshot lulus. [Laporan Phase 5](../production/PHASE5_REPORT.md).
+- [ ] Review manusia untuk art/animasi DRAFT, chemistry/tempo percakapan, pacing Chapter I, monitor/GPU/fullscreen nyata dan audio komposer. Tidak diklaim teruji headful/manusia.
+
+Checklist Phase 0–4 berikut adalah riwayat pengujian tiap phase.
+
+
 ## Phase 4 — vertical slice sampai Mournfang
 
 **PHASE 4 PASS (fungsional/QA otomatis).** Bukti/batasan: `../production/PHASE4_REPORT.md`. Bukan Chapter I penuh.

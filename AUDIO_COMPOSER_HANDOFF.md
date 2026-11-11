@@ -1,5 +1,22 @@
 # Composer handoff — Game Director authored music only
 
+## Phase 6 — Chapter II
+
+Liora, Hutan 2, Torvan dan Veyrath tetap **AWAITING_COMPOSER**. Implementasi memakai ID BGM/SFX yang sudah didaftarkan sebagai placeholder senyap; tidak ada file dibuat, diunduh, disintesis atau dimasukkan. Perpindahan suasana dan telegraph battle tetap terbaca lewat sprite/teks tanpa audio. Komposer/Game Director dapat meninjau cue berikut pada sesi audio terpisah; nama final dan file tetap menunggu keputusan mereka.
+
+## Phase 5 — Aveloria dan dua dentang
+
+Semua kebutuhan tetap **AWAITING_COMPOSER**. Tidak ada musik/SFX dibuat, diunduh, disintesis atau dimasukkan. `BGM_AVELORIA_DAY` memakai registry existing; tidak menambah BGM duplikat. Boot hanya meminta file READY. Lonceng wajib terbaca lewat sprite, jarum tetap dan teks meskipun seluruh audio belum tersedia.
+
+| Filename / status | Penempatan dan mood | Tempo / instrumen / loop |
+|---|---|---|
+| `BGM_AVELORIA_DAY.ogg` (registry existing) | Gerbang, jalan, pasar, arsip, halaman dan audiensi; kehangatan warga dengan wibawa yang tenang | 88–106 BPM, 60–90 detik; woodwind ringkas, plucked/chip pulse, bass lembut. Loop seamless. Jangan dominasi dialog |
+| `SFX_AVELORIA_BELL.ogg` (permintaan spesifikasi, belum runtime READY) | Satu dentang menara; cue yang sama dipakai dua kali dalam C1-09, dengan ruang hening di antaranya; bukan stinger horor | Nonmusikal/tanpa BPM; satu bell 16-bit dengan decay sekitar 2–4 detik, satu-shot, tanpa loop. Nada sama pada kedua dentang; tidak meniru glitch digital |
+| `SFX_FOOTSTEP_STONE.ogg` (permintaan spesifikasi) | Langkah di jalan batu kerajaan; halus, tidak mengalahkan input/dialog | Nonmusikal, pendek/kering, chip/noise lembut, tanpa loop kontinu |
+| `SFX_UI_MOVE.ogg`, `SFX_UI_CONFIRM.ogg`, `SFX_UI_BACK.ogg` (existing handoff) | Navigasi toko dan menu existing | Pendek, tenang, one-shot; patuh Master/SFX/Mute |
+
+BGM existing dihentikan saat momen lonceng; tidak ada track malam baru. Kedua dentang belum memanggil file SFX yang belum dibuat. Sesudah file komposer tersedia, tambahkan cue READY dengan timing di action `cityBell`, tanpa menghapus teks visual. Mix dan kualitas audio terdengar memerlukan review manusia.
+
 ## Phase 4 — Mournfang dan akhir vertical slice
 
 Semua cue tetap **AWAITING_COMPOSER**. Tidak ada audio dibuat, diunduh, disintesis atau dimasukkan. Tidak ada track duplikat; game tetap playable dalam silent fallback.

@@ -6,6 +6,7 @@ import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { ITEMS } from '../rpg/definitions';
 import { trade, type Shop } from '../rpg/actions';
 import { getServices } from '../systems/Services';
+import { tradeWithDerrria } from '../rpg/derrria';
 
 /** Reusable shop overlay. Only a QA harness invokes it in Phase 3; no merchant enters the story. */
 export class ShopScene extends Phaser.Scene {
@@ -49,8 +50,10 @@ export class ShopScene extends Phaser.Scene {
     };
     this.menu = new MenuList(this, { x: 76, y: 43, width: 136, rowHeight: 18, items, onFocusChange: item => describe(item.id), onDisabledConfirm: item => this.message.setText(item.disabledHint ?? ''),
       onConfirm: item => {
-        const services = getServices(this), result = trade(services.gameState.snapshot()!, this.shop, this.mode, item.id);
-        if (result.ok) { services.gameState.load(result.data); this.shop = result.shop; }
+        const services = getServices(this), result = this.shop.id === 'derrria'
+          ? tradeWithDerrria(services.gameState.snapshot()!, this.mode, item.id)
+          : trade(services.gameState.snapshot()!, this.shop, this.mode, item.id);
+        if (result.ok) { services.gameState.load(result.data); this.shop = result.shop; if (this.shop.id === 'derrria') services.checkpoints.requestAutosave(); }
         this.message.setText(result.message); this.render(item.id);
       } });
     if (focusId) this.menu.focusId(focusId); describe(this.menu.focusedItem.id);

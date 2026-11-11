@@ -1,8 +1,12 @@
 # WEB APP — THE FATE: BEYOND TIME
 
-Phase 4 PASS untuk scope fungsional/QA otomatis: 405 unit +375 produksi Edge +38 Chrome +38 dev Edge, strict TS/build lulus. Art dan target pacing manusia 10–15 menit masih perlu review.
+Phase 6: Bab II playable dari ending Bab I hingga laporan ke Velthia. Liora, Hutan 2, Zira, Torvan dalam party, dua battle wajib dan boss Veyrath terhubung; save Bab I tetap valid. Art dan angka balancing DRAFT, audio AWAITING_COMPOSER. QA aktual: `../docs/production/PHASE6_REPORT.md`.
 
-Phaser 4.2.1 + TypeScript + Vite. Vertical slice C1-01..05: intro/Nambo/loop/Hollowling → checkpoint tepi hutan → Mournfang → penutup menuju Aveloria, dengan RPG dan save/load nyata. Status QA/backlog: `../docs/production/PHASE4_REPORT.md`. Bukan seluruh Chapter I; Phase 5 belum dimulai. Save lokal: tiga slot manual + satu autosave, Settings terpisah; menghapus data situs dapat menghapus progress.
+## Riwayat Phase 5
+
+Phase 5: Chapter I kini terhubung sampai Aveloria, Talric, Azie, Velthia, lonceng ganda dan penutup bab. Laporan QA aktual dan batasan: `../docs/production/PHASE5_REPORT.md`. Art tetap DRAFT/NEEDS_REVIEW; pacing dan review artistik manusia masih diperlukan.
+
+Phaser 4.2.1 + TypeScript + Vite. C1-01..09: hutan → Hollowling → Mournfang → Masuk Aveloria → pemeriksaan gerbang → arsip → audiensi → kembali ke halaman → dua dentang → Bab I selesai. Kota aman memiliki pasar Derrria, empat warga tanpa nama, collision dan kamera existing. Stok toko, gold, inventory, posisi dan flags ikut save v2. Chapter II belum playable. Save lokal: tiga slot manual + satu autosave, Settings terpisah; menghapus data situs dapat menghapus progress.
 
 ## Menjalankan
 
@@ -14,12 +18,16 @@ npm run dev                 # http://127.0.0.1:5173/
 npm run build               # typecheck + build statis ke web/dist/
 npm run preview             # sajikan web/dist (http://127.0.0.1:4173/)
 npm test                    # unit test (vitest)
-npm run test:e2e            # satu preview server: Phase 0–4, Title→dua battle→save/refresh→penutup (build dulu)
+npm run test:e2e            # satu preview server: Phase 0–6, termasuk Bab II (build dulu)
 # Focused: $env:E2E_SUITES='phase4.mjs'; npm run test:e2e
+# Kota: $env:E2E_SUITES='phase5.mjs'; npm run test:e2e
+# Bab II: $env:E2E_SUITES='phase6.mjs'; npm run test:e2e
 # Browser Chrome existing: $env:E2E_CHANNEL='chrome'; npm run test:e2e
 # Untuk memakai dev server yang sudah aktif:
 # $env:E2E_URL='http://127.0.0.1:5173/'; npm run test:e2e
 npm run assets:prepare      # buat ulang aset turunan (portrait, atlas bersih) dan seni lingkungan DRAFT
+node scripts/prepare-aveloria-assets.mjs # hanya impor atlas/portrait kota existing; source tetap utuh
+node scripts/prepare-chapter2-assets.mjs # impor atlas/portrait Bab II DRAFT existing
 node scripts/asset-qa.mjs <png> <json> <nama>   # QA atlas: bbox, tepi sel, kiri/kanan
 npm run verify              # typecheck + unit test + build
 ```

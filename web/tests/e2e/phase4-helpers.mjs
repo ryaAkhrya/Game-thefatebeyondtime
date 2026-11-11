@@ -93,7 +93,9 @@ export async function verticalSliceJourney(page, check, shot, journey) {
   await openPause(page); await openMenu(page, 'inventory'); await selectMenu(page, 'potion'); await press(page, 'Enter');
   check('Boss loot is a real shared consumable, usable in world Inventory', (await state(page)).items.potion === 0 && (await state(page)).vitals.hp > afterBoss.vitals.hp);
   await back(page, 'pause'); await back(page, 'world');
-  await journey.walkTo(page, 1304, 400); await journey.face(page, 'ArrowRight'); await press(page, 'Enter');
+  await journey.walkTo(page, 1312, 400); await journey.face(page, 'ArrowRight');
+  await page.waitForFunction(() => window.__tfbt.world()?.target === 'slice_exit');
+  await press(page, 'Enter');
   await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
   check('Walking beyond the defeated boss reaches an explicit Aveloria demo ending', await page.evaluate(() => window.__tfbt.activeScenes().includes('SliceEndScene') && window.__tfbt.state().flags['c1.vertical_slice_complete'] && window.__tfbt.state().chapter === 'I' && !window.__tfbt.state().flags['chapter.1_complete']));
   await shot(page, 'phase4_slice_end'); await checkLayout(page, check, 'slice ending');

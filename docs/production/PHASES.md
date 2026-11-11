@@ -1,5 +1,16 @@
 # PHASE ROADMAP — DESKTOP WEB (CLAUDE CODE)
 
+## Phase 6 otonom — Chapter II: Whispers of Fate
+
+Scope instruksi terbaru: C2-01..09 dari akhir Bab I sampai ending Bab II, Liora/Zira, Hutan 2/Torvan, party dua anggota, Veyrath dan save/load kompatibel. Status QA aktual: `PHASE6_REPORT.md`. Bab III belum termasuk. Label Phase 6 release pada roadmap historis di bawah tidak menggantikan instruksi Chapter II ini.
+
+## Riwayat Phase 5 — Chapter I Completion
+
+Instruksi 10 November 2026 mengotorisasikan **sisa Chapter I saja**, bukan seluruh rencana Full Story Production lama. C1-06..09 telah diimplementasikan: Aveloria/Talric/Azie/Velthia/lonceng/penutup, dengan pasar Derrria, collision/kamera, portrait/choice dan save kota. Runtime tetap Chapter I/party solo. QA akhir/status: `docs/production/PHASE5_REPORT.md` (root) / `PHASE5_REPORT.md` (folder produksi).
+
+Gate aktual: baseline 405 unit/375 Edge/38 Chrome/38 dev diulang; **PHASE 5 PASS fungsional/QA otomatis:** 460 unit, 484 produksi Edge, 113 Chrome dan 113 dev Edge, strict TS/build. Art/naskah/scene direction DRAFT memerlukan review manusia. **Chapter II tidak playable dan tidak boleh dimulai tanpa instruksi baru.** Rencana P5B–D di bawah tetap backlog.
+
+
 **Satu phase pada satu waktu.** Tidak ada game yang dianggap berjalan hanya karena ada kode. Setelah Phase 0–4: MVP web playable; Phase 5–6: cerita lengkap dan rilis.
 
 ## Gerbang umum untuk setiap phase

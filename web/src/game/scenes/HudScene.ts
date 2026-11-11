@@ -36,10 +36,10 @@ export class HudScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => (this.ready = false));
 
     this.objectiveBg = this.add.rectangle(6, 5, 10, 13, COLORS.ink, 0.78).setOrigin(0, 0).setDepth(10);
-    this.objectiveText = makeText(this, 10, 8, '', { color: COLORS.bitterLime }).setDepth(11);
+    this.objectiveText = makeText(this, 10, 8, '', { color: COLORS.bitterLime, wrapWidth: 296, lineSpacing: 2 }).setDepth(11);
 
     this.toastBg = this.add.rectangle(0, 26, 10, 13, COLORS.deepPlum, 0.95).setOrigin(0.5, 0).setStrokeStyle(1, COLORS.bitterLime).setDepth(12);
-    this.toastText = makeText(this, UI_WIDTH / 2, 29, '', { originX: 0.5 }).setDepth(13);
+    this.toastText = makeText(this, UI_WIDTH / 2, 29, '', { originX: 0.5, wrapWidth: 288, lineSpacing: 2 }).setDepth(13);
 
     this.promptBg = this.add.rectangle(UI_WIDTH / 2, 160, 10, 13, COLORS.deepPlum, 0.95).setOrigin(0.5, 0).setStrokeStyle(1, COLORS.bitterLime).setDepth(10);
     this.promptText = makeText(this, UI_WIDTH / 2, 163, '', { originX: 0.5 }).setDepth(11);
@@ -70,8 +70,8 @@ export class HudScene extends Phaser.Scene {
     this.objectiveText.setVisible(show);
     if (text) {
       this.objectiveText.setText(text);
-      this.objectiveBg.setSize(text.length * 8 + 8, 13);
-      this.objectiveBg.displayWidth = text.length * 8 + 8;
+      this.objectiveBg.setSize(Math.min(308, this.objectiveText.width + 8), this.objectiveText.height + 6);
+      this.placeToast();
     }
   }
 
@@ -85,14 +85,19 @@ export class HudScene extends Phaser.Scene {
     this.currentToast = text;
     this.toastText.setText(text).setVisible(true);
     this.toastBg.setVisible(true);
-    const w = text.length * 8 + 12;
-    this.toastBg.setPosition(UI_WIDTH / 2, 26).setSize(w, 13);
-    this.toastBg.displayWidth = w;
+    this.toastBg.setSize(Math.min(308, this.toastText.width + 12), this.toastText.height + 6);
+    this.placeToast();
     this.toastTimer = this.time.delayedCall(ms, () => {
       this.currentToast = '';
       this.toastText.setVisible(false);
       this.toastBg.setVisible(false);
     });
+  }
+
+  private placeToast(): void {
+    const y = this.objectiveText.visible ? Math.max(26, 10 + this.objectiveText.height + 8) : 26;
+    this.toastBg.setPosition(UI_WIDTH / 2, y);
+    this.toastText.setPosition(UI_WIDTH / 2, y + 3);
   }
 
   private applyPrompt(): void {

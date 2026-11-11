@@ -1,0 +1,221 @@
+{
+  "generatedBy": "scripts/prepare-chapter2-assets.mjs",
+  "status": "DRAFT",
+  "items": [
+    {
+      "id": "C03_explore",
+      "source": "assets/characters/C03_Torvan/C03_EXPLORATION_ATLAS_DRAFT.png",
+      "out": "assets/characters/C03_explore.png",
+      "status": "DRAFT",
+      "grid": [
+        32,
+        48
+      ],
+      "frameCount": 24,
+      "note": "Byte-identical source; four battle poses are held, not full animation."
+    },
+    {
+      "id": "C03_battle",
+      "source": "assets/characters/C03_Torvan/C03_BATTLE_ATLAS_DRAFT.png",
+      "out": "assets/battle/C03_battle.png",
+      "status": "DRAFT",
+      "grid": [
+        64,
+        64
+      ],
+      "frameCount": 4,
+      "note": "Byte-identical source; four battle poses are held, not full animation."
+    },
+    {
+      "id": "C03_NEUTRAL",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C03_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        104,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C03_DETERMINED",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_DETERMINED.png",
+      "out": "assets/portraits/C03_DETERMINED.png",
+      "status": "DRAFT",
+      "size": [
+        111,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C03_MISCHIEVOUS",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_MISCHIEVOUS.png",
+      "out": "assets/portraits/C03_MISCHIEVOUS.png",
+      "status": "DRAFT",
+      "size": [
+        112,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C03_CURIOUS",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_CURIOUS.png",
+      "out": "assets/portraits/C03_CURIOUS.png",
+      "status": "DRAFT",
+      "size": [
+        109,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C03_SAD",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_SAD.png",
+      "out": "assets/portraits/C03_SAD.png",
+      "status": "DRAFT",
+      "size": [
+        108,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C03_SURPRISED",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits/C03_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        109,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C03_SOLEMN",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_SOLEMN.png",
+      "out": "assets/portraits/C03_SOLEMN.png",
+      "status": "DRAFT",
+      "size": [
+        117,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C03_UPSET",
+      "source": "assets/characters/C03_Torvan/C03_EXPRESSION_UPSET.png",
+      "out": "assets/portraits/C03_UPSET.png",
+      "status": "DRAFT",
+      "size": [
+        112,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C07_explore",
+      "source": "assets/characters/C07_Zira/C07_EXPLORATION_ATLAS_DRAFT.png",
+      "out": "assets/characters/C07_explore.png",
+      "status": "DRAFT",
+      "grid": [
+        32,
+        48
+      ],
+      "frameCount": 24,
+      "note": "Byte-identical source; four battle poses are held, not full animation."
+    },
+    {
+      "id": "C07_NEUTRAL",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits/C07_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        91,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C07_CAUTIOUS",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_CAUTIOUS.png",
+      "out": "assets/portraits/C07_CAUTIOUS.png",
+      "status": "DRAFT",
+      "size": [
+        91,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C07_HAPPY",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_HAPPY.png",
+      "out": "assets/portraits/C07_HAPPY.png",
+      "status": "DRAFT",
+      "size": [
+        91,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C07_SAD",
+      "source": "assets/characters/C07_Zira/C07_EXPRESSION_SAD.png",
+      "out": "assets/portraits/C07_SAD.png",
+      "status": "DRAFT",
+      "size": [
+        91,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "C02_VULNERABLE",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_VULNERABLE.png",
+      "out": "assets/portraits/C02_VULNERABLE.png",
+      "status": "DRAFT",
+      "size": [
+        118,
+        128
+      ],
+      "note": "Original expression resized to 128 px using existing portrait pipeline; no redraw."
+    },
+    {
+      "id": "M02_battle",
+      "source": "assets/monsters/M02_Briaroot/M02_BATTLE_ATLAS_DRAFT.png",
+      "out": "assets/battle/M02_battle.png",
+      "status": "DRAFT",
+      "grid": [
+        64,
+        64
+      ],
+      "frameCount": 4,
+      "note": "Byte-identical source; four battle poses are held, not full animation."
+    },
+    {
+      "id": "M03_battle",
+      "source": "assets/monsters/M03_Wisplet/M03_BATTLE_ATLAS_DRAFT.png",
+      "out": "assets/battle/M03_battle.png",
+      "status": "DRAFT",
+      "grid": [
+        64,
+        64
+      ],
+      "frameCount": 4,
+      "note": "Byte-identical source; four battle poses are held, not full animation."
+    },
+    {
+      "id": "B02_battle",
+      "source": "assets/bosses/B02_Veyrath/B02_BATTLE_ATLAS_DRAFT.png",
+      "out": "assets/battle/B02_battle.png",
+      "status": "DRAFT",
+      "grid": [
+        96,
+        96
+      ],
+      "frameCount": 4,
+      "note": "Byte-identical source; four battle poses are held, not full animation."
+    }
+  ]
+}

@@ -1,5 +1,30 @@
 # TASKS — STATUS SEBENARNYA
 
+## Phase 6 otonom — Chapter II
+
+- [x] Baseline Phase 0–5: 460 unit, 484 Edge produksi, 113 Chrome, 113 dev Edge; TypeScript/build.
+- [x] C2-01..09 playable: Azie/Velthia, Liora/Zira, Hutan 2/Torvan, duo tutorial, Veyrath, fragmen, laporan dan ending.
+- [x] Party duo, skill/support/target/status/EXP per anggota, save v2 kompatibel, retry/reward sekali.
+- [x] Patroli opsional M02+M03, cooldown 20 detik tersimpan; tidak mewajibkan grinding.
+- [ ] Review artistik, dialog kerja, balancing/pacing manusia, audio komposer. Angka QA aktual: `PHASE6_REPORT.md`.
+- [ ] Bab III menunggu instruksi baru.
+
+## Riwayat Phase 5 — Chapter I / Aveloria (10 November 2026)
+
+- [x] Baseline aktual: 405 unit, 375 produksi Edge, 38 Chrome boss, 38 dev Edge boss; strict TypeScript/build.
+- [x] C1-06..09: vista Aveloria, Talric, arsip Azie, audiensi Velthia, dua lonceng, penyelidikan dan penutup Chapter I.
+- [x] Safe-zone kota dengan gerbang, jalan/plaza/pasar, halaman dan ruang pertemuan; collision/kamera existing.
+- [x] Empat atlas NPC DRAFT asli, portrait individual/ekspresi, pilihan keyboard, empat warga tanpa nama.
+- [x] Toko Derrria: shared inventory, emas dan stok persistent; tidak ada reward kota atau party join.
+- [x] Save v2 additive/optional, flags berurutan, posisi/NPC/malam pulih; save forest lama tetap valid.
+- [x] 460 unit/16 files dan strict TS/build; QA browser awal Aveloria 65/65 kedua resolusi.
+- [x] **Phase 5 PASS fungsional/QA otomatis:** 460 unit, 484 produksi Edge, 113 Chrome, 113 dev Edge; strict TS/build, render order dan screenshot lulus. [Laporan Phase 5](PHASE5_REPORT.md).
+- [ ] Review manusia: visual/animasi DRAFT, dialog/chemistry, pacing, hardware nyata, audio komposer.
+- [ ] Side quest optional (backlog). Chapter II hanya setelah instruksi baru; tidak diimplementasikan pada Phase 5 ini.
+
+Bagian Phase 0–4 berikut adalah riwayat.
+
+
 **Phase 4 PASS (fungsional/QA otomatis)** (10 Nov 2026): intro sampai Mournfang dan penutup menuju Aveloria. 405 unit, 375 produksi Edge +38 Chrome +38 dev Edge, strict TS/build lulus. Bukti di `PHASE4_REPORT.md`. Art DRAFT/NEEDS_REVIEW, human pacing belum divalidasi; Phase 5/Chapter II belum dikerjakan.
 
 ## Phase 0 — Web Foundation

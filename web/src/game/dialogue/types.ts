@@ -10,7 +10,9 @@ export type ExpressionId =
   | 'CONCERNED'
   | 'ANGRY'
   | 'SAD'
-  | 'EMBARRASSED';
+  | 'EMBARRASSED'
+  | 'STERN' | 'AMUSED' | 'WORRIED' | 'SUSPICIOUS' | 'SKEPTICAL' | 'ALARMED'
+  | 'VULNERABLE' | 'MISCHIEVOUS' | 'CURIOUS' | 'SOLEMN' | 'UPSET' | 'CAUTIOUS';
 
 /**
  * speech  = ucapan ke orang lain
@@ -35,7 +37,7 @@ export interface DialogueLine {
   /** Path portrait sumber di assets/ (sesuai DIALOGUE_EVENTS.json); salinan runtime diturunkan dari ID. */
   portrait?: string;
   /** Asal teks, untuk audit editorial. */
-  source: 'DIALOGUE_EVENTS' | 'CHAPTER_I_SCRIPT' | 'REUSE' | 'DRAFT_IMPL';
+  source: 'DIALOGUE_EVENTS' | 'CHAPTER_I_SCRIPT' | 'CHAPTER_II_SCRIPT' | 'REUSE' | 'DRAFT_IMPL';
 }
 
 export interface ChoiceOption {

@@ -11,6 +11,7 @@ import { battleTutorial } from './battle-helpers.mjs';
 import { selectMenu } from './battle-helpers.mjs';
 import { persistenceJourney } from './phase3-helpers.mjs';
 import { verticalSliceJourney } from './phase4-helpers.mjs';
+import { aveloriaJourney } from './phase5-helpers.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
 const webRoot = resolve(here, '../..');
@@ -93,7 +94,7 @@ async function playDialogue(page, { choose = 0, record: rec = [] } = {}) {
   const seen = [];
   for (let guard = 0; guard < 80; guard++) {
     const w = await world(page);
-    if (!w.dialogue) break;
+    if (!w?.dialogue) break; // a completed prelude may already have transitioned World -> Battle
     const d = w.dialogue;
     if (d.state === 'typing') {
       await sleep(page, 60);
@@ -554,6 +555,7 @@ async function main() {
     check('Encounter tidak terulang setelah kemenangan', !(await page.evaluate(() => window.__tfbt.battle())) && !(await world(page)).dialogue);
     await persistenceJourney(page, check, shot, { walkTo, face, playDialogue });
     await verticalSliceJourney(page, check, shot, { walkTo, face, playDialogue });
+    await aveloriaJourney(page, check, shot);
 
     check('Tidak ada error JS sepanjang sesi cerita penuh', s.errors.length === 0, s.errors.join(' | '));
     check('Tidak ada request gagal / 404 (aset hilang)', s.failed.length === 0, s.failed.join(' | '));

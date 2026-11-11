@@ -1,5 +1,17 @@
 # Asset index v3.3 — per file
 
+## Web import Phase 6 — Liora, Hutan 2, party dan Veyrath
+
+`web/scripts/prepare-chapter2-assets.mjs` menyalin **6 atlas DRAFT PNG+JSON byte-identical** dari library: C03 eksplorasi/battle, C07 eksplorasi, M02/M03/B02 battle. **13 portrait** C03/C07/C02 VULNERABLE diturunkan dari PNG individual existing lewat resize 128 px. Jejak sumber/output/ukuran dan status ada di `web/public/assets/chapter2.generated.json`. Lingkungan Liora/Hutan 2 dan dua warga tanpa nama adalah code-native DRAFT. Atlas battle C03/M02/M03/B02 hanya empat pose sumber; adapter menahan pose saat playback, tanpa mengklaim frame animasi final. Siluet/ekspresi, terutama C03/C07/B02, perlu review artist. Tidak ada audio baru. Screenshot dan catatan di `docs/production/PHASE6_REPORT.md`.
+
+## Web import Phase 5 — Aveloria
+
+Empat atlas eksplorasi C02 Velthia, C05 Azie, C06 Talric dan C09 Derrria disalin **utuh/byte-identical** dari `assets/characters/<ID>_<Nama>/<ID>_EXPLORATION_ATLAS_DRAFT.{png,json}` ke `web/public/assets/characters/<ID>_explore.{png,json}`. Grid 32×48, atlas 192×192, 24 sel, empat arah × enam frame, pivot [16,46]. DRAFT/NEEDS_REVIEW, tanpa battle kit NPC atau party join Velthia. Wajah/kostum sumber tidak digambar ulang; prototipe sangat sederhana dan animasi belum final.
+
+14 portrait turunan berasal dari **PNG individual** existing, tinggi runtime 128 dengan pipeline resize existing: C02 NEUTRAL/STERN/AMUSED/WORRIED/SURPRISED; C05 NEUTRAL/WORRIED/SKEPTICAL; C06 NEUTRAL/SUSPICIOUS/ALARMED; C09 NEUTRAL/AMUSED/WORRIED. Sumber, output dan ukuran tercatat pada `web/public/assets/aveloria.generated.json`, diproduksi `web/scripts/prepare-aveloria-assets.mjs`. Tidak ada pengganti v3.3 untuk atlas kota ini. Source hash/table di bawah tetap utuh.
+
+Lingkungan Aveloria dan empat warga tanpa nama adalah **code-native DRAFT** di `world/aveloria.ts`/`AveloriaView.ts`: bukan art PNG final. Geometri collision terpisah; renderer dapat diganti tanpa mengubah quest/save. Evidence runtime/review/batasan ada di `docs/production/PHASE5_REPORT.md`. Tidak ada audio, konsep wajah atau source reference crop baru.
+
 ## Web import Phase 4 — Mournfang
 
 `assets/bosses/B01_Mournfang/B01_BATTLE_ATLAS_DRAFT.{png,json}` disalin byte-identical ke `web/public/assets/battle/`; hanya empat pose grid 96×96 (idle/attack/hit/defeated). Tidak ada atlas B01 v3.3 yang menggantikannya. Adapter playback menahan pose existing; tidak menambah gambar/frame sumber atau mengklaim animasi final. Source JSON tetap DRAFT; review tetap NEEDS_REVIEW. Detail wajah tulang/tanduk, kaki, artikulasi gerak dan beberapa piksel tepi belum cukup mencerminkan concept art; masuk backlog `docs/production/PHASE4_REPORT.md`. Tidak ada perubahan hash/source asli atau audio.

@@ -17,7 +17,14 @@ export const YARIC_PROFILE: ProgressionProfile = {
   growth: { HP: 12, MP: 2, ATK: 3, DEF: 1, MAG: 1, MDEF: 1, SPD: 1 },
   thresholds: [0, 25, 70, 140, 235],
 };
-export const PROFILES: Readonly<Record<string, ProgressionProfile>> = { C01: YARIC_PROFILE };
+/** ASSUMPTION / DRAFT: Torvan starts below Yaric's physical power, with faster support turns. */
+export const TORVAN_PROFILE: ProgressionProfile = {
+  id: 'C03', classId: 'mage',
+  base: { HP: 62, MP: 20, ATK: 7, DEF: 5, MAG: 15, MDEF: 11, SPD: 13 },
+  growth: { HP: 7, MP: 4, ATK: 1, DEF: 1, MAG: 2, MDEF: 2, SPD: 1 },
+  thresholds: [0, 25, 70, 140, 235],
+};
+export const PROFILES: Readonly<Record<string, ProgressionProfile>> = { C01: YARIC_PROFILE, C03: TORVAN_PROFILE };
 export interface ItemDefinition {
   id: string; name: string; description: string; kind: 'consumable' | 'equipment' | 'key';
   buy: number; sell: number; sellable: boolean; healHP?: number;
@@ -30,6 +37,7 @@ export const ITEMS: Readonly<Record<string, ItemDefinition>> = {
   // Test harness only: never granted by Chapter I or placed in the forest.
   qa_staff: { id: 'qa_staff', name: 'Tongkat Uji', description: 'Perlengkapan uji kelas penyihir; bukan hadiah cerita.', kind: 'equipment', slot: 'weapon', classes: ['mage'], bonus: { MAG: 3 }, buy: 20, sell: 8, sellable: true },
   qa_key: { id: 'qa_key', name: 'Penanda Uji', description: 'Barang penting uji. Tidak dijual atau dibuang.', kind: 'key', buy: 0, sell: 0, sellable: false },
+  twig_staff: { id: 'twig_staff', name: 'Tongkat Ranting', description: 'Tongkat kecil Torvan. MAG +2. Data DRAF.', kind: 'equipment', slot: 'weapon', classes: ['mage'], bonus: { MAG: 2 }, buy: 0, sell: 0, sellable: false },
 };
 export const STARTER_ITEMS = { yaric_greatsword: 1, travel_coat: 1 };
 export interface SkillDefinition { id: string; name: string; classId: ClassId; level: number; cost: number; prerequisite?: string; bonus?: Partial<Stats>; description: string }
@@ -37,5 +45,9 @@ export const SKILLS: readonly SkillDefinition[] = [
   { id: 'ground_slam', name: 'Ground Slam', classId: 'swordsman', level: 1, cost: 0, description: 'Jurus awal. 4 MP, hantaman tanah fisik. Sudah terbuka.' },
   { id: 'heavy_grip', name: 'Hantaman Berat', classId: 'swordsman', level: 2, cost: 1, prerequisite: 'ground_slam', bonus: { ATK: 2 }, description: 'DRAF: pasif ATK +2. Perlu level 2 dan 1 poin jurus.' },
   { id: 'firm_stance', name: 'Kuda-kuda Kukuh', classId: 'swordsman', level: 2, cost: 1, prerequisite: 'ground_slam', bonus: { DEF: 2 }, description: 'DRAF: pasif DEF +2. Perlu level 2 dan 1 poin jurus.' },
+  { id: 'ranting_nakal', name: 'Ranting Nakal', classId: 'mage', level: 1, cost: 0, description: '3 MP. Sihir daun tunggal; efektif pada musuh berpelindung.' },
+  { id: 'bukan_aku', name: 'Bukan Aku!', classId: 'mage', level: 1, cost: 0, description: '2 MP. Naikkan pertahanan satu sekutu hingga ia selesai bertindak.' },
+  { id: 'tunas_bandel', name: 'Tunas Bandel', classId: 'mage', level: 2, cost: 1, prerequisite: 'ranting_nakal', description: '4 MP. Pulihkan 24 HP satu sekutu. DRAF.' },
+  { id: 'keajaiban_kecil', name: 'Keajaiban Kecil', classId: 'mage', level: 5, cost: 2, prerequisite: 'tunas_bandel', description: 'Ultimate konsep. Belum dipakai pada Chapter II.' },
 ];
 export const HOLLOWLING_REWARD = { id: 'reward.first_hollowling.rpg', exp: 25, gold: 8 } as const;

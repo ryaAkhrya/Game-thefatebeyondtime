@@ -1,5 +1,17 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 5 — Chapter I / Aveloria
+
+Baseline diulang: **405 unit +375 produksi Edge +38 Chrome boss +38 dev Edge boss**, strict TypeScript/build PASS. Dua koreksi helper baseline dan log percobaan gagal dicatat di laporan Phase 5.
+
+- [x] 460 unit/16 files: urutan event, source dialogue/ekspresi, collision/rute, compatibility v2, save slots, stock/currency rollback.
+- [x] Build awal Aveloria 65/65 focused produksi Edge, 1366×768 dan 1920×1080: gate/plaza/ending save, cutscene Pause/Settings, lonceng, portrait, shop, no replay/softlock/error JS/aset/audio.
+- [x] **Phase 5 PASS fungsional/QA otomatis:** 460 unit, 484 produksi Edge, 113 Chrome, 113 dev Edge; strict TS/build, render order dan screenshot lulus. [Laporan Phase 5](docs/production/PHASE5_REPORT.md).
+- [ ] Review manusia untuk art/animasi DRAFT, chemistry/tempo percakapan, pacing Chapter I, monitor/GPU/fullscreen nyata dan audio komposer. Tidak diklaim teruji headful/manusia.
+
+Checklist Phase 0–4 berikut adalah riwayat pengujian tiap phase.
+
+
 ## Phase 4 — vertical slice sampai Mournfang
 
 **PHASE 4 PASS (fungsional/QA otomatis).** Bukti/batasan: `docs/production/PHASE4_REPORT.md`. Bukan Chapter I penuh.
@@ -98,3 +110,14 @@ Checklist di bawah mencakup fase lain juga; save/EXP/leveling/random encounter b
 - [ ] C05–C09 have no combat sprites or invented abilities; B04=C04 staff design.
 - [ ] Meteor telegraph visible with reduced flashes; Velthia mandatory and shield reachable on first and later meteor cycles.
 - [ ] Reload cannot softlock; silent BGM fallback; private data absent from public build.
+
+## Phase 6 — Chapter II evidence
+
+- [x] C2-01..09 terhubung dari ending Bab I ke ending Bab II via keyboard; 97 baris source diuji verbatim di unit test.
+- [x] Liora/Zira, Hutan 2, batu penanda, Torvan, duo tutorial, Veyrath, dua fragmen, dan laporan Velthia diuji di browser dua resolusi.
+- [x] Party C01+C03, target, status, reward sekali, retry rollback dan old solo combat diuji unit/regresi.
+- [x] Slot Bab I lama dan slot Bab II, refresh/Continue dengan Torvan, serta checkpoint aman diuji di browser.
+- [x] Patroli opsional M02+M03: cooldown 20 detik tersimpan, Kabur tanpa hadiah, menang sekali, dan penanda tertutup diuji di browser dua resolusi serta unit.
+- [ ] Review manusia pada wajah/siluet atlas DRAFT, dialog/chemistry, balancing dan pacing perangkat nyata; audio tetap AWAITING_COMPOSER.
+
+Rincian PASS/FAIL aktual dan screenshot: `docs/production/PHASE6_REPORT.md`. Checklist umum historis di atas tetap memuat scope rilis yang belum selesai.

@@ -14,13 +14,18 @@ export class BattlePanel {
   private readonly turn: Phaser.GameObjects.Text;
   private readonly message: Phaser.GameObjects.Text;
   private readonly hint: Phaser.GameObjects.Text;
+  private readonly name: Phaser.GameObjects.Text;
+  private readonly roster: Phaser.GameObjects.Text;
   private menu?: MenuList;
-  mode: 'main' | 'skill' | 'item' | 'result' | 'busy' = 'main';
-  constructor(private readonly scene: Phaser.Scene, private readonly onAction: (action: Command | 'continue' | 'retry' | 'title') => void, private readonly enemyName = 'Hollowling') {
+  private sourceMode: 'main' | 'skill' | 'item' = 'main';
+  private duo = false;
+  mode: 'main' | 'skill' | 'item' | 'target' | 'result' | 'busy' = 'main';
+  constructor(private readonly scene: Phaser.Scene, private readonly onAction: (action: Command | 'continue' | 'retry' | 'title', targetId?: string) => void, private readonly enemyName = 'Hollowling') {
     scene.add.rectangle(6, 5, 308, 27, COLORS.ink).setOrigin(0).setStrokeStyle(1, COLORS.plumLine).setDepth(20);
     scene.add.rectangle(6, 131, 308, 48, COLORS.deepPlum).setOrigin(0).setStrokeStyle(1, COLORS.bitterLime).setDepth(20);
     const text = (x: number, y: number, value: string, color: number = COLORS.paper) => makeText(scene, x, y, value, { color }).setDepth(21);
-    text(12, 8, enemyName); text(230, 8, 'Yaric');
+    text(12, 8, enemyName); this.name = text(230, 8, 'Yaric');
+    this.roster = makeText(scene, 138, 7, '', { size: 6, lineSpacing: 3 }).setDepth(21).setVisible(false);
     this.enemy = text(12, 21, ''); this.hp = text(168, 21, ''); this.mp = text(252, 21, '');
     this.turn = text(140, 8, '', COLORS.bitterLime);
     this.message = makeText(scene, 112, 135, '', { wrapWidth: 192, lineSpacing: 1 }).setDepth(21);
@@ -29,51 +34,78 @@ export class BattlePanel {
   }
   say(text: string): void { this.message.setText(text); }
   refresh(engine: BattleEngine): void {
-    const s = engine.snapshot(), p = s.actors.find(a => a.side === 'player')!, e = s.actors.find(a => a.side === 'enemy')!;
+    const s = engine.snapshot(), players = s.actors.filter(a => a.side === 'player'), p = players[0]!, e = s.actors.find(a => a.side === 'enemy' && a.hp > 0) ?? s.actors.find(a => a.side === 'enemy')!;
+    this.duo = players.length > 1;
+    this.name.setVisible(!this.duo); this.hp.setVisible(!this.duo); this.mp.setVisible(!this.duo); this.roster.setVisible(this.duo);
     this.hp.setText(`HP ${p.hp}/${p.stats.HP}`); this.mp.setText(`MP${p.mp}/${p.stats.MP}`);
+    if (this.duo) this.roster.setText(players.map(a => `${a.id === engine.current.id && !s.outcome ? '>' : ' '}${a.name} HP${a.hp}/${a.stats.HP} MP${a.mp}/${a.stats.MP}`).join('\n'));
     this.enemy.setText(`HP ${e.hp}/${e.stats.HP}`);
-    this.turn.setText(s.outcome ? '' : e.intent === 'sweep' ? 'SAPUAN!' : e.intent === 'recover' ? 'GOYAH' : engine.current.side === 'player' ? 'ANDA' : 'MUSUH');
+    this.turn.setPosition(this.duo ? 94 : 140, 8).setFontSize(this.duo ? 6 : 8);
+    this.turn.setText(s.outcome ? '' : e.intent === 'sweep' ? 'SAPUAN!' : e.intent === 'recover' ? 'GOYAH' : e.intent === 'knight_thrust' ? this.duo ? 'TUSUK!' : 'TUSUKAN!' : engine.current.side === 'player' ? 'ANDA' : 'MUSUH');
   }
   show(engine: BattleEngine, mode: 'main' | 'skill' | 'item' = 'main'): void {
     this.mode = mode;
     this.refresh(engine);
-    const count = engine.snapshot().items.potion ?? 0;
+    const state = engine.snapshot(), count = state.items.potion ?? 0;
+    const skills = engine.current.skills ?? [];
     const choices: { id: string; label: string; command?: Command }[] = mode === 'skill'
-      ? [{ id: 'ground_slam', label: 'Ground Slam', command: 'ground_slam' }, { id: 'back', label: 'Kembali' }]
+      ? [...skills.filter(id => ['ground_slam', 'ranting_nakal', 'bukan_aku', 'tunas_bandel'].includes(id)).map(id => ({ id, label: ({ ground_slam: 'Ground Slam', ranting_nakal: 'Ranting Nakal', bukan_aku: 'Bukan Aku!', tunas_bandel: 'Tunas Bandel' } as Record<string, string>)[id]!, command: id as Command })), { id: 'back', label: 'Kembali' }]
       : mode === 'item'
         ? [{ id: 'potion', label: `Potion x${count}`, command: 'potion' }, { id: 'back', label: 'Kembali' }]
         : [{ id: 'attack', label: 'Serang', command: 'attack' }, { id: 'skill', label: 'Jurus' }, { id: 'item', label: 'Barang' }, { id: 'defend', label: 'Bertahan', command: 'defend' }, { id: 'run', label: 'Kabur', command: 'run' }];
-    const items = choices.map(c => ({ ...c, disabled: !!(c.command && engine.unavailable(c.command)), disabledHint: c.command ? engine.unavailable(c.command) ?? undefined : undefined }));
+    const reason = (command: Command): string | null => {
+      if (['potion', 'tunas_bandel', 'bukan_aku'].includes(command) && this.duo) {
+        const allies = state.actors.filter(a => a.side === 'player' && a.hp > 0);
+        if (allies.some(a => engine.unavailable(command, a.id) === null)) return null;
+      }
+      return engine.unavailable(command);
+    };
+    const items = choices.map(c => ({ ...c, disabled: !!(c.command && reason(c.command)), disabledHint: c.command ? reason(c.command) ?? undefined : undefined }));
     const describe = (item: MenuItem): void => {
       const descriptions: Record<string, string> = {
         attack: `Tebasan greatsword ke ${this.enemyName}.`, skill: 'Gunakan jurus dengan MP.', item: 'Gunakan Potion bila HP berkurang.',
         defend: 'Kurangi kerusakan separuh hingga giliran berikutnya.', run: 'Mencoba meninggalkan pertarungan.',
-        ground_slam: '4 MP. Hantaman tanah, kerusakan fisik lebih besar.', potion: 'Pulihkan hingga 36 HP Yaric.', back: 'Kembali ke perintah.',
+        ground_slam: '4 MP. Hantaman tanah, kerusakan fisik lebih besar.', potion: 'Pulihkan hingga 36 HP satu anggota.', back: 'Kembali ke perintah.',
+        ranting_nakal: '3 MP. Sihir daun; dapat memutus kuda-kuda Veyrath.', bukan_aku: '2 MP. Lindungi satu anggota party.', tunas_bandel: '4 MP. Pulihkan 24 HP satu anggota.',
       };
       this.say(item.disabledHint ?? descriptions[item.id] ?? '');
     };
     this.makeMenu(items, item => {
       if (item.id === 'skill' || item.id === 'item') { this.show(engine, item.id); return; }
       if (item.id === 'back') { this.show(engine); return; }
-      this.onAction(item.id as Command);
+      this.chooseTarget(engine, item.id as Command, mode);
     }, describe);
     if (mode !== 'main') describe(this.menu!.focusedItem);
     this.hint.setText('Panah:pilih Enter:aksi Esc:jeda');
   }
   handle(event: IntentEvent, engine: BattleEngine): void {
+    if (event.intent === 'back' && this.mode === 'target') { this.show(engine, this.sourceMode); return; }
     if (event.intent === 'back' && (this.mode === 'skill' || this.mode === 'item')) { this.show(engine); return; }
     this.menu?.handleIntent({ ...event, intent: event.intent === 'left' ? 'up' : event.intent === 'right' ? 'down' : event.intent });
   }
   busy(): void { this.mode = 'busy'; this.menu?.destroy(); this.menu = undefined; this.hint.setText('Tunggu sampai aksi selesai.'); }
-  result(victory: boolean, reward?: RewardReceipt | null): void {
+  result(outcome: 'victory' | 'defeat' | 'escaped', reward?: RewardReceipt | null): void {
     this.mode = 'result';
-    this.say(victory ? `MENANG\n${this.enemyName} dikalahkan.` : 'KALAH\nCoba lagi dari sebelum pertarungan.');
-    if (victory && reward) this.say(`MENANG  +${reward.exp} EXP\n+${reward.gold} emas  Lv ${reward.beforeLevel} > ${reward.afterLevel}\n${reward.items?.potion ? `+${reward.items.potion} Potion  ` : ''}+${reward.skillPoints} poin jurus`);
-    this.hint.setText(victory ? 'Enter: lanjutkan eksplorasi' : 'Item dan MP kembali ke checkpoint.');
+    this.say(outcome === 'victory' ? `MENANG\n${this.enemyName} dikalahkan.` : outcome === 'escaped' ? 'LOLOS\nParty kembali ke jalur hutan.' : 'KALAH\nCoba lagi dari sebelum pertarungan.');
+    if (outcome === 'victory' && reward) this.say(`MENANG  +${reward.exp} EXP${this.duo ? ' tiap anggota' : ''}\n+${reward.gold} emas  Lv ${reward.beforeLevel} > ${reward.afterLevel}\n${reward.items?.potion ? `+${reward.items.potion} Potion  ` : ''}+${reward.skillPoints} poin jurus`);
+    this.hint.setText(outcome !== 'defeat' ? 'Enter: lanjutkan eksplorasi' : 'Item dan MP kembali ke checkpoint.');
     this.makeMenu([
-      { id: victory ? 'continue' : 'retry', label: victory ? 'Lanjutkan' : 'Coba Lagi' },
+      { id: outcome === 'defeat' ? 'retry' : 'continue', label: outcome === 'defeat' ? 'Coba Lagi' : 'Lanjutkan' },
       { id: 'title', label: 'Ke Judul' },
     ], item => this.onAction(item.id as 'continue' | 'retry' | 'title'));
+  }
+  private chooseTarget(engine: BattleEngine, command: Command, sourceMode: 'main' | 'skill' | 'item'): void {
+    if (command === 'defend' || command === 'run') { this.onAction(command); return; }
+    const ally = ['potion', 'bukan_aku', 'tunas_bandel'].includes(command);
+    const candidates = engine.snapshot().actors.filter(a => a.side === (ally ? 'player' : 'enemy') && a.hp > 0);
+    if (candidates.length === 1) { this.onAction(command, candidates[0]!.id); return; }
+    this.mode = 'target'; this.sourceMode = sourceMode;
+    const items: MenuItem[] = candidates.map(a => ({ id: a.id, label: a.name, disabled: !!engine.unavailable(command, a.id), disabledHint: engine.unavailable(command, a.id) ?? undefined }));
+    this.makeMenu(items, item => this.onAction(command, item.id), item => {
+      const a = candidates.find(a => a.id === item.id)!;
+      this.say(item.disabledHint ?? `Target ${a.name}: HP ${a.hp}/${a.stats.HP}.`);
+    });
+    this.hint.setText('Pilih target  Enter:aksi  Esc:kembali');
   }
   private makeMenu(items: MenuItem[], confirm: (item: MenuItem) => void, focus?: (item: MenuItem) => void): void {
     this.menu?.destroy();

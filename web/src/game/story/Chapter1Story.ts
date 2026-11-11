@@ -16,6 +16,9 @@ import { FIRST_HOLLOWLING_FLAG } from '../combat/BattleSession';
 import { FIRST_HOLLOWLING_INTRO, FIRST_HOLLOWLING_VICTORY } from '../dialogue/firstHollowling';
 import { AVELORIA_SIGN, BEFORE_MOURNFANG, MOURNFANG_INTRO, MOURNFANG_RESPONSE, MOURNFANG_VICTORY } from '../dialogue/mournfang';
 import { BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, SLICE_COMPLETE, type EncounterId } from '../combat/encounters';
+import { AveloriaStory } from './AveloriaStory';
+import { Chapter2Story } from './Chapter2Story';
+import type { AreaId } from '../data/ids';
 
 /** Flag cerita kanonik (docs/narrative/STORY_AND_SCENES.md). Dinaikkan hanya setelah event benar-benar selesai. */
 export const FLAG = {
@@ -54,7 +57,15 @@ export type StoryAction =
   | { type: 'forestEdge' }
   | { type: 'rest' }
   | { type: 'mournfangApproach' }
-  | { type: 'sliceEnd' };
+  | { type: 'sliceEnd' }
+  | { type: 'cityStage'; stage: 'vista' | 'vistaEnd' | 'gate' | 'gateOpen' | 'archive' | 'audience' | 'audienceEnd' | 'evening' }
+  | { type: 'cityBell'; number: 1 | 2 }
+  | { type: 'chapterEnd' }
+  | { type: 'shop' }
+  | { type: 'changeArea'; area: Extract<AreaId, 'aveloria' | 'liora' | 'forest_2'> }
+  | { type: 'joinTorvan' }
+  | { type: 'restParty' }
+  | { type: 'chapter2End' };
 
 export interface StoryContext {
   /** Salinan periodik (0 = pertama) untuk papan/semak/peti. */
@@ -100,6 +111,8 @@ export class Chapter1Story {
 
   /** Teks tujuan di HUD, diturunkan dari flag (selalu konsisten dengan state). */
   objective(): string | null {
+    if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).objective();
+    if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).objective();
     if (!this.has(FLAG.introSeen)) return null;
     if (!this.awake) return `Periksa sekitar (${this.examinedCount}/2)`;
     if (!this.namboDone) return 'Cari jalan keluar dari hutan.';
@@ -112,6 +125,8 @@ export class Chapter1Story {
 
   /** Aksi saat game dimulai: intro C1-01 sekali. */
   onStart(): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).onStart();
+    if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).onStart();
     if (this.has(FLAG.mournfang) && !this.has(FLAG.mournfangVictorySeen)) return [
       { type: 'dialogue', script: MOURNFANG_VICTORY },
       { type: 'setFlag', flag: FLAG.mournfangVictorySeen }, { type: 'objective' },
@@ -130,6 +145,8 @@ export class Chapter1Story {
   }
 
   interact(id: string, ctx: StoryContext): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).interact(id);
+    if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).interact(id);
     const base = id.split('#')[0]!;
     switch (base) {
       case 'forest_exit':
@@ -167,6 +184,8 @@ export class Chapter1Story {
   }
 
   trigger(id: string, _ctx: StoryContext): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).trigger(id);
+    if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).trigger(id);
     const base = id.split('#')[0]!;
     switch (base) {
       case 'boss_checkpoint':

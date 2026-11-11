@@ -4,6 +4,7 @@ import { DialogueRunner } from '../../game/dialogue/DialogueRunner';
 import { DISPLAY_NAMES, portraitKey, type DialogueScript } from '../../game/dialogue/types';
 import type { Services } from '../../game/systems/Services';
 import { makeText } from '../styles/theme';
+import { SCENE_KEYS } from '../../game/data/ids';
 
 /**
  * Layout (ruang UI 320x180). Semua angka ada di sini agar UI mudah direvisi tanpa menyentuh DialogueRunner
@@ -76,6 +77,7 @@ export class DialogueBox {
     this.choiceBar.setDepth(depth + 3);
     this.choiceTexts.forEach((t) => t.setDepth(depth + 4));
     this.hide();
+    scene.events.once(Phaser.Scenes.Events.SHUTDOWN, () => { this.releaseInput?.(); this.releaseInput = null; this.runner = null; this.resolve = null; });
   }
 
   get active(): boolean {
@@ -117,7 +119,8 @@ export class DialogueBox {
       } else if (e.intent === 'up' || e.intent === 'down') {
         if (!e.repeat) runner.moveChoice(e.intent === 'up' ? -1 : 1);
       } else if (e.intent === 'back') {
-        runner.fastComplete(); // aman: hanya mempercepat teks, tidak melewati cerita
+        if (this.services.gameState.snapshot()?.area === 'aveloria') this.services.router.openOverlay(this.scene.scene.get(SCENE_KEYS.World), SCENE_KEYS.Pause);
+        else runner.fastComplete(); // existing forest control remains unchanged
       }
     });
     this.refresh();
@@ -127,6 +130,7 @@ export class DialogueBox {
   update(deltaMs: number): void {
     const r = this.runner;
     if (!r) return;
+    if (this.services.gameState.snapshot()?.area === 'aveloria' && this.services.input.topLayerId !== 'dialogue') return;
     r.update(deltaMs);
     if (r.version !== this.lastVersion) this.refresh();
     else if (r.state === 'typing') this.body.setText(r.visibleText);
