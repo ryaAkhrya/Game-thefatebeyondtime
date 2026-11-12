@@ -1,5 +1,17 @@
 # TASKS — STATUS SEBENARNYA
 
+## Phase 7 — Chapter III + combat sinematik + SFX asli (12 November 2026)
+
+- [x] Chapter III playable end-to-end (Aveloria krisis → Velthia bergabung → Kuil Jejak 3 teka-teki → Chronolith → akhir bab); 65 baris canon verbatim; tanpa Bab IV.
+- [x] Velthia (5 jurus, tanpa senjata) + party switch (Torvan cadangan terjaga) + save tanpa migrasi.
+- [x] Transisi battle normal/scripted/boss/temporal + return; linimasa aksi dan hitstop; Reduced Flashes/Screen Shake dihormati.
+- [x] Pustaka VFX piksel (24 efek) dan 44 SFX asli (sintesis kode) terpasang; BGM tidak dibuat.
+- [x] Tes: unit 1049; Edge 906 (722 regresi + 184 Phase 7); Chrome Sprint 2 77 + Phase 4 38 + Phase 7 96.
+- [ ] Review manusia: kualitas suara, seni DRAFT (Velthia/Chronolith/Oathguard/kuil/krisis/VFX), pacing dan balance Chronolith, performa GPU.
+- [ ] Keputusan desain: level cap 5 vs level 8–10 pada brief; Velthia follower di kuil; Ultimate Perlindungan (Bab IV).
+
+Lihat `docs/production/PHASE7_REPORT.md`.
+
 ## Polish Sprint 2 — dunia, karakter, animasi, sprint (12 November 2026)
 
 - [x] P0 Mournfang: atlas V4 dari konsep resmi, terbukti terlihat pada piksel render (35% kotak berubah); monster lain diverifikasi sama.

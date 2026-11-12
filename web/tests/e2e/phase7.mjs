@@ -147,10 +147,15 @@ try {
     }
     // ================= B. Hollowling pertama (scripted) lewat dunia nyata =================
     await page.evaluate(() => window.__tfbt.qa.forest1Late()); await waitWorld(page);
+    await page.waitForTimeout(900);
     const tStart = Date.now();
     await page.keyboard.down('Shift'); await page.keyboard.down('ArrowUp');
-    await page.waitForFunction(() => window.__tfbt.transition()?.mode !== 'open' || window.__tfbt.activeScenes().includes('BattleScene'), null, { timeout: 15000 });
+    await page.waitForFunction(() => window.__tfbt.world()?.dialogue || window.__tfbt.transition()?.mode !== 'open' || window.__tfbt.activeScenes().includes('BattleScene'), null, { timeout: 20000 });
     await page.keyboard.up('ArrowUp'); await page.keyboard.up('Shift');
+    for (let i = 0; i < 80 && !(await scenes(page)).includes('BattleScene'); i++) {
+      const d = (await world(page))?.dialogue;
+      if (d) await press(page, 'Enter'); else await page.waitForTimeout(120);
+    }
     await page.waitForFunction(() => window.__tfbt.activeScenes().includes('BattleScene'), null, { timeout: 8000 });
     const toBattle = Date.now() - tStart;
     const tlog = await page.evaluate(() => window.__tfbt.transition().log);
@@ -197,7 +202,7 @@ try {
     await press(page, 'Enter'); // Lanjutkan
     await page.waitForFunction(() => window.__tfbt.transition()?.log.some(l => l.kind === 'normal' && l.phase === 'cover') || window.__tfbt.activeScenes().includes('WorldScene'), null, { timeout: 8000 });
     await page.waitForFunction(() => window.__tfbt.activeScenes().includes('WorldScene') && window.__tfbt.transition().mode === 'open', null, { timeout: 8000 });
-    await waitWorld(page);
+    await page.waitForTimeout(1200); await talk(page); // dialog pascabattle Hollowling
     check(`${tag}: kembali ke dunia lewat transisi return, tanpa memicu battle ganda`, (await scenes(page)).includes('WorldScene') && !(await scenes(page)).includes('BattleScene'));
     await page.waitForTimeout(800);
     check(`${tag}: tidak ada encounter ganda sesudah kembali`, !(await scenes(page)).includes('BattleScene'));
@@ -310,10 +315,10 @@ try {
     check(`${tag}: Chronolith (B03) benar-benar terlihat (>=22% piksel berubah, selisih >=30)`, cVis.ratio >= 0.22 && cVis.meanDelta >= 30, JSON.stringify(cVis));
     const bossActions = [];
     const seenFx = new Set();
-    const result = await fight(page, { limit: 120, watch: async b => { const e = b.actors.find(a => a.side === 'enemy'); bossActions.push(e.intent); b.fx.played.forEach(f => seenFx.add(f)); if (b.fx.active > 64) errors.push('fx cap terlampaui'); } });
+    const bossResult = await fight(page, { limit: 120, watch: async b => { const e = b.actors.find(a => a.side === 'enemy'); bossActions.push(e.intent); b.fx.played.forEach(f => seenFx.add(f)); if (b.fx.active > 64) errors.push('fx cap terlampaui'); } });
     const fb = await battle(page);
     fb.fx.played.forEach(f => seenFx.add(f));
-    check(`${tag}: Chronolith dikalahkan oleh Yaric+Velthia`, result.outcome === 'victory', JSON.stringify(result.actors.map(a => [a.id, a.hp])));
+    check(`${tag}: Chronolith dikalahkan oleh Yaric+Velthia`, bossResult.outcome === 'victory', JSON.stringify(bossResult.actors.map(a => [a.id, a.hp])));
     const order = fb.traces.map(t => t.command);
     const iCharge = order.indexOf('chrono_charge'), iSlam = order.indexOf('chrono_slam');
     const between = order.slice(iCharge, iSlam).filter(c => !c.startsWith('chrono_'));
@@ -378,13 +383,13 @@ try {
   await page.evaluate(() => window.__tfbt.qa.revealTransition());
   await page.evaluate(() => window.__tfbt.qa.encounter()); await ready(page);
   await selectMenu(page, 'skill'); await press(page, 'Enter'); await selectMenu(page, 'ground_slam'); await press(page, 'Enter'); await ready(page);
-  const hb = await battle(page); const imp = hb.impacts.at(-1);
+  const hb = await battle(page); const imp = hb.impacts.find(i => i.command === 'ground_slam');
   check('Screen Shake ON + Reduced Flashes OFF: Ground Slam menggoyang dan berkilat', imp?.command === 'ground_slam' && imp.shake === true && imp.flash === true, JSON.stringify(imp));
   await context.close();
   ({ page, context } = await openPage(browser, 1366, 768, { reduced_flashes: true, screen_shake: false }));
   await page.evaluate(() => window.__tfbt.qa.encounter()); await ready(page);
   await selectMenu(page, 'skill'); await press(page, 'Enter'); await selectMenu(page, 'ground_slam'); await press(page, 'Enter'); await ready(page);
-  const hb2 = (await battle(page)).impacts.at(-1);
+  const hb2 = (await battle(page)).impacts.find(i => i.command === 'ground_slam');
   check('Screen Shake OFF + Reduced Flashes ON: Ground Slam tanpa goyang dan tanpa kilat', hb2?.shake === false && hb2?.flash === false, JSON.stringify(hb2));
   await context.close();
 

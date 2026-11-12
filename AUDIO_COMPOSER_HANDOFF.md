@@ -1,5 +1,9 @@
 # Composer handoff — Game Director authored music only
 
+## Phase 7 — SFX asli dan BGM Bab III
+
+Phase 7 mengotorisasi **SFX ORIGINAL** yang disintesis dari kode (44 id, `web/public/assets/audio/sfx/`, lihat `docs/production/SFX_DESIGN_AND_MANIFEST.md`). Itu BUKAN musik dan tidak menggantikan pekerjaan komposer: **tidak ada BGM yang dibuat/dimuat**. Cue BGM berikut tetap **AWAITING_COMPOSER**: `BGM_TEMPLE` (puzzle kuil, berhenti untuk Chronolith; sudah di registry), `BGM_BOSS` (Chronolith memakai cue boss yang sama), serta suasana Aveloria krisis (memakai `BGM_AVELORIA_DAY`; komposer dapat menentukan varian). Kualitas SFX asli belum didengar manusia; komposer/Game Director dapat mengganti file SFX mana pun dengan nama id yang sama tanpa perubahan kode.
+
 ## Phase 6 — Chapter II
 
 Liora, Hutan 2, Torvan dan Veyrath tetap **AWAITING_COMPOSER**. Implementasi memakai ID BGM/SFX yang sudah didaftarkan sebagai placeholder senyap; tidak ada file dibuat, diunduh, disintesis atau dimasukkan. Perpindahan suasana dan telegraph battle tetap terbaca lewat sprite/teks tanpa audio. Komposer/Game Director dapat meninjau cue berikut pada sesi audio terpisah; nama final dan file tetap menunggu keputusan mereka.

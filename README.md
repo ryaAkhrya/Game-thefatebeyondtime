@@ -6,7 +6,11 @@ Dunia hutan/kota dibangun ulang, Mournfang kini terlihat jelas (atlas V4), Yaric
 
 UI/UX, Title Screen, tipografi tajam (kanvas = piksel perangkat), banner tujuan dihapus (tujuan di Jurnal), nama Yaric anonim sampai momen pengenalan di Bab II, dan sprite eksplorasi ternormalisasi. Status, bukti, screenshot dan batasan: [POLISH_SPRINT1_REPORT.md](docs/production/POLISH_SPRINT1_REPORT.md). Phase 6 (Bab II) tetap playable; Sprint 2 dan Bab III belum dimulai.
 
-# STATUS TERKINI — Phase 6: Chapter II, Whispers of Fate (10 November 2026)
+# STATUS TERKINI — Phase 7 (12 November 2026): Chapter III, combat sinematik, SFX asli
+
+Chapter III *The Forgotten Promise* playable dari akhir Bab II (kartu "Mulai Bab III"): Aveloria dalam retakan waktu, Velthia bergabung (party Yaric+Velthia, Torvan cadangan), Kuil Jejak (3 teka-teki), boss Chronolith, akhir bab. Combat: transisi battle 4 kategori, linimasa aksi dengan hitstop, VFX piksel, 44 SFX asli dari kode (BGM tetap AWAITING_COMPOSER). QA: unit 1049, Edge produksi 906 (722 regresi + 184 Phase 7), Chrome Sprint 2 77 + Phase 4 38 + Phase 7 96. **FUNCTIONAL PASS — VISUAL/AUDIO REVIEW PENDING**: suara belum didengar manusia, seni DRAFT, pacing/balance belum diuji manusia. Detail dan sisa masalah: [PHASE7_REPORT.md](docs/production/PHASE7_REPORT.md). Preview lokal: **http://127.0.0.1:5173/**.
+
+## Riwayat — Phase 6: Chapter II, Whispers of Fate (10 November 2026)
 
 Chapter II C2-01..09 kini terhubung dari ending Bab I: arsip Azie, perpisahan Velthia, Liora/Zira, Hutan 2, Torvan bergabung, battle dua anggota, Veyrath, dua fragmen, dan laporan akhir ke Velthia. Akhir Bab II berhenti sebelum Bab III. Save v2 tetap membaca slot Bab I, dengan extension opsional untuk HP/MP Torvan dan waktu encounter terakhir. Art C03/C07/B02/M02/M03 serta lingkungan baru tetap DRAFT; audio tetap AWAITING_COMPOSER. Hasil QA dan batasan aktual: [PHASE6_REPORT.md](docs/production/PHASE6_REPORT.md). Preview lokal: **http://127.0.0.1:5173/**.
 

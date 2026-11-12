@@ -282,6 +282,7 @@ export class WorldScene extends Phaser.Scene {
   private tryInteract(): void {
     if (this.busy || !this.target) return;
     const t = this.target;
+    this.services.audio.playSfx('SFX_INTERACT');
     const actions = this.story.interact(t.id, { copy: t.copy, wrapCount: this.wrapCount });
     this.actionLog.push(`interact:${t.id}`);
     if (actions.length > 0) void this.runActions(actions);
@@ -365,6 +366,9 @@ export class WorldScene extends Phaser.Scene {
         break;
       case 'c3':
         this.actionLog.push(`c3:${a.op}${a.arg === undefined ? '' : `:${a.arg}`}`);
+        if (a.op === 'pillar_on' || a.op === 'disc_on' || a.op === 'dial_set') this.services.audio.playSfx('SFX_PUZZLE_ACTIVATE');
+        else if (a.op === 'puzzle_fx') this.services.audio.playSfx('SFX_PUZZLE_SOLVED');
+        else if (a.op === 'gate_open') this.services.audio.playSfx('SFX_DOOR_OPEN');
         await this.view3?.handleAction(a.op, a.arg);
         break;
       case 'chapter3End':
@@ -453,6 +457,7 @@ export class WorldScene extends Phaser.Scene {
       case 'giveItem':
         if (!gameState.hasFlag(FLAG.chestReward)) {
           gameState.addItem(a.item, a.count);
+          this.services.audio.playSfx('SFX_ITEM_PICKUP');
           gameState.setFlag(FLAG.chestReward);
           this.actionLog.push(`item:${a.item}`);
         }
@@ -465,6 +470,7 @@ export class WorldScene extends Phaser.Scene {
         this.openThicket();
         break;
       case 'openChest':
+        this.services.audio.playSfx('SFX_CHEST_OPEN');
         this.openChest();
         break;
       case 'battle':

@@ -29,7 +29,7 @@ async function session({ width = 1366, height = 768, slots = {}, unavailable = f
   }, { slots, unavailable });
   const page = await context.newPage();
   page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
-  page.on('requestfailed', r => failures.push(`${r.url()} ${r.failure()?.errorText}`)); page.on('response', r => { if (r.status() >= 400) failures.push(`${r.status()} ${r.url()}`); if (/\.(ogg|mp3|wav)(\?|$)/.test(r.url())) audio.push(r.url()); });
+  page.on('requestfailed', r => failures.push(`${r.url()} ${r.failure()?.errorText}`)); page.on('response', r => { if (r.status() >= 400) failures.push(`${r.status()} ${r.url()}`); if (/\.(ogg|mp3|wav)(\?|$)/.test(r.url()) && !/\/audio\/sfx\//.test(r.url())) audio.push(r.url()); });
   await page.goto(BASE + '?qa=1'); await page.waitForFunction(() => window.__tfbt?.activeScenes().includes('TitleScene')); await page.waitForTimeout(200);
   return { context, page };
 }

@@ -1,6 +1,10 @@
 # PHASE ROADMAP — DESKTOP WEB (CLAUDE CODE)
 
-## Phase 6 otonom — Chapter II: Whispers of Fate (instruksi terbaru)
+## Phase 7 otonom — Chapter III + combat sinematik + SFX asli (instruksi terbaru)
+
+Instruksi Phase 7 mengotorisasikan Chapter III (C3-01..07) sampai akhir bab, Velthia sebagai anggota party, Kuil Jejak, boss Chronolith, transisi battle 4 kategori, linimasa aksi/hitstop, pustaka VFX piksel dan SFX asli (bukan BGM). Status **FUNCTIONAL PASS — VISUAL/AUDIO REVIEW PENDING**; bukti dan sisa masalah: `docs/production/PHASE7_REPORT.md`. Bab IV, Varlgrim sebagai boss, meteor, dan Ultimate Perlindungan TIDAK termasuk.
+
+## Riwayat Phase 6 — Chapter II: Whispers of Fate
 
 Instruksi Phase 6 terbaru mengotorisasikan Chapter II C2-01..09 dari akhir Bab I sampai penutup laporan Velthia. Implementasi mencakup Liora, Hutan 2, Zira, Torvan sebagai anggota kedua, combat dua karakter, M01/M02/M03, Veyrath, fragmen, serta save/load yang tetap menerima Bab I. Status QA aktual dan keterbatasan: `docs/production/PHASE6_REPORT.md`. Bab III tidak termasuk. Penomoran "Phase 6 — Polish & Release" di roadmap lama di bawah adalah rencana historis, bukan scope instruksi terbaru.
 

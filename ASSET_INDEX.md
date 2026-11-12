@@ -435,3 +435,15 @@ Dibuat oleh `web/scripts/battle-art/build_{c02,b03,m05}.py` (+ `bakit.py`; `pyth
 | `web/public/assets/battle/M05_BATTLE_V1.{png,json}` | `assets/monsters/M05_Oathguard/M05_NEW_CONCEPT_DRAFT.png` | 10 frame 160x128, pivot [84,123], menghadap kanan, 25 warna | NEEDS_REVIEW | Tombak-sabit+lengan, lengan menjangkau, helm, badan atas, badan bawah. Jatuh = rotasi kaku seluruh figur. Kaki kanan melayang ±8 px (perspektif konsep). Pose serang: tombak horizontal kasar. |
 
 Atlas DRAFT lama (`C02/B03/M05_BATTLE_ATLAS_DRAFT.*`, blob/lingkaran 4 pose) tetap utuh di `assets/` dan tidak dimuat game.
+
+
+## Phase 7 — aset kode-native tambahan (lead, 12 November 2026) — DRAFT / NEEDS_REVIEW
+
+| Aset | Lokasi | Pembuat/skrip | Status |
+|---|---|---|---|
+| VFX piksel (5 atlas: combat, nature, velthia, enemy, chrono; 24 efek) | `web/public/assets/vfx/vfx_*.{png,json}` | `node web/scripts/vfx/build.mjs` (`npm run assets:vfx`) | DRAFT code-native, palet <=16 warna/atlas, alfa keras; contact sheet `docs/production/sprint3/vfx-contact-sheets/` |
+| Aset krisis Aveloria (200 frame) | `web/public/assets/environment/town/town_crisis_atlas.{png,json}` | `web/scripts/gen-town-art.mjs crisis` | DRAFT code-native |
+| Kuil Jejak (lantai 1280x1280 + atlas 78 frame) | `web/public/assets/environment/temple/{ground.png,props.png,props.json}` | `web/scripts/gen-temple-art.mjs` | DRAFT code-native |
+| SFX asli (44 id / 53 WAV) | `web/public/assets/audio/sfx/*.wav` | `node web/scripts/sfx/generate.mjs` (`npm run assets:sfx`) | FUNCTIONAL; kualitas AUDIO-REVIEW PENDING; bukan BGM |
+
+Atlas battle C02/B03/M05 dicatat di bagian "Phase 7 battle atlases" di atas.

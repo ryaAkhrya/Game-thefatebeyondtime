@@ -148,3 +148,14 @@ Arah desain: sihir alam Torvan = udara/kayu (ketukan kayu, gemerisik daun, napas
 - Kualitas bunyi belum ditinjau manusia; kemungkinan perlu iterasi (resep ada di `catalog.mjs`, ubah parameter lalu regenerasi).
 - Laju (`rate`) hanya berlaku bila backend Phaser menerapkannya (lihat catatan untuk lead).
 - Tidak ada ducking/mixing dinamis antar kategori; hanya `gain` statis, batas suara, dan interval minimum.
+
+
+## Pemicu yang dipasang lead (Phase 7)
+| Kelompok | Pemicu |
+|---|---|
+| Langkah | `WorldScene.update` lewat `world/footsteps.ts`: stride 26 px jalan / 22 px lari, langkah pertama segera, senyap saat diam; `SFX_STEP_GRASS/DIRT/STONE` menurut area (forest/liora rumput; forest_edge tanah; aveloria/temple batu). |
+| Interaksi | `SFX_INTERACT` saat menekan interaksi pada target; `SFX_CHEST_OPEN`, `SFX_ITEM_PICKUP`; kuil: `SFX_PUZZLE_ACTIVATE` (pilar/cakram/alas), `SFX_PUZZLE_SOLVED`, `SFX_DOOR_OPEN` (gerbang aula). |
+| Transisi | `TransitionScene` memainkan `SFX_BATTLE_TRANSITION_{NORMAL,SCRIPTED,BOSS,TEMPORAL}` saat menutup layar. |
+| Battle | `BattleScene`: `SFX_BATTLE_CONFIRM`, ayun/dampak (`GREATSWORD_*`, `GROUND_SLAM`, `ENEMY_ATTACK`), `DAMAGE`/`ENEMY_DAMAGE`, `DEFEND`, `HEAL`, `SHIELD`, `STATUS_POISON`, sihir (`MAGIC_TORVAN`, `MAGIC_VELTHIA_{CAST,HEAL,SHIELD}`), `CHRONOLITH_{CHARGE,STRIKE,TEMPORAL}`, `VICTORY`/`DEFEAT`. |
+
+Bukti pemanggilan: `window.__tfbt.audio()` (statistik per id) dan E2E `phase7.mjs`. Kualitas bunyi tetap belum ditinjau manusia.

@@ -111,6 +111,17 @@ Checklist di bawah mencakup fase lain juga; save/EXP/leveling/random encounter b
 - [ ] Meteor telegraph visible with reduced flashes; Velthia mandatory and shield reachable on first and later meteor cycles.
 - [ ] Reload cannot softlock; silent BGM fallback; private data absent from public build.
 
+## Phase 7 — Chapter III / combat sinematik / SFX evidence
+
+- [x] Mulai Bab III dari ending Bab II → akhir Bab III via keyboard (Edge 1366/1920, Chrome 1366); Torvan cadangan terjaga, Velthia bergabung sekali.
+- [x] Teka-teki kuil: jawaban salah mereset aman; selesai → gerbang terbuka + checkpoint; save/muat kuil pulih.
+- [x] Chronolith: telegraf memberi giliran pemain, defeat→retry tanpa hadiah ganda, hadiah sekali, tidak respawn; sprite terlihat (uji piksel).
+- [x] Transisi 4 kategori + return diukur; Reduced Flashes ON tanpa denyut; Screen Shake×Reduced Flashes dua kombinasi.
+- [x] SFX asli dimuat tanpa 404; tidak ada BGM dimuat; langkah berbasis jarak.
+- [ ] Review manusia: bunyi SFX, seni DRAFT, pacing/balance Chronolith, performa GPU nyata.
+
+Rincian: `docs/production/PHASE7_REPORT.md`.
+
 ## Phase 6 — Chapter II evidence
 
 - [x] C2-01..09 terhubung dari ending Bab I ke ending Bab II via keyboard; 97 baris source diuji verbatim di unit test.

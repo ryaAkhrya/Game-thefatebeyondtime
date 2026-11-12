@@ -84,7 +84,7 @@ export class BattleScene extends Phaser.Scene {
     // Atlas penuh Phase 7 (Velthia, Oathguard, Chronolith): sudah memuat durasi, pivot, dan kunci frame khusus sendiri.
     for (const id of ['C02', 'M05', 'B03'] as const) { const meta = this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`); if (meta) this.draftPlayback[id] = fullAtlas(meta); }
     this.partner = this.services.gameState.snapshot()!.party.find((id): id is 'C02' | 'C03' => id === 'C02' || id === 'C03') ?? null;
-    this.closing = false; this.locked = true; this.history = []; this.impacts = []; this.traces = []; this.telegraphed = null; this.idle = {}; this.targetId = null; this.stageObjs = []; this.shadows = {};
+    this.closing = false; this.locked = true; this.phase = 'idle'; this.history = []; this.impacts = []; this.traces = []; this.telegraphed = null; this.idle = {}; this.targetId = null; this.stageObjs = []; this.shadows = {};
     this.services.router.arrive(this);
     this.cameras.main.setBackgroundColor(0x263a30);
     this.uiCamera = this.cameras.add(0, 0, this.ui.layout.pixelWidth, this.ui.layout.pixelHeight);
