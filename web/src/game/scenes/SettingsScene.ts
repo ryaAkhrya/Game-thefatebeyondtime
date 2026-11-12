@@ -14,6 +14,7 @@ import { getServices, type Services } from '../systems/Services';
 import { visibleChars } from '../utils/typewriter';
 import { menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
 import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
+import { uiSfx } from '../../ui/kit/sfx';
 
 type RowKind = 'volume' | 'toggle' | 'cycle' | 'action';
 
@@ -121,22 +122,28 @@ export class SettingsScene extends Phaser.Scene {
     switch (e.intent) {
       case 'up':
         this.index = (this.index + ROWS.length - 1) % ROWS.length;
+        uiSfx(this, 'SFX_UI_MOVE');
         this.redraw();
         break;
       case 'down':
         this.index = (this.index + 1) % ROWS.length;
+        uiSfx(this, 'SFX_UI_MOVE');
         this.redraw();
         break;
       case 'left':
         this.adjust(row, -1);
+        uiSfx(this, 'SFX_UI_SELECT_ITEM'); // setelah adjust: pada slider SFX ini sekaligus pratinjau volume baru
         break;
       case 'right':
         this.adjust(row, 1);
+        uiSfx(this, 'SFX_UI_SELECT_ITEM');
         break;
       case 'confirm':
+        uiSfx(this, 'SFX_UI_CONFIRM');
         this.activate(row);
         break;
       case 'back':
+        uiSfx(this, 'SFX_UI_CANCEL');
         this.close();
         break;
     }
@@ -229,12 +236,15 @@ export class SettingsScene extends Phaser.Scene {
     this.redraw();
     this.releaseConfirm = this.services.input.pushLayer('settings-confirm', (e) => {
       if (e.intent === 'left' || e.intent === 'right' || e.intent === 'up' || e.intent === 'down') {
+        uiSfx(this, 'SFX_UI_MOVE');
         this.confirmIndex = this.confirmIndex === 0 ? 1 : 0;
         this.redraw();
       } else if (e.intent === 'back') {
+        uiSfx(this, 'SFX_UI_CANCEL');
         this.closeResetConfirm();
       } else if (e.intent === 'confirm') {
         const doReset = this.confirmIndex === 1;
+        uiSfx(this, doReset ? 'SFX_UI_CONFIRM' : 'SFX_UI_CANCEL');
         this.closeResetConfirm();
         if (doReset) {
           this.services.settings.resetToDefaults();

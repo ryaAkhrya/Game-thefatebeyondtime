@@ -5,6 +5,7 @@ import { Chapter1Story } from '../story/Chapter1Story';
 import { journalNotes } from '../story/journal';
 import { getServices } from '../systems/Services';
 import { MenuList } from '../../ui/components/MenuList';
+import { uiSfx } from '../../ui/kit/sfx';
 import { menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
 import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
 
@@ -37,7 +38,7 @@ export class JournalScene extends Phaser.Scene {
     this.ui.fadeIn();
     bindRelayout(this, () => { this.focusId = this.menu?.focusedItem.id; this.build(); });
     this.releaseInput = services.input.pushLayer('journal', (e) => {
-      if (e.intent === 'back') services.router.closeOverlay(this, this.returnTo);
+      if (e.intent === 'back') { uiSfx(this, 'SFX_UI_CANCEL'); services.router.closeOverlay(this, this.returnTo); }
       else this.menu?.handleIntent(e);
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
@@ -63,6 +64,7 @@ export class JournalScene extends Phaser.Scene {
       this.menu = new MenuList(this, {
         ui, x: body.bodyX, y: listY, width: 236, rowHeight: 32, maxRows: 7, depth: 4, size: TYPE.body, initialId: this.focusId,
         items: notes.map(n => ({ id: n.id, label: n.title })),
+        sfx: { confirm: 'SFX_UI_SELECT_ITEM' },
         onConfirm: () => undefined,
         onFocusChange: item => this.describe(notes.find(n => n.id === item.id)?.text ?? ''),
       });

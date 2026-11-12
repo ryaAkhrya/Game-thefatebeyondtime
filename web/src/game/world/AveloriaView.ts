@@ -8,7 +8,7 @@ import type { LoadedMap } from './forest1';
 import type { Interactable } from './Interaction';
 
 const ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
-interface Actor { x: number; y: number; facing: Facing; entity: string; sprite: Phaser.GameObjects.Sprite; shadow: Phaser.GameObjects.Ellipse }
+export interface Actor { x: number; y: number; facing: Facing; entity: string; sprite: Phaser.GameObjects.Sprite; shadow: Phaser.GameObjects.Ellipse }
 
 /** Renderer only. Original named-character textures and pivots are preserved. */
 export class AveloriaView {
@@ -86,8 +86,26 @@ export class AveloriaView {
       playState(actor.sprite, actor.sprite.getData('tag') as string, 'idle', actor.facing);
     }
   }
+  /** Akses NPC bernama (talric, azie, velthia, derrria) untuk view krisis Bab III. */
+  actor(id: string): Actor | undefined { return this.actors.get(id); }
+  get bellImage(): Phaser.GameObjects.Image { return this.bell; }
+  get gateImage(): Phaser.GameObjects.Image { return this.gate; }
+  /** Gerbang kota: terbuka = portcullis tersembunyi + collision dilepas (tanpa menyentuh flag Bab I). */
+  setGate(open: boolean): void {
+    const gate = this.loaded.map.solidRects.find(s => s.id === 'city_gate')!;
+    this.gate.setVisible(!open);
+    this.loaded.collision.setDynamic('city_gate', open ? null : gate);
+  }
+  /** Warga grafis Bab I disembunyikan (Bab III menggantinya dengan sprite warga krisis). */
+  setResidentsVisible(visible: boolean): void {
+    for (const r of this.residents) {
+      r.graphic.setVisible(visible);
+      this.loaded.collision.setDynamic(`resident:${r.id}`, visible ? footBox(r.x, r.y) : null);
+    }
+  }
   private night(): void { this.evening = true; this.dusk.setAlpha(0.22); }
-  private place(id: string, x: number, y: number, facing: Facing): void {
+  /** Menaruh NPC bernama (sprite, bayangan, collision dinamis, kotak interaksi). Dipakai juga oleh AveloriaCrisisView. */
+  place(id: string, x: number, y: number, facing: Facing): void {
     const n = this.actors.get(id)!; Object.assign(n, { x, y, facing });
     n.sprite.setPosition(x, y).setDepth(y); playState(n.sprite, n.sprite.getData('tag') as string, 'idle', facing, true); n.shadow.setPosition(x, y - 1).setDepth(y - 1);
     this.loaded.collision.setDynamic(`cityNpc:${id}`, footBox(x, y));

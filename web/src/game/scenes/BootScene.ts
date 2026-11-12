@@ -5,6 +5,8 @@ import { ENV, PORTRAIT_EXPRESSIONS } from '../data/assetPaths';
 import { portraitUrl } from '../dialogue/types';
 import { TITLE_ART_KEYS } from '../data/assetPaths';
 import { ENV_ATLASES, ENV_IMAGES } from '../data/environmentAssets';
+import { SFX_REGISTRY } from '../data/sfxRegistry';
+import { VFX_ATLASES } from '../vfx/vfxAssets';
 import { MUSIC_REGISTRY } from '../data/musicRegistry';
 import { BATTLE_SFX } from '../data/battleSfxRegistry';
 import { getServices } from '../systems/Services';
@@ -32,6 +34,9 @@ export class BootScene extends Phaser.Scene {
       if (cue.status === 'READY') this.load.audio(cue.id, `assets/audio/${cue.file}`);
     }
     for (const cue of BATTLE_SFX) if (cue.status === 'READY') this.load.audio(cue.id, `assets/audio/${cue.file}`);
+    // SFX original Phase 7: tiap file dimuat dengan key `<id>` (satu file) atau `<id>#<n>` (variasi). Kegagalan memuat tidak fatal.
+    for (const cue of SFX_REGISTRY) if (cue.status === 'READY') cue.files.forEach((file, i) => this.load.audio(cue.files.length === 1 ? cue.id : `${cue.id}#${i}`, `assets/audio/sfx/${file}`));
+    for (const a of VFX_ATLASES) this.load.atlas(a.key, a.image, a.json);
     for (const a of assets.loadable()) {
       this.load.spritesheet(a.id, a.finalPath ?? a.publicPath!, { frameWidth: (a.finalFrameSize ?? a.frameSize)[0], frameHeight: (a.finalFrameSize ?? a.frameSize)[1] });
       // Atlas eksplorasi juga membawa meta (cols + anims) untuk sistem animasi berbasis data.
@@ -66,6 +71,7 @@ export class BootScene extends Phaser.Scene {
     }
 
     void fontsReady.catch(() => undefined).then(() => {
+      this.scene.launch(SCENE_KEYS.Transition); // overlay transisi besar: berjalan terus di atas semua scene
       this.scene.start(SCENE_KEYS.Title);
     });
   }

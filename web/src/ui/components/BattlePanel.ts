@@ -7,9 +7,27 @@ import { bar } from './frame';
 import { TYPE, Ui } from '../kit/ui';
 import type { RewardReceipt } from '../../game/rpg/progression';
 import { UNKNOWN_LABEL } from '../../game/story/identity';
+import { VELTHIA_SKILLS } from '../../game/rpg/velthia';
 
 export const BATTLE_BAND = { y: 388, h: 152 } as const;
-const STATUS_LABEL: Record<string, string> = { poison: 'Racun', stun: 'Pingsan', atk_up: 'Serang+', def_up: 'Tahan+' };
+const STATUS_LABEL: Record<string, string> = { poison: 'Racun', stun: 'Pingsan', atk_up: 'Serang+', def_up: 'Tahan+', shield: 'Selubung', regen: 'Pulih', concord: 'Selaras', chrono_guard: 'Tertutup' };
+type SkillTarget = 'enemy' | 'ally' | 'allies' | 'yaric';
+/** Tabel jurus untuk menu: label, MP, deskripsi, jenis target. Jurus Velthia diambil dari rpg/velthia.ts (satu sumber). */
+const SKILL_UI: Record<string, { label: string; mp: number; desc: string; target: SkillTarget }> = {
+  ground_slam: { label: 'Ground Slam', mp: 4, desc: '4 MP. Hantaman tanah, kerusakan fisik lebih besar.', target: 'enemy' },
+  ranting_nakal: { label: 'Ranting Nakal', mp: 3, desc: '3 MP. Sihir daun; dapat memutus kuda-kuda Veyrath.', target: 'enemy' },
+  bukan_aku: { label: 'Bukan Aku!', mp: 2, desc: '2 MP. Lindungi satu anggota party.', target: 'ally' },
+  tunas_bandel: { label: 'Tunas Bandel', mp: 4, desc: '4 MP. Pulihkan 24 HP satu anggota.', target: 'ally' },
+  ...Object.fromEntries(VELTHIA_SKILLS.map(v => [v.id, { label: v.name, mp: v.mp, desc: v.description, target: v.target }])),
+};
+/** Perintah yang menargetkan sekutu (Potion + jurus bertarget ally). */
+const targetKind = (command: string): SkillTarget => command === 'potion' ? 'ally' : SKILL_UI[command]?.target ?? 'enemy';
+const DANGER: Record<string, { text: string; danger: boolean }> = {
+  sweep: { text: 'SAPUAN!', danger: true }, knight_thrust: { text: 'TUSUKAN!', danger: true }, chrono_slam: { text: 'HANTAMAN!', danger: true },
+  chrono_sweep: { text: 'SAPUAN!', danger: true }, chrono_charge: { text: 'MENGUMPULKAN', danger: false }, chrono_guard: { text: 'BERTAHAN', danger: false },
+  chrono_rewind: { text: 'MEMUTAR WAKTU', danger: false }, oath_brace: { text: 'MENAHAN', danger: false },
+  recover: { text: 'GOYAH', danger: false }, knight_recover: { text: 'TERBUKA', danger: false },
+};
 const DEPTH = 20;
 type PanelMode = 'main' | 'skill' | 'item' | 'target' | 'result' | 'busy';
 
@@ -113,8 +131,9 @@ export class BattlePanel {
 
     // lencana giliran + bahaya
     const e0 = enemies.find(e => e.hp > 0) ?? enemies[0]!;
-    const danger = e0.intent === 'sweep' ? 'SAPUAN!' : e0.intent === 'knight_thrust' ? 'TUSUKAN!' : '';
-    const calm = e0.intent === 'recover' ? 'GOYAH' : e0.intent === 'knight_recover' ? 'TERBUKA' : '';
+    const badge = e0.intent ? DANGER[e0.intent] : undefined;
+    const danger = badge?.danger ? badge.text : '';
+    const calm = badge && !badge.danger ? badge.text : '';
     if (!s.outcome) {
       if (danger) {
         const w = 190;
@@ -156,13 +175,13 @@ export class BattlePanel {
     const state = engine.snapshot(), count = state.items.potion ?? 0;
     const skills = engine.current.skills ?? [];
     const choices: { id: string; label: string; command?: Command; right?: string }[] = mode === 'skill'
-      ? [...skills.filter(id => ['ground_slam', 'ranting_nakal', 'bukan_aku', 'tunas_bandel'].includes(id)).map(id => ({ id, label: ({ ground_slam: 'Ground Slam', ranting_nakal: 'Ranting Nakal', bukan_aku: 'Bukan Aku!', tunas_bandel: 'Tunas Bandel' } as Record<string, string>)[id]!, command: id as Command,
-        right: `${({ ground_slam: 4, ranting_nakal: 3, bukan_aku: 2, tunas_bandel: 4 } as Record<string, number>)[id]} MP` })), { id: 'back', label: 'Kembali' }]
+      ? [...skills.filter(id => id in SKILL_UI).map(id => ({ id, label: SKILL_UI[id]!.label, command: id as Command, right: `${SKILL_UI[id]!.mp} MP` })), { id: 'back', label: 'Kembali' }]
       : mode === 'item'
         ? [{ id: 'potion', label: 'Potion', command: 'potion', right: `×${count}` }, { id: 'back', label: 'Kembali' }]
         : [{ id: 'attack', label: 'Serang', command: 'attack' }, { id: 'skill', label: 'Jurus' }, { id: 'item', label: 'Barang' }, { id: 'defend', label: 'Bertahan', command: 'defend' }, { id: 'run', label: 'Kabur', command: 'run' }];
     const reason = (command: Command): string | null => {
-      if (['potion', 'tunas_bandel', 'bukan_aku'].includes(command) && this.duo) {
+      const kind = targetKind(command);
+      if (this.duo && kind === 'ally') {
         const allies = state.actors.filter(a => a.side === 'player' && a.hp > 0);
         if (allies.some(a => engine.unavailable(command, a.id) === null)) return null;
       }
@@ -174,7 +193,7 @@ export class BattlePanel {
         attack: `Tebasan greatsword ke ${this.enemyName}.`, skill: 'Gunakan jurus dengan MP.', item: 'Gunakan Potion bila HP berkurang.',
         defend: 'Kurangi kerusakan separuh hingga giliran berikutnya.', run: 'Mencoba meninggalkan pertarungan.',
         ground_slam: '4 MP. Hantaman tanah, kerusakan fisik lebih besar.', potion: 'Pulihkan hingga 36 HP satu anggota.', back: 'Kembali ke perintah.',
-        ranting_nakal: '3 MP. Sihir daun; dapat memutus kuda-kuda Veyrath.', bukan_aku: '2 MP. Lindungi satu anggota party.', tunas_bandel: '4 MP. Pulihkan 24 HP satu anggota.',
+        ...Object.fromEntries(Object.entries(SKILL_UI).map(([id, v]) => [id, v.desc])),
       };
       this.say(item.disabledHint ?? descriptions[item.id] ?? '');
     };
@@ -236,8 +255,10 @@ export class BattlePanel {
 
   private chooseTarget(engine: BattleEngine, command: Command, sourceMode: 'main' | 'skill' | 'item'): void {
     if (command === 'defend' || command === 'run') { this.onAction(command); return; }
-    const ally = ['potion', 'bukan_aku', 'tunas_bandel'].includes(command);
-    const candidates = engine.snapshot().actors.filter(a => a.side === (ally ? 'player' : 'enemy') && a.hp > 0);
+    const kind = targetKind(command);
+    if (kind === 'allies') { this.onAction(command); return; } // seluruh sekutu: tanpa pilih target
+    const ally = kind !== 'enemy';
+    const candidates = engine.snapshot().actors.filter(a => a.side === (ally ? 'player' : 'enemy') && a.hp > 0 && (kind !== 'yaric' || a.id === 'C01'));
     if (candidates.length === 1) { this.onAction(command, candidates[0]!.id); return; }
     this.mode = 'target'; this.sourceMode = sourceMode;
     const items: MenuItem[] = candidates.map(a => ({ id: a.id, label: this.name(a), right: `${a.hp}/${a.stats.HP}`, disabled: !!engine.unavailable(command, a.id), disabledHint: engine.unavailable(command, a.id) ?? undefined }));

@@ -1,0 +1,166 @@
+{
+  "entity_id": "M05",
+  "status": "NEEDS_REVIEW",
+  "facing": "right",
+  "source": "assets/monsters/M05_Oathguard/M05_NEW_CONCEPT_DRAFT.png",
+  "foot_pivot": [
+    84,
+    123
+  ],
+  "notes": "DRAFT / NEEDS_REVIEW. Official concept pixelized and re-posed as a paper-doll (polearm arm, reaching arm, helmet, upper body, lower body); falls are rigid rotations of the whole figure. Every frame is a re-pose of the same drawing; needs an artist redraw. Script: web/scripts/battle-art/build_m05.py.",
+  "frame_size": [
+    160,
+    128
+  ],
+  "atlas_size": [
+    1600,
+    128
+  ],
+  "frames": {
+    "idle_a": {
+      "index_0_based": 0,
+      "rect": [
+        0,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 560
+    },
+    "idle_b": {
+      "index_0_based": 1,
+      "rect": [
+        160,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 560
+    },
+    "anticipation": {
+      "index_0_based": 2,
+      "rect": [
+        320,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 340
+    },
+    "attack": {
+      "index_0_based": 3,
+      "rect": [
+        480,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 240
+    },
+    "followthrough": {
+      "index_0_based": 4,
+      "rect": [
+        640,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 170
+    },
+    "recovery": {
+      "index_0_based": 5,
+      "rect": [
+        800,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 300
+    },
+    "hit_recoil": {
+      "index_0_based": 6,
+      "rect": [
+        960,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 220
+    },
+    "hit_recover": {
+      "index_0_based": 7,
+      "rect": [
+        1120,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 170
+    },
+    "death_start": {
+      "index_0_based": 8,
+      "rect": [
+        1280,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 300
+    },
+    "defeated": {
+      "index_0_based": 9,
+      "rect": [
+        1440,
+        0,
+        160,
+        128
+      ],
+      "pivot": [
+        84,
+        123
+      ],
+      "duration_ms": 700
+    }
+  },
+  "event": {
+    "frame_key": "attack",
+    "index_0_based": 3
+  },
+  "palette_size": 25
+}

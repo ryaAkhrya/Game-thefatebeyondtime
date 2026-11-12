@@ -1,0 +1,6 @@
+1. particles: nleaf_a, nleaf_b, nleaf_c, ntwig_a, ntwig_b, nspore, ndirt_a, ndirt_b
+2. torvan_leaf_bolt: nbolt_1, nbolt_2, nbolt_3
+3. nburst: nburst_1, nburst_2, nburst_3, nburst_4
+4. torvan_vine: nvine_1, nvine_2, nvine_3, nvine_4, nvine_5, nvine_6, nvine_7
+5. torvan_support: nsup_1, nsup_2, nsup_3, nsup_4, nsup_5, nsup_6
+6. forest_summon_small: nsum_1, nsum_2, nsum_3, nsum_4, nsum_5, nsum_6, nsum_7

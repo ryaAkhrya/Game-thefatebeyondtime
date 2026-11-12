@@ -7,6 +7,7 @@ import type { Services } from '../../game/systems/Services';
 import { SCENE_KEYS } from '../../game/data/ids';
 import { UNKNOWN_LABEL, isNameKnown } from '../../game/story/identity';
 import { FONT, TYPE, Ui } from '../kit/ui';
+import { uiSfx } from '../kit/sfx';
 
 /**
  * Tata letak dialog (satuan desain 960x540). Semua angka di sini agar UI mudah direvisi tanpa menyentuh
@@ -156,9 +157,16 @@ export class DialogueBox {
     runner.start();
     this.releaseInput = this.services.input.pushLayer('dialogue', (e) => {
       if (e.intent === 'confirm') {
-        if (runner.press() === 'finished') this.finish();
+        const result = runner.press();
+        // 'completed_text' (mempercepat ketikan) dan 'ignored' senyap; hanya kemajuan nyata/pilihan yang berbunyi.
+        if (result === 'advanced' || result === 'finished') uiSfx(this.scene, 'SFX_UI_DIALOGUE_ADVANCE');
+        else if (result === 'chose') uiSfx(this.scene, 'SFX_UI_CONFIRM');
+        if (result === 'finished') this.finish();
       } else if (e.intent === 'up' || e.intent === 'down') {
-        if (!e.repeat) runner.moveChoice(e.intent === 'up' ? -1 : 1);
+        if (!e.repeat) {
+          if (runner.choice) uiSfx(this.scene, 'SFX_UI_DIALOGUE_CHOICE');
+          runner.moveChoice(e.intent === 'up' ? -1 : 1);
+        }
       } else if (e.intent === 'back') {
         if (this.services.gameState.snapshot()?.area === 'aveloria') this.services.router.openOverlay(this.scene.scene.get(SCENE_KEYS.World), SCENE_KEYS.Pause);
         else runner.fastComplete(); // existing forest control remains unchanged

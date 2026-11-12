@@ -1,11 +1,13 @@
 import Phaser from 'phaser';
 import { MenuList } from '../../ui/components/MenuList';
+import { uiSfx } from '../../ui/kit/sfx';
 import { bar, menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
 import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
 import { AREA_LABEL, BEAT_LABEL, formatPlaytime, partyName } from '../../ui/labels';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { effectiveStats } from '../rpg/progression';
+import { memberVitals } from '../rpg/vitals';
 import { isNameKnown } from '../story/identity';
 import { SAVE_SLOTS, type SaveReadResult, type SaveSlot } from '../systems/SaveRepository';
 import { getServices } from '../systems/Services';
@@ -41,8 +43,8 @@ export class SaveLoadScene extends Phaser.Scene {
     const services = getServices(this);
     this.releaseInput = services.input.pushLayer('save-load', event => {
       if (this.closing) return;
-      if (event.intent === 'back') { if (this.confirmation) { this.confirmation = null; this.redraw(); } else services.router.closeOverlay(this, this.returnTo); }
-      else if (!this.confirmation && (event.intent === 'left' || event.intent === 'right')) { this.mode = this.mode === 'save' ? 'load' : 'save'; this.messageText = ''; this.redraw(this.menu?.focusedItem.id); }
+      if (event.intent === 'back') { uiSfx(this, 'SFX_UI_CANCEL'); if (this.confirmation) { this.confirmation = null; this.redraw(); } else services.router.closeOverlay(this, this.returnTo); }
+      else if (!this.confirmation && (event.intent === 'left' || event.intent === 'right')) { uiSfx(this, 'SFX_UI_SELECT_ITEM'); this.mode = this.mode === 'save' ? 'load' : 'save'; this.messageText = ''; this.redraw(this.menu?.focusedItem.id); }
       else this.menu?.handleIntent(event);
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
@@ -76,7 +78,7 @@ export class SaveLoadScene extends Phaser.Scene {
     t(x, y + 34, `Bab ${d.chapter}  ·  ${AREA_LABEL[d.area] ?? d.area}`, { weight: '600', color: COLORS.bitterLime });
     t(x, y + 58, BEAT_LABEL[d.storyBeat] ?? '', { color: COLORS.paperDim });
     let py = y + 100;
-    const member = (id: 'C01' | 'C03', hp: number, mp: number): void => {
+    const member = (id: 'C01' | 'C02' | 'C03', hp: number, mp: number): void => {
       const c = d.rpg.characters[id]!;
       t(x, py, partyName(id, known), { weight: '600' });
       t(x + w, py, `Lv ${c.level}`, { originX: 1, color: COLORS.paperDim });
@@ -88,7 +90,7 @@ export class SaveLoadScene extends Phaser.Scene {
       py += 66;
     };
     member('C01', d.vitals.hp, d.vitals.mp);
-    if (d.partyVitals) member('C03', d.partyVitals.C03.hp, d.partyVitals.C03.mp);
+    for (const id of d.party) if (id !== 'C01') { const v = memberVitals(d, id); if (v) member(id as 'C02' | 'C03', v.hp, v.mp); } // anggota aktif sesuai party
     t(x, py + 6, `${local} WIB   ·   ${formatPlaytime(d.playtimeSec)}`, { size: TYPE.small, color: COLORS.paperDim });
     if (result.recovered || result.migrated) t(x, py + 28, result.recovered ? 'Dari cadangan.' : 'Data lama terbaca.', { size: TYPE.small, color: COLORS.warn });
   }
@@ -115,15 +117,16 @@ export class SaveLoadScene extends Phaser.Scene {
       ui.text(dx, body.bodyY + 42, this.mode === 'save' ? 'Data sebelumnya menjadi cadangan jika valid.' : 'Progres yang belum disimpan akan diganti.', { color: COLORS.paperDim, width: dw, depth: 3 });
       this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 256, rowHeight: 40, depth: 4, size: TYPE.body + 0.5,
         items: [{ id: 'cancel', label: 'Batal' }, { id: 'yes', label: this.mode === 'save' ? 'Ya, timpa' : 'Ya, muat' }],
-        onConfirm: item => { this.confirmation = null; if (item.id === 'yes') this.perform(slot); else this.redraw(slot); } });
+        sfx: { confirm: false },
+        onConfirm: item => { if (item.id !== 'yes') uiSfx(this, 'SFX_UI_CANCEL'); this.confirmation = null; if (item.id === 'yes') this.perform(slot); else this.redraw(slot); } });
       return;
     }
-    this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 256, rowHeight: 48, depth: 4, size: TYPE.body + 1, items: rows, initialId: focusId,
+    this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 256, rowHeight: 48, depth: 4, size: TYPE.body + 1, items: rows, initialId: focusId, sfx: { confirm: false },
       onFocusChange: item => this.describe(item.id as SaveSlot, saves.read(item.id as SaveSlot), dx, body.bodyY + 4, dw),
       onDisabledConfirm: item => { this.messageText = item.disabledHint ?? ''; this.message?.setText(this.messageText); },
       onConfirm: item => {
         const slot = item.id as SaveSlot;
-        if (this.mode === 'load' || saves.read(slot).status !== 'empty') this.askConfirm(slot);
+        if (this.mode === 'load' || saves.read(slot).status !== 'empty') { uiSfx(this, 'SFX_UI_CONFIRM'); this.askConfirm(slot); }
         else this.perform(slot);
       } });
     const f = this.menu.focusedItem.id as SaveSlot;
@@ -137,9 +140,10 @@ export class SaveLoadScene extends Phaser.Scene {
 
   private perform(slot: SaveSlot): void {
     const services = getServices(this);
-    if (this.mode === 'save') { const result = services.checkpoints.save(slot); this.messageText = result.ok ? `${slotName(slot)} tersimpan.` : services.checkpoints.lastMessage; this.redraw(slot); return; }
+    if (this.mode === 'save') { const result = services.checkpoints.save(slot); uiSfx(this, result.ok ? 'SFX_UI_SAVE_OK' : 'SFX_UI_SAVE_FAIL'); this.messageText = result.ok ? `${slotName(slot)} tersimpan.` : services.checkpoints.lastMessage; this.redraw(slot); return; }
     const result = services.saves.read(slot);
-    if (result.status !== 'ok') { this.messageText = 'Data tidak dapat dimuat.'; this.redraw(slot); return; }
+    if (result.status !== 'ok') { uiSfx(this, 'SFX_UI_SAVE_FAIL'); this.messageText = 'Data tidak dapat dimuat.'; this.redraw(slot); return; }
+    uiSfx(this, 'SFX_UI_SAVE_OK');
     services.gameState.load(result.data); services.checkpoints.reset(); this.closing = true;
     this.scene.stop(SCENE_KEYS.Pause); this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud);
     this.scene.stop(SCENE_KEYS.SliceEnd);

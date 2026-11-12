@@ -2,6 +2,7 @@ import type Phaser from 'phaser';
 import type { IntentEvent } from '../../game/core/InputManager';
 import { COLORS, css } from '../../game/config/palette';
 import { TYPE, type Ui } from '../kit/ui';
+import { uiSfx } from '../kit/sfx';
 
 export interface MenuItem {
   id: string;
@@ -36,6 +37,8 @@ export interface MenuListOptions {
   onConfirm: (item: MenuItem) => void;
   onDisabledConfirm?: (item: MenuItem) => void;
   onFocusChange?: (item: MenuItem) => void;
+  /** Id SFX per aksi; `false` = senyap (mis. scene memutar bunyi hasilnya sendiri). Default: gerak SFX_UI_MOVE, konfirmasi SFX_UI_CONFIRM, item nonaktif SFX_UI_CANCEL. */
+  sfx?: { move?: string | false; confirm?: string | false; disabled?: string | false };
 }
 
 interface Row {
@@ -62,7 +65,7 @@ export class MenuList {
   private readonly visible: number;
 
   constructor(
-    scene: Phaser.Scene,
+    private readonly scene: Phaser.Scene,
     private readonly opts: MenuListOptions,
   ) {
     this.registry = scene.registry;
@@ -139,20 +142,32 @@ export class MenuList {
       case 'up':
         this.index = (this.index + n - 1) % n;
         this.render(true);
+        if (n > 1) this.play(this.opts.sfx?.move, 'SFX_UI_MOVE');
         break;
       case 'down':
         this.index = (this.index + 1) % n;
         this.render(true);
+        if (n > 1) this.play(this.opts.sfx?.move, 'SFX_UI_MOVE');
         break;
       case 'confirm': {
         const item = this.focusedItem;
-        if (item.disabled) this.opts.onDisabledConfirm?.(item);
-        else this.opts.onConfirm(item);
+        if (item.disabled) {
+          this.play(this.opts.sfx?.disabled, 'SFX_UI_CANCEL');
+          this.opts.onDisabledConfirm?.(item);
+        } else {
+          this.play(this.opts.sfx?.confirm, 'SFX_UI_CONFIRM');
+          this.opts.onConfirm(item);
+        }
         break;
       }
       default:
         break;
     }
+  }
+
+  private play(choice: string | false | undefined, fallback: string): void {
+    if (choice === false) return;
+    uiSfx(this.scene, choice ?? fallback);
   }
 
   private render(notify = false): void {

@@ -11,13 +11,20 @@ import { drawForestEdgeGround, loadForestEdge } from '../world/forestEdge';
 import { BOSS_CHECKPOINT, FOREST_EDGE_FLAG, MOURNFANG_FLAG } from '../combat/encounters';
 import { restBeforeMournfang } from '../rpg/checkpoints';
 import { BATTLE_TEXTURE } from '../combat/BattleAtlas';
+import { presentationFor } from '../combat/presentation';
+import { FootstepTracker, STEP_SFX, surfaceFor } from '../world/footsteps';
 import { loadAveloria } from '../world/aveloria';
 import { AveloriaView } from '../world/AveloriaView';
 import { derrriaShop } from '../rpg/derrria';
 import { loadForest2, loadLiora } from '../world/chapter2Maps';
 import { Chapter2View } from '../world/Chapter2View';
 import { FOREST2_SPAWN, LIORA_SPAWN, RETURN_SPAWN } from '../story/chapter2Flags';
-import { joinTorvan, restChapter2Party } from '../rpg/party';
+import { joinTorvan, joinVelthia, restChapter2Party, restChapter3Party } from '../rpg/party';
+import { loadTemple, TEMPLE_BATTLE_RETURN, TEMPLE_FROM_FOREST } from '../world/templeMaps';
+import { TempleView } from '../world/TempleView';
+import { AveloriaCrisisView } from '../world/AveloriaCrisisView';
+import type { AreaView3 } from '../world/AreaView3';
+import { C3 } from '../story/chapter3Flags';
 import { DISPLAY_EVENT, getDisplay } from '../systems/DisplayController';
 import { SPRINT_SPEED, WALK_SPEED } from '../world/movement';
 import { playState, registerCharacterAnims, type AnimState, type CharacterAnimMeta } from '../world/CharacterAnims';
@@ -58,10 +65,14 @@ export class WorldScene extends Phaser.Scene {
   private wrapCount = 0;
   private wasMoving = false;
   private sprinting = false;
+  private readonly steps = new FootstepTracker();
+  private stepCount = 0;
   private target: Interactable | null = null;
   private actionLog: string[] = [];
   private city?: AveloriaView;
   private chapter2?: Chapter2View;
+  /** Chapter III: Aveloria krisis atau Kuil Jejak (kontrak AreaView3); `react` hanya ada pada Aveloria krisis. */
+  private view3?: AreaView3 & { react?(speaker: string, line: string): void };
   private cityLine = '';
 
   constructor() {
@@ -75,8 +86,8 @@ export class WorldScene extends Phaser.Scene {
     if (!gameState.isActive) gameState.startNewGame();
     this.story = new Chapter1Story(gameState);
     const area = gameState.snapshot()!.area;
-    this.loaded = area === 'aveloria' ? loadAveloria() : area === 'liora' ? loadLiora() : area === 'forest_2' ? loadForest2() : area === 'forest_edge' ? loadForestEdge() : loadForest1();
-    this.city = undefined; this.chapter2 = undefined; this.cityLine = '';
+    this.loaded = area === 'aveloria' ? loadAveloria() : area === 'liora' ? loadLiora() : area === 'forest_2' ? loadForest2() : area === 'forest_edge' ? loadForestEdge() : area === 'temple' ? loadTemple() : loadForest1();
+    this.city = undefined; this.view3 = undefined; this.chapter2 = undefined; this.cityLine = '';
     this.nambo = undefined; this.bossSprite = undefined;
     this.busy = false;
     this.started = false;
@@ -96,7 +107,7 @@ export class WorldScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game.events.off(DISPLAY_EVENT, onDisplay));
 
     // ---- dasar peta (fallback polos bila gambar gagal dimuat) ----
-    if (map.id === 'aveloria' || map.id === 'liora' || map.id === 'forest_2') { /* ground is drawn with area view below */ }
+    if (map.id === 'aveloria' || map.id === 'liora' || map.id === 'forest_2' || map.id === 'temple') { /* ground is drawn with area view below */ }
     else if (map.id === 'forest_edge') drawForestEdgeGround(this, map);
     else if (this.textures.exists(ENV.groundKey)) this.add.image(0, 0, ENV.groundKey).setOrigin(0, 0).setDepth(-1000);
     else this.add.rectangle(0, 0, map.width, map.height, 0x2e4934).setOrigin(0, 0).setDepth(-1000);
@@ -128,7 +139,9 @@ export class WorldScene extends Phaser.Scene {
 
     // ---- keadaan dinamis dari flag ----
     this.interactables = this.loaded.interactables.map((i) => ({ ...i }));
-    if (map.id === 'aveloria') this.city = new AveloriaView(this, this.loaded, this.interactables);
+    if (map.id === 'aveloria' && gameState.hasFlag(C3.start)) this.view3 = new AveloriaCrisisView(this, this.loaded, this.interactables);
+    else if (map.id === 'aveloria') this.city = new AveloriaView(this, this.loaded, this.interactables);
+    if (map.id === 'temple') this.view3 = new TempleView(this, this.loaded, this.interactables);
     if (map.id === 'liora' || map.id === 'forest_2') this.chapter2 = new Chapter2View(this, this.loaded, this.interactables);
     this.syncNamboInteractable();
     this.applyFlagState();
@@ -154,12 +167,13 @@ export class WorldScene extends Phaser.Scene {
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
       this.releaseInput?.();
+      this.view3?.destroy();
       audio.stopBgm();
       this.scene.stop(SCENE_KEYS.Hud);
     });
 
     // Musik hutan: BGM_FOREST_01 berstatus AWAITING_COMPOSER -> senyap tanpa error, dimulai hanya setelah gesture.
-    audio.playBgm(map.id === 'aveloria' ? 'BGM_AVELORIA_DAY' : map.id === 'liora' ? 'BGM_LIORA' : map.id === 'forest_2' ? 'BGM_FOREST_02' : 'BGM_FOREST_01');
+    audio.playBgm(map.id === 'temple' ? 'BGM_TEMPLE' : map.id === 'aveloria' ? 'BGM_AVELORIA_DAY' : map.id === 'liora' ? 'BGM_LIORA' : map.id === 'forest_2' ? 'BGM_FOREST_02' : 'BGM_FOREST_01');
 
     // fade-in: pembukaan C1-01 pelan (bangun), selanjutnya singkat
     const firstTime = !this.story.objective();
@@ -205,15 +219,21 @@ export class WorldScene extends Phaser.Scene {
       moved = r.moved;
     }
     if (moved <= 0) this.sprinting = false;
+    if (this.steps.update(moved, this.sprinting)) {
+      const surface = surfaceFor(this.loaded.map.id);
+      this.stepCount++; this.services.audio.playSfx(STEP_SFX[surface]);
+    }
     this.handleWrap();
     this.syncWalker(this.player, moved > 0 ? (this.sprinting ? 'sprint' : 'walk') : 'idle');
     if (this.nambo) this.syncWalker(this.nambo, this.nambo.state === 'walk' ? 'walk' : 'idle', true);
     this.city?.update(_time, this.busy);
+    this.view3?.update(this.player, moved > 0, delta, this.sprinting);
     this.chapter2?.update(this.player, moved > 0, delta, this.sprinting);
     const dialogue = this.hud.dialogue.debug;
-    if (this.city && dialogue && dialogue.line !== this.cityLine) {
+    const reactor = this.city ?? this.view3;
+    if (reactor?.react && dialogue && dialogue.line !== this.cityLine) {
       this.cityLine = dialogue.line;
-      this.city.react(dialogue.portrait.split('_')[0]!, dialogue.line);
+      reactor.react(dialogue.portrait.split('_')[0]!, dialogue.line);
       if (dialogue.line.startsWith('C1-08')) this.player.facing = dialogue.line === 'C1-08-L013' ? 'left' : 'up';
     }
 
@@ -314,7 +334,7 @@ export class WorldScene extends Phaser.Scene {
     } finally {
       this.busy = false;
       this.hud.setObjective(this.story.objective());
-      if (completed && actions.some(a => a.type === 'setFlag' || a.type === 'giveItem' || a.type === 'rest' || a.type === 'joinTorvan' || a.type === 'restParty')) this.services.checkpoints.requestAutosave();
+      if (completed && actions.some(a => a.type === 'setFlag' || a.type === 'giveItem' || a.type === 'rest' || a.type === 'joinTorvan' || a.type === 'joinVelthia' || a.type === 'restParty')) this.services.checkpoints.requestAutosave();
     }
   }
 
@@ -326,7 +346,7 @@ export class WorldScene extends Phaser.Scene {
         const next = gameState.snapshot()!;
         const previous = next.area;
         next.area = a.area;
-        next.position = a.area === 'liora' ? previous === 'forest_2' ? { x: 480, y: 160, facing: 'down' } : { ...LIORA_SPAWN }
+        next.position = a.area === 'temple' ? { ...TEMPLE_FROM_FOREST } : a.area === 'liora' ? previous === 'forest_2' ? { x: 480, y: 160, facing: 'down' } : { ...LIORA_SPAWN }
           : a.area === 'forest_2' ? { ...FOREST2_SPAWN }
           : previous === 'forest_2' ? { ...RETURN_SPAWN } : { x: 640, y: 1312, facing: 'up' };
         gameState.load(next); this.services.checkpoints.requestAutosave();
@@ -337,8 +357,21 @@ export class WorldScene extends Phaser.Scene {
       case 'joinTorvan':
         gameState.load(joinTorvan(gameState.snapshot()!)); this.applyFlagState();
         break;
+      case 'joinVelthia':
+        gameState.load(joinVelthia(gameState.snapshot()!)); this.applyFlagState();
+        break;
       case 'restParty':
-        gameState.load(restChapter2Party(gameState.snapshot()!)); this.applyFlagState();
+        gameState.load(gameState.snapshot()!.chapter === 'III' ? restChapter3Party(gameState.snapshot()!) : restChapter2Party(gameState.snapshot()!)); this.applyFlagState();
+        break;
+      case 'c3':
+        this.actionLog.push(`c3:${a.op}${a.arg === undefined ? '' : `:${a.arg}`}`);
+        await this.view3?.handleAction(a.op, a.arg);
+        break;
+      case 'chapter3End':
+        gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'temple');
+        this.services.checkpoints.setSafe(true); this.services.checkpoints.requestAutosave();
+        if (this.services.checkpoints.flush()?.ok === false) this.hud.toast('Simpan otomatis gagal.');
+        this.services.router.openOverlay(this, SCENE_KEYS.SliceEnd);
         break;
       case 'chapter2End':
         gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'aveloria');
@@ -409,7 +442,7 @@ export class WorldScene extends Phaser.Scene {
         break;
       case 'setFlag':
         if (gameState.setFlag(a.flag)) this.actionLog.push(`flag:${a.flag}`);
-        if (this.city || this.chapter2 || a.flag === FLAG.awake || a.flag === FLAG.victorySeen) this.applyFlagState();
+        if (this.city || this.view3 || this.chapter2 || a.flag === FLAG.awake || a.flag === FLAG.victorySeen) this.applyFlagState();
         break;
       case 'objective':
         this.hud.setObjective(this.story.objective());
@@ -440,6 +473,11 @@ export class WorldScene extends Phaser.Scene {
           if (a.encounter === 'veyrath') gameState.load(restChapter2Party(gameState.snapshot()!));
           this.player.x = a.encounter === 'veyrath' ? 928 : 744; this.player.y = a.encounter === 'veyrath' ? 320 : 544; this.player.facing = 'right';
           gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'forest_2');
+        } else if (a.encounter === 'temple_oathguard' || a.encounter === 'temple_mixed' || a.encounter === 'chronolith') {
+          if (a.encounter === 'chronolith') gameState.load(restChapter3Party(gameState.snapshot()!)); // pemulihan penuh sebelum bos: retry ramah, tanpa grinding
+          const back = TEMPLE_BATTLE_RETURN[a.encounter];
+          this.player.x = back.x; this.player.y = back.y; this.player.facing = back.facing;
+          gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'temple');
         } else if (a.encounter === 'mournfang') {
           gameState.load(restBeforeMournfang(gameState.snapshot()!));
           this.player.x = BOSS_CHECKPOINT.x; this.player.y = BOSS_CHECKPOINT.y; this.player.facing = BOSS_CHECKPOINT.facing;
@@ -454,7 +492,8 @@ export class WorldScene extends Phaser.Scene {
         if (save && !save.ok) this.hud.toast('Simpan otomatis gagal.');
         this.services.checkpoints.setSafe(false);
         this.leaving = true;
-        this.services.router.goto(this, SCENE_KEYS.Battle, { encounter: a.encounter ?? 'hollowling' });
+        const pres = presentationFor(a.encounter ?? 'hollowling', gameState.snapshot()!.flags);
+        this.services.router.goto(this, SCENE_KEYS.Battle, { encounter: a.encounter ?? 'hollowling' }, { transition: pres.kind, label: pres.name });
         // router.goto menghentikan scene ini; tunggu tanpa melakukan apa pun lagi
         await new Promise<void>(() => undefined);
         break;
@@ -464,6 +503,7 @@ export class WorldScene extends Phaser.Scene {
   // ------------------------------------------------------------ keadaan dunia
 
   private applyFlagState(): void {
+    if (this.view3) { this.view3.apply(this.services.gameState.snapshot()!.flags); return; }
     if (this.city) { this.city.apply(this.services.gameState.snapshot()!.flags); return; }
     if (this.chapter2) { this.chapter2.apply(this.services.gameState.snapshot()!.flags); return; }
     const { collision, map } = this.loaded;
@@ -610,6 +650,8 @@ export class WorldScene extends Phaser.Scene {
       nambo: this.nambo ? { x: Math.round(this.nambo.x), y: Math.round(this.nambo.y), facing: this.nambo.facing } : null,
       bossVisible: !!this.bossSprite?.visible,
       city: this.city?.debug() ?? null,
+      view3: this.view3?.debug() ?? null,
+      interactables: this.interactables.map(i => ({ id: i.id, x: Math.round(i.x), y: Math.round(i.y), w: Math.round(i.w), h: Math.round(i.h), enabled: i.enabled !== false })),
       chapter2: this.chapter2?.debug() ?? null,
       toast: this.hud?.currentToast ?? '',
       thicketOpen: [...this.propSprites.entries()].some(([id, img]) => id.startsWith('thicket') && img.frame.name === 'thicket_open'),
@@ -617,6 +659,7 @@ export class WorldScene extends Phaser.Scene {
       log: this.actionLog.slice(-60),
       moving: this.wasMoving,
       sprinting: this.sprinting,
+      footsteps: { count: this.stepCount, surface: surfaceFor(this.loaded.map.id) },
       standable: this.loaded.collision.canStand(footBox(this.player.x, this.player.y)),
       moveState: this.player.state,
       anim: this.player.sprite.anims.currentAnim?.key ?? null,

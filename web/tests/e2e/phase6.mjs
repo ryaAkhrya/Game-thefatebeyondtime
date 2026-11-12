@@ -54,7 +54,7 @@ try {
     page = await context.newPage();
     page.on('pageerror', e => errors.push(e.message)); page.on('console', m => { if (m.type() === 'error') errors.push(m.text()); });
     page.on('requestfailed', r => requests.push(`${r.url()} ${r.failure()?.errorText}`));
-    page.on('response', r => { if (r.status() >= 400) requests.push(`${r.status()} ${r.url()}`); if (/\.(ogg|wav|mp3)(\?|$)/.test(r.url())) audio.push(r.url()); });
+    page.on('response', r => { if (r.status() >= 400) requests.push(`${r.status()} ${r.url()}`); if (/\.(ogg|wav|mp3)(\?|$)/.test(r.url()) && !/\/audio\/sfx\//.test(r.url())) audio.push(r.url()); });
     await page.goto(BASE + '?qa=1'); await page.waitForFunction(() => window.__tfbt?.activeScenes().includes('TitleScene'));
     await page.evaluate(() => window.__tfbt.qa.chapter1Complete()); await waitWorld(page);
     await interact(page, 'velthia'); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');

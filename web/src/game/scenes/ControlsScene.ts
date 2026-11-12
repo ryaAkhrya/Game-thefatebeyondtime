@@ -5,6 +5,7 @@ import { CONTROL_LEGEND } from '../core/InputManager';
 import { getServices } from '../systems/Services';
 import { menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
 import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
+import { uiSfx } from '../../ui/kit/sfx';
 
 const WIN: WindowSpec = { x: 180, y: 92, w: 600, h: 356, title: 'Panduan Kontrol' };
 
@@ -31,7 +32,7 @@ export class ControlsScene extends Phaser.Scene {
     this.ui.fadeIn();
     bindRelayout(this, () => this.build());
     this.releaseInput = services.input.pushLayer('controls', (e) => {
-      if (e.intent === 'back' || e.intent === 'confirm') this.close(services.router);
+      if (e.intent === 'back' || e.intent === 'confirm') { uiSfx(this, 'SFX_UI_CANCEL'); this.close(services.router); }
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
   }

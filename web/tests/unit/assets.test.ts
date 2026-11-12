@@ -23,7 +23,7 @@ describe('AssetRegistry', () => {
   const registry = new AssetRegistry();
 
   it('memetakan aset aktif battle v3.3 dan eksplorasi Yaric/Nambo', () => {
-    expect(registry.list().map((a) => a.id).sort()).toEqual(['B01_MOURNFANG_BATTLE', 'B02_CH2_BATTLE', 'C01_YARIC_BATTLE', 'C01_YARIC_EXPLORE', 'C02_CITY_EXPLORE', 'C03_CH2_BATTLE', 'C03_CH2_EXPLORE', 'C05_CITY_EXPLORE', 'C06_CITY_EXPLORE', 'C07_CH2_EXPLORE', 'C08_NAMBO_EXPLORE', 'C09_CITY_EXPLORE', 'M01_HOLLOWLING_BATTLE', 'M02_CH2_BATTLE', 'M03_CH2_BATTLE', 'VFX_C01_GROUND_SLAM']);
+    expect(registry.list().map((a) => a.id).sort()).toEqual(['B01_MOURNFANG_BATTLE', 'B02_CH2_BATTLE', 'B03_BATTLE_V1', 'C01_YARIC_BATTLE', 'C01_YARIC_EXPLORE', 'C02_BATTLE_V1', 'C02_CITY_EXPLORE', 'C03_CH2_BATTLE', 'C03_CH2_EXPLORE', 'C05_CITY_EXPLORE', 'C06_CITY_EXPLORE', 'C07_CH2_EXPLORE', 'C08_NAMBO_EXPLORE', 'C09_CITY_EXPLORE', 'M01_HOLLOWLING_BATTLE', 'M02_CH2_BATTLE', 'M03_CH2_BATTLE', 'M05_BATTLE_V1', 'VFX_C01_GROUND_SLAM']);
   });
 
   it('battle dan eksplorasi diimpor; tidak ada yang PRODUCTION_READY', () => {
@@ -32,7 +32,7 @@ describe('AssetRegistry', () => {
       expect(registry.isProductionReady(a.id)).toBe(false);
     }
     expect(battle.every((a) => a.version === 'v3.3' && a.imported)).toBe(true);
-    expect(registry.loadable()).toHaveLength(16);
+    expect(registry.loadable()).toHaveLength(19);
   });
 
   it('memakai versi TERBARU yang ada: eksplorasi Yaric v3.2 (v3.3 tidak punya eksplorasi), Nambo masih DRAFT', () => {

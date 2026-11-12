@@ -1,7 +1,9 @@
 export interface AtlasFrame { index_0_based: number; rect: [number, number, number, number]; pivot: [number, number]; duration_ms: number }
 export interface BattleAtlas { frame_size: [number, number]; frames: Record<string, AtlasFrame>; event: { frame_key: string; index_0_based: number } }
 export const BATTLE_TEXTURE = { C01: 'C01_YARIC_BATTLE', C03: 'C03_CH2_BATTLE', M01: 'M01_HOLLOWLING_BATTLE',
-  M02: 'M02_CH2_BATTLE', M03: 'M03_CH2_BATTLE', B01: 'B01_MOURNFANG_BATTLE', B02: 'B02_CH2_BATTLE', slam: 'VFX_C01_GROUND_SLAM' } as const;
+  M02: 'M02_CH2_BATTLE', M03: 'M03_CH2_BATTLE', B01: 'B01_MOURNFANG_BATTLE', B02: 'B02_CH2_BATTLE',
+  /** Phase 7 (Agent BA): atlas penuh 13-an frame (DRAFT/NEEDS_REVIEW), tiap atlas membawa duration_ms, pivot dan event sendiri. */
+  C02: 'C02_BATTLE_V1', B03: 'B03_BATTLE_V1', M05: 'M05_BATTLE_V1', slam: 'VFX_C01_GROUND_SLAM' } as const;
 
 export interface PoseAtlas { authored_grid: [number, number]; frames: Record<string, { rect: [number, number, number, number]; pivot: [number, number] }> }
 /** Playback aliases HOLD the four existing poses. They do not claim extra authored animation frames. */
@@ -40,4 +42,17 @@ export function bossAtlas(meta: unknown): BattleAtlas {
   const m = meta as Partial<BattleAtlas> & Partial<PoseAtlas>;
   if (m.frames && 'idle_a' in m.frames && m.frame_size) return m as BattleAtlas;
   return mournfangPlayback(meta as PoseAtlas);
+}
+
+/** Atlas Phase 7 (C02 Velthia, B03 Chronolith, M05 Oathguard) sudah berformat BattleAtlas penuh; helper hanya memvalidasi kunci wajib. */
+export const REQUIRED_BATTLE_FRAMES = ['idle_a', 'idle_b', 'anticipation', 'attack', 'followthrough', 'recovery', 'hit_recoil', 'hit_recover', 'death_start', 'defeated'] as const;
+export function fullAtlas(meta: unknown): BattleAtlas {
+  const m = meta as Partial<BattleAtlas>;
+  if (!m.frame_size || !m.frames || !m.event) throw new Error('Invalid full battle atlas');
+  for (const k of REQUIRED_BATTLE_FRAMES) if (!(k in m.frames)) throw new Error(`Battle atlas missing frame ${k}`);
+  return m as BattleAtlas;
+}
+/** Frame untuk kunci khusus (cast/heal/shield/summon/guard/special/charge): jatuh ke fallback bila atlas tidak punya. */
+export function frameKeyFor(atlas: BattleAtlas, key: string, fallback = 'attack'): string {
+  return key in atlas.frames ? key : fallback in atlas.frames ? fallback : 'idle_a';
 }

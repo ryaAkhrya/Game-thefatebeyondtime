@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { MenuList, type MenuItem } from '../../ui/components/MenuList';
+import { uiSfx } from '../../ui/kit/sfx';
 import { menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
 import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
 import { COLORS } from '../config/palette';
@@ -36,8 +37,8 @@ export class ShopScene extends Phaser.Scene {
     bindRelayout(this, () => this.render(this.menu?.focusedItem.id));
     const services = getServices(this);
     this.releaseInput = services.input.pushLayer('shop', e => {
-      if (e.intent === 'back') services.router.closeOverlay(this, this.returnTo);
-      else if (e.intent === 'left' || e.intent === 'right') { this.mode = this.mode === 'buy' ? 'sell' : 'buy'; this.messageText = ''; this.redraw(); }
+      if (e.intent === 'back') { uiSfx(this, 'SFX_UI_CANCEL'); services.router.closeOverlay(this, this.returnTo); }
+      else if (e.intent === 'left' || e.intent === 'right') { uiSfx(this, 'SFX_UI_SELECT_ITEM'); this.mode = this.mode === 'buy' ? 'sell' : 'buy'; this.messageText = ''; this.redraw(); }
       else this.menu?.handleIntent(e);
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
@@ -78,7 +79,7 @@ export class ShopScene extends Phaser.Scene {
       t(dx, y + 26, 'Stok toko', { color: COLORS.paperDim }); t(dx + 150, y + 26, `${this.shop.stock[id] ?? 0}`, { weight: '600' });
       t(dx, y + 52, 'Di tas', { color: COLORS.paperDim }); t(dx + 150, y + 52, `${state.items[id] ?? 0}`, { weight: '600' });
     };
-    this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 308, rowHeight: 38, maxRows: 8, depth: 4, size: TYPE.body + 0.5, items, initialId: focusId,
+    this.menu = new MenuList(this, { ui, x: body.bodyX, y: body.bodyY + 4, width: 308, rowHeight: 38, maxRows: 8, depth: 4, size: TYPE.body + 0.5, items, initialId: focusId, sfx: { confirm: false },
       onFocusChange: item => describe(item.id),
       onDisabledConfirm: item => { this.messageText = item.disabledHint ?? ''; this.message?.setText(this.messageText); },
       onConfirm: item => {
@@ -86,6 +87,7 @@ export class ShopScene extends Phaser.Scene {
         const snap = services.gameState.snapshot()!;
         const result = this.shop.id === 'derrria' ? tradeWithDerrria(snap, this.mode, item.id) : trade(snap, this.shop, this.mode, item.id);
         if (result.ok) { services.gameState.load(result.data); this.shop = result.shop; if (this.shop.id === 'derrria') services.checkpoints.requestAutosave(); }
+        uiSfx(this, !result.ok ? 'SFX_UI_CANCEL' : this.mode === 'buy' ? 'SFX_UI_SHOP_BUY' : 'SFX_UI_SHOP_SELL');
         this.messageText = result.message;
         this.redraw(item.id);
       } });

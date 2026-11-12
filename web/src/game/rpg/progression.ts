@@ -1,7 +1,8 @@
 import type { Stats } from '../combat/BattleEngine';
-import { ITEMS, MAX_GOLD, MAX_ITEMS, PROFILES, SKILLS, YARIC_PROFILE, type CharacterProgress, type ProgressionProfile, type RpgState } from './definitions';
+import { ITEMS, MAX_GOLD, MAX_ITEMS, PROFILES, SKILLS, STARTING_EQUIPMENT, YARIC_PROFILE, type CharacterProgress, type ProgressionProfile, type RpgState } from './definitions';
 import type { GameStateData } from '../systems/GameState';
 import { changeItem } from './inventory';
+import { memberVitals, setMemberVitals } from './vitals';
 
 export const STAT_KEYS: readonly (keyof Stats)[] = ['HP', 'MP', 'ATK', 'DEF', 'MAG', 'MDEF', 'SPD'];
 export function levelForExp(exp: number, profile: ProgressionProfile = YARIC_PROFILE): number {
@@ -10,10 +11,16 @@ export function levelForExp(exp: number, profile: ProgressionProfile = YARIC_PRO
 export function baseStatsAt(level: number, profile: ProgressionProfile = YARIC_PROFILE): Stats {
   return Object.fromEntries(STAT_KEYS.map(key => [key, profile.base[key] + profile.growth[key] * (level - 1)])) as unknown as Stats;
 }
-export function createCharacter(profile: ProgressionProfile = YARIC_PROFILE): CharacterProgress {
-  return { classId: profile.classId, level: 1, exp: 0, baseStats: baseStatsAt(1, profile), skillPoints: 0,
-    unlockedSkills: profile.id === 'C01' ? ['ground_slam'] : profile.id === 'C03' ? ['ranting_nakal', 'bukan_aku'] : [],
-    equipment: { weapon: profile.id === 'C01' ? 'yaric_greatsword' : profile.id === 'C03' ? 'twig_staff' : null, armor: profile.id === 'C01' ? 'travel_coat' : null } };
+/** Jurus cost-0 tanpa prasyarat terbuka otomatis menurut level (tidak mengubah Yaric/Torvan: semuanya level 1). */
+function autoSkills(profile: ProgressionProfile, level: number, known: readonly string[] = []): string[] {
+  return SKILLS.filter(s => s.classId === profile.classId && s.cost === 0 && s.level <= level && (!s.prerequisite || known.includes(s.prerequisite))).map(s => s.id);
+}
+/** `startExp` memungkinkan bergabung pada level tertentu (Velthia). Poin jurus = level - 1 (belum dibelanjakan). */
+export function createCharacter(profile: ProgressionProfile = YARIC_PROFILE, startExp = 0): CharacterProgress {
+  const exp = Math.max(0, Math.min(profile.thresholds.at(-1)!, startExp)), level = levelForExp(exp, profile);
+  const eq = STARTING_EQUIPMENT[profile.id] ?? { weapon: null, armor: null };
+  return { classId: profile.classId, level, exp, baseStats: baseStatsAt(level, profile), skillPoints: level - 1,
+    unlockedSkills: autoSkills(profile, level), equipment: { weapon: eq.weapon, armor: eq.armor } };
 }
 export function createRpgState(): RpgState { return { gold: 0, characters: { C01: createCharacter() } }; }
 export function effectiveStats(data: Pick<GameStateData, 'rpg'>, id = 'C01'): Stats {
@@ -35,6 +42,7 @@ export function gainExp(character: CharacterProgress, amount: number, profile: P
   const next = structuredClone(character), cap = profile.thresholds.at(-1)!;
   next.exp = Math.min(cap, next.exp + amount); next.level = levelForExp(next.exp, profile);
   next.baseStats = baseStatsAt(next.level, profile); next.skillPoints += next.level - character.level;
+  for (const id of autoSkills(profile, next.level, next.unlockedSkills)) if (!next.unlockedSkills.includes(id)) next.unlockedSkills.push(id);
   return next;
 }
 export interface RewardReceipt { exp: number; gold: number; beforeLevel: number; afterLevel: number; skillPoints: number; items?: Record<string, number> }
@@ -53,10 +61,10 @@ export function applyReward(data: GameStateData, reward: { id: string; exp: numb
     const current = next.rpg.characters[id]!;
     const oldStats = effectiveStats(data, id);
     next.rpg.characters[id] = gainExp(current, reward.exp, PROFILES[id]);
-    if (id === 'C03' && next.partyVitals?.C03) {
+    const vitals = id === 'C01' ? undefined : memberVitals(next, id);
+    if (vitals) {
       const newStats = effectiveStats(next, id);
-      next.partyVitals.C03 = { hp: Math.min(newStats.HP, next.partyVitals.C03.hp + newStats.HP - oldStats.HP),
-        mp: Math.min(newStats.MP, next.partyVitals.C03.mp + newStats.MP - oldStats.MP) };
+      setMemberVitals(next, id, { hp: Math.min(newStats.HP, vitals.hp + newStats.HP - oldStats.HP), mp: Math.min(newStats.MP, vitals.mp + newStats.MP - oldStats.MP) });
     }
   }
   const after = effectiveStats(next);

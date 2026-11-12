@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { MenuList, type MenuItem } from '../../ui/components/MenuList';
+import { uiSfx } from '../../ui/kit/sfx';
 import { bar, menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
 import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
 import { nameKnownIn, partyName } from '../../ui/labels';
@@ -8,6 +9,7 @@ import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { equip, unlockSkill, useItem } from '../rpg/actions';
 import { ITEMS, PROFILES, SKILLS, type EquipmentSlot } from '../rpg/definitions';
 import { itemUseReason } from '../rpg/inventory';
+import { memberVitals } from '../rpg/vitals';
 import { effectiveStats, STAT_KEYS } from '../rpg/progression';
 import { getServices } from '../systems/Services';
 
@@ -30,7 +32,7 @@ export class RpgMenuScene extends Phaser.Scene {
   private message?: Phaser.GameObjects.Text;
   private detailObjs: Phaser.GameObjects.GameObject[] = [];
   private releaseInput?: () => void;
-  private characterId: 'C01' | 'C03' = 'C01';
+  private characterId: 'C01' | 'C02' | 'C03' = 'C01';
   private focusId?: string;
 
   constructor() { super(SCENE_KEYS.RpgMenu); }
@@ -48,9 +50,11 @@ export class RpgMenuScene extends Phaser.Scene {
     bindRelayout(this, () => { this.focusId = this.menu?.focusedItem.id; this.render(this.focusId); });
     const services = getServices(this);
     this.releaseInput = services.input.pushLayer('rpg-menu', e => {
-      if (e.intent === 'back') services.router.closeOverlay(this, this.returnTo);
-      else if ((e.intent === 'left' || e.intent === 'right') && services.gameState.snapshot()?.party.includes('C03')) {
-        this.characterId = this.characterId === 'C01' ? 'C03' : 'C01'; this.messageText = ''; this.focusId = undefined; this.redraw();
+      if (e.intent === 'back') { uiSfx(this, 'SFX_UI_CANCEL'); services.router.closeOverlay(this, this.returnTo); }
+      else if ((e.intent === 'left' || e.intent === 'right') && (services.gameState.snapshot()?.party.length ?? 1) > 1) {
+        const party = services.gameState.snapshot()!.party as ('C01' | 'C02' | 'C03')[];
+        const at = Math.max(0, party.indexOf(this.characterId)), step = e.intent === 'right' ? 1 : party.length - 1;
+        uiSfx(this, 'SFX_UI_MOVE'); this.characterId = party[(at + step) % party.length]!; this.messageText = ''; this.focusId = undefined; this.redraw();
       } else this.menu?.handleIntent({ ...e, intent: e.intent === 'left' ? 'up' : e.intent === 'right' ? 'down' : e.intent });
     });
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.releaseInput?.());
@@ -73,8 +77,8 @@ export class RpgMenuScene extends Phaser.Scene {
     const known = nameKnownIn(state);
     const c = state.rpg.characters[this.characterId]!;
     const stats = effectiveStats(state, this.characterId);
-    const vitals = this.characterId === 'C03' ? state.partyVitals!.C03 : state.vitals;
-    const duo = state.party.includes('C03');
+    const vitals = memberVitals(state, this.characterId)!;
+    const duo = state.party.length > 1;
     const who = partyName(this.characterId, known);
     veil(ui, 0.97);
     const WIN: WindowSpec = this.windowFor(state);
@@ -159,13 +163,14 @@ export class RpgMenuScene extends Phaser.Scene {
         t(detailX, y + 8, 'Tampilan karakter tidak berubah.', { size: TYPE.small, color: COLORS.paperDim });
       }
     };
-    this.menu = new MenuList(this, { ui, x: body.bodyX, y: top, width: 298, rowHeight: 36, maxRows: 9, depth: 4, size: TYPE.body + 0.5, items, initialId: focusId,
+    this.menu = new MenuList(this, { ui, x: body.bodyX, y: top, width: 298, rowHeight: 36, maxRows: 9, depth: 4, size: TYPE.body + 0.5, items, initialId: focusId, sfx: { confirm: false },
       onFocusChange: describe, onDisabledConfirm: item => this.setMessage(item.disabledHint ?? 'Tidak tersedia.'),
       onConfirm: item => {
         const current = services.gameState.snapshot()!;
         const [slot, value] = item.id.split(':') as [EquipmentSlot, string];
         const result = this.kind === 'inventory' ? useItem(current, item.id, this.characterId) : this.kind === 'skills' ? unlockSkill(current, item.id, this.characterId) : equip(current, slot, value === 'none' ? null : value, this.characterId);
         this.messageText = services.gameState.apply(result);
+        uiSfx(this, !result.ok ? 'SFX_UI_CANCEL' : this.kind === 'equipment' ? 'SFX_UI_SELECT_ITEM' : 'SFX_UI_ITEM_USE');
         this.redraw(item.id);
       } });
     describe(this.menu.focusedItem);
@@ -210,7 +215,7 @@ export class RpgMenuScene extends Phaser.Scene {
     const next = PROFILES[this.characterId]!.thresholds[c.level];
     row('EXP', next ? `${c.exp} / ${next}` : `${c.exp}  (maks)`, next ? c.exp / next : 1, COLORS.rose);
     ui.text(x, y, `Poin jurus  ${c.skillPoints}`, { size: TYPE.small, color: COLORS.paperDim, depth: 3 });
-    this.menu = new MenuList(this, { ui, x: body.bodyX, y: this.win.y + this.win.h - 104, width: 180, rowHeight: 34, depth: 4, size: TYPE.body, items: [{ id: 'back', label: 'Kembali' }],
+    this.menu = new MenuList(this, { ui, x: body.bodyX, y: this.win.y + this.win.h - 104, width: 180, rowHeight: 34, depth: 4, size: TYPE.body, items: [{ id: 'back', label: 'Kembali' }], sfx: { confirm: 'SFX_UI_CANCEL' },
       onConfirm: () => getServices(this).router.closeOverlay(this, this.returnTo) });
   }
 }

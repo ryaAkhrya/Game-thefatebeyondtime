@@ -1,0 +1,725 @@
+[
+  {
+    "id": "SFX_UI_MOVE",
+    "category": "ui",
+    "minIntervalMs": 45,
+    "gain": 0.5,
+    "files": [
+      {
+        "file": "SFX_UI_MOVE.wav",
+        "durationMs": 70,
+        "peakDb": -3,
+        "rmsDb": -16.9,
+        "sha256": "c001bc2df8847fb5b60e1222280dfe0743b7acc251aff29c660fcc08e88a9a2f"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_CONFIRM",
+    "category": "ui",
+    "minIntervalMs": 80,
+    "gain": 0.55,
+    "files": [
+      {
+        "file": "SFX_UI_CONFIRM.wav",
+        "durationMs": 200,
+        "peakDb": -3,
+        "rmsDb": -13.6,
+        "sha256": "6d058c73640c8d4969e8f694b99c56301de693a61cbd789265e666308dcb2984"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_CANCEL",
+    "category": "ui",
+    "minIntervalMs": 80,
+    "gain": 0.5,
+    "files": [
+      {
+        "file": "SFX_UI_CANCEL.wav",
+        "durationMs": 170,
+        "peakDb": -3,
+        "rmsDb": -13.8,
+        "sha256": "704552cf2db1ae0a15ffc4d7dbfe0c5d44ffa0bafb34ebef1568d27554f895b2"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_SELECT_ITEM",
+    "category": "ui",
+    "minIntervalMs": 60,
+    "gain": 0.5,
+    "files": [
+      {
+        "file": "SFX_UI_SELECT_ITEM.wav",
+        "durationMs": 90,
+        "peakDb": -3,
+        "rmsDb": -13.1,
+        "sha256": "553588157ad6a48706d56ca499e5f982ef5fb17804eb8e88c0eda8bfbfc3bc5c"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_ITEM_USE",
+    "category": "ui",
+    "minIntervalMs": 120,
+    "gain": 0.6,
+    "files": [
+      {
+        "file": "SFX_UI_ITEM_USE.wav",
+        "durationMs": 200,
+        "peakDb": -3,
+        "rmsDb": -16.7,
+        "sha256": "7f5dea3126c9e94580b5639b0d5d5dd3da9e73a4e36ff79c256baca9402d3eea"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_SAVE_OK",
+    "category": "ui",
+    "minIntervalMs": 200,
+    "gain": 0.6,
+    "files": [
+      {
+        "file": "SFX_UI_SAVE_OK.wav",
+        "durationMs": 200,
+        "peakDb": -3,
+        "rmsDb": -13.7,
+        "sha256": "6c9ae6e3b3c6729cd5491167522fc1a9fb3d49dc0e55f9ea3ad3eb79d64b86a7"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_SAVE_FAIL",
+    "category": "ui",
+    "minIntervalMs": 200,
+    "gain": 0.55,
+    "files": [
+      {
+        "file": "SFX_UI_SAVE_FAIL.wav",
+        "durationMs": 200,
+        "peakDb": -3,
+        "rmsDb": -17.3,
+        "sha256": "7baa3de1ad9ade796a0c5cd84d7262605d4c283414a61b3d7fb0785745a2f163"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_DIALOGUE_ADVANCE",
+    "category": "ui",
+    "minIntervalMs": 60,
+    "gain": 0.35,
+    "files": [
+      {
+        "file": "SFX_UI_DIALOGUE_ADVANCE.wav",
+        "durationMs": 55,
+        "peakDb": -3,
+        "rmsDb": -15.1,
+        "sha256": "6ce0d54f6f5d5794448fc4a97b9dd6d401645de9f6534c2b30a1338fd8b76399"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_DIALOGUE_CHOICE",
+    "category": "ui",
+    "minIntervalMs": 60,
+    "gain": 0.45,
+    "files": [
+      {
+        "file": "SFX_UI_DIALOGUE_CHOICE.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -13.9,
+        "sha256": "41b1bf8c9ef75799fddb952c4178a5f3a77434461e64c8cc544825fecd8ce024"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_SHOP_BUY",
+    "category": "ui",
+    "minIntervalMs": 100,
+    "gain": 0.6,
+    "files": [
+      {
+        "file": "SFX_UI_SHOP_BUY.wav",
+        "durationMs": 200,
+        "peakDb": -3,
+        "rmsDb": -14.1,
+        "sha256": "70120bd3fbe5499313ecb7e9576b9f57a978376b441a78d918386bddf00489b5"
+      }
+    ]
+  },
+  {
+    "id": "SFX_UI_SHOP_SELL",
+    "category": "ui",
+    "minIntervalMs": 100,
+    "gain": 0.6,
+    "files": [
+      {
+        "file": "SFX_UI_SHOP_SELL.wav",
+        "durationMs": 190,
+        "peakDb": -3,
+        "rmsDb": -14,
+        "sha256": "fe4c2f791952a21ae812d15363cb3f594b429e697e9aa4673a90d2f774b5f5e7"
+      }
+    ]
+  },
+  {
+    "id": "SFX_STEP_GRASS",
+    "category": "step",
+    "minIntervalMs": 90,
+    "gain": 0.5,
+    "files": [
+      {
+        "file": "SFX_STEP_GRASS_01.wav",
+        "durationMs": 110,
+        "peakDb": -3,
+        "rmsDb": -18.5,
+        "sha256": "327042d0f51ea2f131cf8b2e30ce114f20007ea1945ff6bd64b09755b2620da8"
+      },
+      {
+        "file": "SFX_STEP_GRASS_02.wav",
+        "durationMs": 110,
+        "peakDb": -3,
+        "rmsDb": -18.3,
+        "sha256": "b46c6a09f4969d059145148a1f272867ab68f33c97efc2cc2196705769493430"
+      },
+      {
+        "file": "SFX_STEP_GRASS_03.wav",
+        "durationMs": 110,
+        "peakDb": -3,
+        "rmsDb": -18.5,
+        "sha256": "a15eca32cfbe256a7600b1bb9d9132c6e0bdc5c36cf5b8e085bfcab6ca4e81b7"
+      },
+      {
+        "file": "SFX_STEP_GRASS_04.wav",
+        "durationMs": 110,
+        "peakDb": -3,
+        "rmsDb": -18,
+        "sha256": "a111f182fcfb5e95c4963589ea8a9651edfc713aae872f97d01de061af166971"
+      }
+    ]
+  },
+  {
+    "id": "SFX_STEP_DIRT",
+    "category": "step",
+    "minIntervalMs": 90,
+    "gain": 0.55,
+    "files": [
+      {
+        "file": "SFX_STEP_DIRT_01.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -14.8,
+        "sha256": "2d66945491aed5af58714d968115d97a98af4eae4240b9ec07e793546e944472"
+      },
+      {
+        "file": "SFX_STEP_DIRT_02.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -15.7,
+        "sha256": "7de9ad723a2a3e474d09ec1f86451210d64d87434dd11d719c6e8ec679712d78"
+      },
+      {
+        "file": "SFX_STEP_DIRT_03.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -15.7,
+        "sha256": "9fddbb7f3230d2baae03c22f4ad20dfe629b499a4dc4a7eb43c9b15f1e3b6a52"
+      },
+      {
+        "file": "SFX_STEP_DIRT_04.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -14.8,
+        "sha256": "3c0a025fca9a027ad10ea82bc6b522939516323beded6a1201357fec15e5bd9c"
+      }
+    ]
+  },
+  {
+    "id": "SFX_STEP_STONE",
+    "category": "step",
+    "minIntervalMs": 90,
+    "gain": 0.5,
+    "files": [
+      {
+        "file": "SFX_STEP_STONE_01.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -18,
+        "sha256": "3c4e7b13eb0d4afc2f04d3d9f55c839bf19a5fdbb901fa7c955ee2ea4c4609ce"
+      },
+      {
+        "file": "SFX_STEP_STONE_02.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -17.3,
+        "sha256": "98e4a1d09728df7a163393e9208f52c1ffba7d031183671001865f3c0256359c"
+      },
+      {
+        "file": "SFX_STEP_STONE_03.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -17.8,
+        "sha256": "21784c155240048918c60217b1ceec30018895c70bdffae6d948982b81599759"
+      },
+      {
+        "file": "SFX_STEP_STONE_04.wav",
+        "durationMs": 100,
+        "peakDb": -3,
+        "rmsDb": -17.2,
+        "sha256": "17758fdd37a67e85bc86e238e7e7f48b471d7d0136e8dbc9b192c9624f2df893"
+      }
+    ]
+  },
+  {
+    "id": "SFX_INTERACT",
+    "category": "interact",
+    "minIntervalMs": 150,
+    "gain": 0.6,
+    "files": [
+      {
+        "file": "SFX_INTERACT.wav",
+        "durationMs": 220,
+        "peakDb": -3,
+        "rmsDb": -14.3,
+        "sha256": "baa6fb590f4f42cc635142c1d33a2bf8dbf084be93246b3d79c56c2afacded38"
+      }
+    ]
+  },
+  {
+    "id": "SFX_CHEST_OPEN",
+    "category": "interact",
+    "minIntervalMs": 400,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_CHEST_OPEN.wav",
+        "durationMs": 900,
+        "peakDb": -3,
+        "rmsDb": -18.6,
+        "sha256": "6f75d7abccb2de4cd861912d9767927a00044283e49155c815d5cd0fe13361a7"
+      }
+    ]
+  },
+  {
+    "id": "SFX_ITEM_PICKUP",
+    "category": "interact",
+    "minIntervalMs": 150,
+    "gain": 0.6,
+    "files": [
+      {
+        "file": "SFX_ITEM_PICKUP.wav",
+        "durationMs": 320,
+        "peakDb": -3,
+        "rmsDb": -13.7,
+        "sha256": "d7473d63c0e397baa2d2e110ffa6444afd96b8ea41b776fbf4d721e0fa475f7e"
+      }
+    ]
+  },
+  {
+    "id": "SFX_DOOR_OPEN",
+    "category": "interact",
+    "minIntervalMs": 500,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_DOOR_OPEN.wav",
+        "durationMs": 900,
+        "peakDb": -3,
+        "rmsDb": -18.1,
+        "sha256": "788ed82a3b43189bbb410ef496994faceced79f651ee1335201e5c565428059b"
+      }
+    ]
+  },
+  {
+    "id": "SFX_PUZZLE_ACTIVATE",
+    "category": "interact",
+    "minIntervalMs": 300,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_PUZZLE_ACTIVATE.wav",
+        "durationMs": 600,
+        "peakDb": -3,
+        "rmsDb": -17.3,
+        "sha256": "37dc36823489ce03789a8afc31a6955abbeb528567a1685cdf96d5d647ab9383"
+      }
+    ]
+  },
+  {
+    "id": "SFX_PUZZLE_SOLVED",
+    "category": "interact",
+    "minIntervalMs": 800,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_PUZZLE_SOLVED.wav",
+        "durationMs": 1450,
+        "peakDb": -3,
+        "rmsDb": -16.9,
+        "sha256": "61c371fd559ca56799cfecad67663f592ef82b88fc18376ff8af43741b3f5858"
+      }
+    ]
+  },
+  {
+    "id": "SFX_BATTLE_TRANSITION_NORMAL",
+    "category": "transition",
+    "minIntervalMs": 800,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_BATTLE_TRANSITION_NORMAL.wav",
+        "durationMs": 850,
+        "peakDb": -3,
+        "rmsDb": -21,
+        "sha256": "30b28608bef3bb2518dea0fa06156a249b50e099b1f85bb39812833be763c195"
+      }
+    ]
+  },
+  {
+    "id": "SFX_BATTLE_TRANSITION_BOSS",
+    "category": "transition",
+    "minIntervalMs": 1000,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_BATTLE_TRANSITION_BOSS.wav",
+        "durationMs": 1400,
+        "peakDb": -3,
+        "rmsDb": -16,
+        "sha256": "2302a4b3c68302721b38f33e6749b22ae2d1b9d250d2bc6b668e0e3d789864bf"
+      }
+    ]
+  },
+  {
+    "id": "SFX_BATTLE_TRANSITION_TEMPORAL",
+    "category": "transition",
+    "minIntervalMs": 1000,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_BATTLE_TRANSITION_TEMPORAL.wav",
+        "durationMs": 1150,
+        "peakDb": -3,
+        "rmsDb": -18.2,
+        "sha256": "7a5c243963880cc2056d5b81a7287b7581114bd1d86db2f086feb6291187323e"
+      }
+    ]
+  },
+  {
+    "id": "SFX_BATTLE_TRANSITION_SCRIPTED",
+    "category": "transition",
+    "minIntervalMs": 1000,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_BATTLE_TRANSITION_SCRIPTED.wav",
+        "durationMs": 1000,
+        "peakDb": -3,
+        "rmsDb": -16.7,
+        "sha256": "a3e17182e4632a14c4138c6bd227524d2090729d9533f7352a8b59e74ad5edcc"
+      }
+    ]
+  },
+  {
+    "id": "SFX_BATTLE_CONFIRM",
+    "category": "ui",
+    "minIntervalMs": 80,
+    "gain": 0.6,
+    "files": [
+      {
+        "file": "SFX_BATTLE_CONFIRM.wav",
+        "durationMs": 200,
+        "peakDb": -3,
+        "rmsDb": -15.7,
+        "sha256": "1b7a6a89002e16ecb931d7dc238aa81682a5056088e0f0f79510b25c5633b72f"
+      }
+    ]
+  },
+  {
+    "id": "SFX_GREATSWORD_SWING",
+    "category": "battle",
+    "minIntervalMs": 120,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_GREATSWORD_SWING.wav",
+        "durationMs": 380,
+        "peakDb": -3,
+        "rmsDb": -18.1,
+        "sha256": "f3ddc7fa3e599f23c61605630f07794adf2b0792630aeddb004dd5db55711ef3"
+      }
+    ]
+  },
+  {
+    "id": "SFX_GREATSWORD_IMPACT",
+    "category": "battle",
+    "minIntervalMs": 60,
+    "gain": 1,
+    "files": [
+      {
+        "file": "SFX_GREATSWORD_IMPACT.wav",
+        "durationMs": 500,
+        "peakDb": -3,
+        "rmsDb": -15.8,
+        "sha256": "1a087c93cd9baa20342c1c5740f83b2f1e803917422831a60f29471abd82bb7f"
+      }
+    ]
+  },
+  {
+    "id": "SFX_GROUND_SLAM",
+    "category": "battle",
+    "minIntervalMs": 200,
+    "gain": 1,
+    "files": [
+      {
+        "file": "SFX_GROUND_SLAM.wav",
+        "durationMs": 600,
+        "peakDb": -3,
+        "rmsDb": -12.5,
+        "sha256": "a29cf43099234962deb63b33af1d2c362c46e2ad95254ac3ce481b7802e0da7e"
+      }
+    ]
+  },
+  {
+    "id": "SFX_ENEMY_ATTACK",
+    "category": "battle",
+    "minIntervalMs": 120,
+    "gain": 0.9,
+    "files": [
+      {
+        "file": "SFX_ENEMY_ATTACK.wav",
+        "durationMs": 400,
+        "peakDb": -3,
+        "rmsDb": -19.5,
+        "sha256": "d59493cec50731f404f1917aa6d65c3089aee9e22fda8099c2f2e7e58ccf362c"
+      }
+    ]
+  },
+  {
+    "id": "SFX_DAMAGE",
+    "category": "battle",
+    "minIntervalMs": 80,
+    "gain": 0.95,
+    "files": [
+      {
+        "file": "SFX_DAMAGE.wav",
+        "durationMs": 280,
+        "peakDb": -3,
+        "rmsDb": -17.2,
+        "sha256": "7d82989ecccb93de07e262811c4476949cbf91011aec5e6973753e165802ed33"
+      }
+    ]
+  },
+  {
+    "id": "SFX_ENEMY_DAMAGE",
+    "category": "battle",
+    "minIntervalMs": 80,
+    "gain": 0.95,
+    "files": [
+      {
+        "file": "SFX_ENEMY_DAMAGE.wav",
+        "durationMs": 260,
+        "peakDb": -3,
+        "rmsDb": -20.9,
+        "sha256": "bfdf26c568851402aa83f9c35bf49b4ed1e9301b7a8cb110e316485fcd7a2f65"
+      }
+    ]
+  },
+  {
+    "id": "SFX_DEFEND",
+    "category": "battle",
+    "minIntervalMs": 120,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_DEFEND.wav",
+        "durationMs": 320,
+        "peakDb": -3,
+        "rmsDb": -20.5,
+        "sha256": "dc903bef93b9e81b3b8d2baedb938616a8a6ef1702a3465fc7fa47edb987eb0a"
+      }
+    ]
+  },
+  {
+    "id": "SFX_HEAL",
+    "category": "magic",
+    "minIntervalMs": 200,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_HEAL.wav",
+        "durationMs": 1000,
+        "peakDb": -3,
+        "rmsDb": -14.4,
+        "sha256": "9f7ccc1236f6cd2b44a6905a086c4324f95d8754c4f0abf27f4677c20d4a358e"
+      }
+    ]
+  },
+  {
+    "id": "SFX_SHIELD",
+    "category": "magic",
+    "minIntervalMs": 200,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_SHIELD.wav",
+        "durationMs": 700,
+        "peakDb": -3,
+        "rmsDb": -18.1,
+        "sha256": "3dbb74a0e8a84c66172bb43cac3c235dd141a7b85a24dc47a86f3820db304e79"
+      }
+    ]
+  },
+  {
+    "id": "SFX_STATUS_POISON",
+    "category": "magic",
+    "minIntervalMs": 300,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_STATUS_POISON.wav",
+        "durationMs": 650,
+        "peakDb": -3,
+        "rmsDb": -16,
+        "sha256": "a73ee067a85bc991b1bdc2d8dd1ce559c03bb11a163b611f10528546b40d9dda"
+      }
+    ]
+  },
+  {
+    "id": "SFX_VICTORY",
+    "category": "stinger",
+    "minIntervalMs": 2000,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_VICTORY.wav",
+        "durationMs": 2450,
+        "peakDb": -3,
+        "rmsDb": -18.3,
+        "sha256": "2dd18cbc1c4ee460703d69cf36db52f9599cd282e2ea5b4cf92fc4a1bf6d4ce1"
+      }
+    ]
+  },
+  {
+    "id": "SFX_DEFEAT",
+    "category": "stinger",
+    "minIntervalMs": 2000,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_DEFEAT.wav",
+        "durationMs": 2450,
+        "peakDb": -3,
+        "rmsDb": -15.3,
+        "sha256": "6243ef2150b7e263da862960efc5d37074013f528be51ac303a72c1c495a279a"
+      }
+    ]
+  },
+  {
+    "id": "SFX_MAGIC_TORVAN",
+    "category": "magic",
+    "minIntervalMs": 200,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_MAGIC_TORVAN.wav",
+        "durationMs": 950,
+        "peakDb": -3,
+        "rmsDb": -17.6,
+        "sha256": "fff19e4f1a3b20afc42cfb0074b64f1c8027311dd33f66683d5d2b08e50fe9fc"
+      }
+    ]
+  },
+  {
+    "id": "SFX_MAGIC_VELTHIA_CAST",
+    "category": "magic",
+    "minIntervalMs": 200,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_MAGIC_VELTHIA_CAST.wav",
+        "durationMs": 900,
+        "peakDb": -3,
+        "rmsDb": -17.4,
+        "sha256": "ef2e0d917e7725b4ef141060a7d6cb7a59ec0e4ea0fb9a658bf0b2605a97c070"
+      }
+    ]
+  },
+  {
+    "id": "SFX_MAGIC_VELTHIA_SHIELD",
+    "category": "magic",
+    "minIntervalMs": 250,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_MAGIC_VELTHIA_SHIELD.wav",
+        "durationMs": 1150,
+        "peakDb": -3,
+        "rmsDb": -15.2,
+        "sha256": "75d23599495c105c3ac736e4bb100bf93dcdc8c028d3b4108a7e5ce906bccb59"
+      }
+    ]
+  },
+  {
+    "id": "SFX_MAGIC_VELTHIA_HEAL",
+    "category": "magic",
+    "minIntervalMs": 250,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_MAGIC_VELTHIA_HEAL.wav",
+        "durationMs": 1200,
+        "peakDb": -3,
+        "rmsDb": -15.2,
+        "sha256": "045af853b1518492d7d6b82f588dfa66fc0af6efcb339089254b6f4c92e99dc2"
+      }
+    ]
+  },
+  {
+    "id": "SFX_CHRONOLITH_CHARGE",
+    "category": "magic",
+    "minIntervalMs": 300,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_CHRONOLITH_CHARGE.wav",
+        "durationMs": 1200,
+        "peakDb": -3,
+        "rmsDb": -17.6,
+        "sha256": "35c23df6ec37ecb8378d86b8b4d05826ba8c22d97d820b8ac32123f9473a5676"
+      }
+    ]
+  },
+  {
+    "id": "SFX_CHRONOLITH_STRIKE",
+    "category": "magic",
+    "minIntervalMs": 300,
+    "gain": 1,
+    "files": [
+      {
+        "file": "SFX_CHRONOLITH_STRIKE.wav",
+        "durationMs": 1000,
+        "peakDb": -3,
+        "rmsDb": -15.3,
+        "sha256": "6a537301f7e357e45eecfd6a9a49205c868fefc6710765a78b73ddbbf63696dd"
+      }
+    ]
+  },
+  {
+    "id": "SFX_CHRONOLITH_TEMPORAL",
+    "category": "magic",
+    "minIntervalMs": 300,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_CHRONOLITH_TEMPORAL.wav",
+        "durationMs": 1200,
+        "peakDb": -3,
+        "rmsDb": -15.6,
+        "sha256": "f01e63c15fc0f17081908b701a34cf9cb4ccc1fc44b20c0694ecc1e9f376dfdd"
+      }
+    ]
+  }
+]

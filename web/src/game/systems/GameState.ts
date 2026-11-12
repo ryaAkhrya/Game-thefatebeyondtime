@@ -7,6 +7,7 @@ import type { RpgResult } from '../rpg/actions';
 import { BOSS_CHECKPOINT_FLAG, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, SLICE_COMPLETE } from '../combat/encounters';
 import { CITY_FLAG } from '../story/aveloriaFlags';
 import { C2 } from '../story/chapter2Flags';
+import { C3, C3_BEATS, type C3Beat } from '../story/chapter3Flags';
 import { ITEMS, MAX_ITEMS } from '../rpg/definitions';
 
 export const GAME_STATE_VERSION = 2;
@@ -29,11 +30,14 @@ export interface GameStateData {
   items: Record<string, number>;
   /** Canonical v2 vitals; migration supplies defaults only for older saves. */
   vitals: { hp: number; mp: number };
-  /** Optional v2 extension. Absent in every Chapter I save. */
-  partyVitals?: { C03: { hp: number; mp: number } };
+  /**
+   * Optional v2 extension. Absent in every Chapter I save. C03 wajib setelah Torvan bergabung dan tetap ada saat ia cadangan;
+   * C02 wajib hanya setelah Velthia bergabung (Chapter III).
+   */
+  partyVitals?: { C03: { hp: number; mp: number }; C02?: { hp: number; mp: number } };
   rpg: RpgState;
   storyBeat: 'C1-01' | 'C1-02' | 'C1-03' | 'C1-04' | 'C1-04-DONE' | 'C1-05' | 'C1-05-DONE' | 'SLICE-DONE' | 'C1-06' | 'C1-07' | 'C1-08' | 'C1-09' | 'C1-DONE'
-    | 'C2-01' | 'C2-02' | 'C2-03' | 'C2-04' | 'C2-05' | 'C2-06' | 'C2-07' | 'C2-08' | 'C2-09' | 'C2-DONE';
+    | 'C2-01' | 'C2-02' | 'C2-03' | 'C2-04' | 'C2-05' | 'C2-06' | 'C2-07' | 'C2-08' | 'C2-09' | 'C2-DONE' | C3Beat;
   /** Optional extension of v2: old saves have never opened a persistent shop. */
   world: { forestWrapCount: number; shops?: Record<string, Record<string, number>>; lastChapter2EncounterSec?: number };
   playtimeSec: number;
@@ -59,6 +63,15 @@ export function createNewGameData(): GameStateData {
 const FACINGS: readonly Facing[] = ['up', 'down', 'left', 'right'];
 
 export function storyBeatFor(flags: Record<string, boolean>): GameStateData['storyBeat'] {
+  // Chapter III (diturunkan dari flag; urutan dari yang paling akhir).
+  if (flags[C3.complete]) return 'C3-DONE';
+  if (flags[C3.chronolithOutroSeen] || flags[C3.hiddenName] || flags[C3.promise]) return 'C3-07';
+  if (flags[C3.chronolith]) return 'C3-06';
+  if (flags[C3.gateOpen] || flags[C3.checkpoint] || flags[C3.chronolithIntroSeen]) return 'C3-05';
+  if (flags[C3.campSeen] || flags[C3.puzzleA] || flags[C3.puzzleB] || flags[C3.puzzleC] || flags[C3.puzzleNote] || flags[C3.templeFight1] || flags[C3.templeFight2]) return 'C3-04';
+  if (flags[C3.departed] || flags[C3.templeEntered]) return 'C3-03';
+  if (flags[C3.velthiaJoined] || flags[C3.torvanStays]) return 'C3-02';
+  if (flags[C3.start]) return 'C3-01';
   if (flags[C2.complete]) return 'C2-DONE';
   if (flags[C2.fragments]) return 'C2-09';
   if (flags[C2.veyrath]) return 'C2-08';
@@ -136,8 +149,8 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
   if (!rpg || !(r.party as string[]).every(id => rpg.characters[id])) return null;
   if (!record(r.world) || !integer(r.world.forestWrapCount, 0, 1000000)) return null;
   const lastChapter2EncounterSec = r.world.lastChapter2EncounterSec;
-  if (lastChapter2EncounterSec !== undefined && (r.chapter !== 'II' || typeof lastChapter2EncounterSec !== 'number' || !Number.isFinite(lastChapter2EncounterSec) || lastChapter2EncounterSec < 0 || lastChapter2EncounterSec > (r.playtimeSec as number))) return null;
-  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE', 'C1-05', 'C1-05-DONE', 'SLICE-DONE', 'C1-06', 'C1-07', 'C1-08', 'C1-09', 'C1-DONE', 'C2-01', 'C2-02', 'C2-03', 'C2-04', 'C2-05', 'C2-06', 'C2-07', 'C2-08', 'C2-09', 'C2-DONE'].includes(String(r.storyBeat))) return null;
+  if (lastChapter2EncounterSec !== undefined && ((r.chapter !== 'II' && r.chapter !== 'III') || typeof lastChapter2EncounterSec !== 'number' || !Number.isFinite(lastChapter2EncounterSec) || lastChapter2EncounterSec < 0 || lastChapter2EncounterSec > (r.playtimeSec as number))) return null;
+  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE', 'C1-05', 'C1-05-DONE', 'SLICE-DONE', 'C1-06', 'C1-07', 'C1-08', 'C1-09', 'C1-DONE', 'C2-01', 'C2-02', 'C2-03', 'C2-04', 'C2-05', 'C2-06', 'C2-07', 'C2-08', 'C2-09', 'C2-DONE', ...C3_BEATS].includes(String(r.storyBeat))) return null;
   if ((r.area === 'forest_edge' || flags[FOREST_EDGE_FLAG] || flags[BOSS_CHECKPOINT_FLAG] || flags[MOURNFANG_FLAG]) && !flags[FIRST_HOLLOWLING_FLAG]) return null;
   if (flags['reward.mournfang.rpg'] && !flags[MOURNFANG_FLAG]) return null;
   if ((flags[MOURNFANG_VICTORY_SEEN] || flags[SLICE_COMPLETE]) && !flags[MOURNFANG_FLAG]) return null;
@@ -155,7 +168,18 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
   for (const [next, previous] of [[C2.depart, C2.start], [C2.farewell, C2.depart], [C2.zira, C2.farewell], [C2.forest, C2.zira], [C2.secondMarker, C2.forest], [C2.torvan, C2.forest], [C2.tutorial, C2.torvan], [C2.tutorialSeen, C2.tutorial], [C2.patrol, C2.tutorial], [C2.checkpoint, C2.torvan], [C2.veyrath, C2.tutorial], [C2.veyrath, C2.secondMarker], [C2.veyrathSeen, C2.veyrath], [C2.fragmentA, C2.veyrath], [C2.fragments, C2.fragmentA], [C2.complete, C2.fragments]]) {
     if (flags[next!] && !flags[previous!]) return null;
   }
-  if ((flags[C2.torvan] && (r.party as string[]).join() !== 'C01,C03') || (!flags[C2.torvan] && (r.party as string[]).join() !== 'C01')) return null;
+  // Chapter III: setiap flag/area/bab butuh Bab II selesai; Velthia menggantikan Torvan (cadangan) sebagai anggota ke-2.
+  const anyC3 = Object.values(C3).some(f => flags[f]);
+  if ((r.chapter === 'III' || r.area === 'temple' || anyC3) && !flags[C2.complete]) return null;
+  if ((r.chapter === 'III' || anyC3) && !flags[C3.start]) return null;
+  if ((r.chapter === 'I' || r.chapter === 'II') && anyC3) return null;
+  if (r.area === 'temple' && !flags[C3.velthiaJoined]) return null;
+  for (const [next, previous] of [[C3.velthiaJoined, C2.torvan], [C3.templeEntered, C3.velthiaJoined], [C3.templeFight1, C3.velthiaJoined], [C3.templeFight2, C3.velthiaJoined],
+    [C3.gateOpen, C3.templeEntered], [C3.chronolith, C3.velthiaJoined], [C3.chronolithOutroSeen, C3.chronolith], [C3.complete, C3.chronolith], ['reward.c3_chronolith.rpg', C3.chronolith]]) {
+    if (flags[next!] && !flags[previous!]) return null;
+  }
+  const expectedParty = flags[C3.velthiaJoined] ? 'C01,C02' : flags[C2.torvan] ? 'C01,C03' : 'C01';
+  if ((r.party as string[]).join() !== expectedParty) return null;
   let shops: GameStateData['world']['shops'];
   if (r.world.shops !== undefined) {
     if (!record(r.world.shops) || Object.keys(r.world.shops).some(id => id !== 'derrria')) return null;
@@ -186,6 +210,13 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
     if (!integer(v.hp, 0, torvan.HP) || !integer(v.mp, 0, torvan.MP)) return null;
     partyVitals = { C03: { hp: v.hp, mp: v.mp } };
   } else if (r.partyVitals !== undefined || rpg.characters.C03) return null;
+  if (partyVitals && flags[C3.velthiaJoined]) {
+    const pv = r.partyVitals as Record<string, unknown>;
+    if (!rpg.characters.C02 || !record(pv.C02)) return null;
+    const velthia = effectiveStats({ rpg }, 'C02'), v = pv.C02;
+    if (!integer(v.hp, 0, velthia.HP) || !integer(v.mp, 0, velthia.MP)) return null;
+    partyVitals = { ...partyVitals, C02: { hp: v.hp, mp: v.mp } };
+  } else if (rpg.characters.C02 || (record(r.partyVitals) && r.partyVitals.C02 !== undefined)) return null;
 
   return {
     schemaVersion: GAME_STATE_VERSION,

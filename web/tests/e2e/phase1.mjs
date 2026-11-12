@@ -560,7 +560,7 @@ async function main() {
 
     check('Tidak ada error JS sepanjang sesi cerita penuh', s.errors.length === 0, s.errors.join(' | '));
     check('Tidak ada request gagal / 404 (aset hilang)', s.failed.length === 0, s.failed.join(' | '));
-    check('Tidak ada permintaan file musik (.ogg/.mp3/.wav); game senyap tanpa BGM', !s.requests.some((u) => /\.(ogg|mp3|wav)(\?|$)/.test(u)), s.requests.filter((u) => /\.(ogg|mp3|wav)/.test(u)).join(','));
+    check('Tidak ada permintaan file musik (.ogg/.mp3/.wav); game senyap tanpa BGM', !s.requests.some((u) => (/\.(ogg|mp3|wav)(\?|$)/.test(u) && !/\/audio\/sfx\//.test(u))), s.requests.filter((u) => /\.(ogg|mp3|wav)/.test(u) && !/\/audio\/sfx\//.test(u)).join(','));
     await s.context.close();
   }
 

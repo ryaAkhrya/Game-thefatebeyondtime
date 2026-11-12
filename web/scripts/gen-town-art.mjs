@@ -2,6 +2,7 @@
 // Output web/public/assets/environment/town/:
 //   aveloria_ground.png / liora_ground.png   tanah satu gambar (paving, transisi, bayangan jatuh sudah dibaking)
 //   aveloria_atlas.png|json / liora_atlas.png|json   atlas sprite (frame Phaser + pivot per frame)
+//   town_crisis_atlas.png|json   (target 'crisis': prop + warga krisis Chapter III; TIDAK ikut target bawaan agar aset Bab I-II tidak berubah)
 // Semua gambar dihasilkan kode ini (tanpa aset luar). STATUS: DRAFT dev art, dapat diganti file PNG/JSON bernama sama.
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
@@ -35,4 +36,14 @@ if ((!only || only === 'liora') && LIORA_ITEMS.length) {
   const { bakeLiora } = await import('./town-art/lio-ground.mjs');
   const frames = lioraFrames();
   emit('liora', frames, bakeLiora(LIORA_ITEMS, toMap(frames)));
+}
+
+if (only === 'crisis') {
+  const { crisisFrames } = await import('./town-art/crisis-all.mjs');
+  const frames = crisisFrames();
+  const { canvas, json } = packAtlas(frames.map(f => ({ name: f.name, c: f.c, pivot: f.pivot })), 2048);
+  json.meta.image = 'town_crisis_atlas.png';
+  writeFileSync(resolve(outDir, 'town_crisis_atlas.png'), canvas.png());
+  writeFileSync(resolve(outDir, 'town_crisis_atlas.json'), JSON.stringify(json));
+  console.log('town_crisis: atlas ' + canvas.w + 'x' + canvas.h + ' (' + frames.length + ' frame)');
 }

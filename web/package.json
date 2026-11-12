@@ -14,6 +14,8 @@
     "verify": "npm run typecheck && npm run test && npm run build",
     "assets:prepare": "node scripts/prepare-assets.mjs && node scripts/gen-forest-art.mjs && node scripts/prepare-battle-assets.mjs && node scripts/prepare-aveloria-assets.mjs && node scripts/prepare-chapter2-assets.mjs && node scripts/prepare-ui-assets.mjs && node scripts/normalize-exploration-sprites.mjs",
     "assets:sprint2": "node scripts/gen-forest-art.mjs && node scripts/gen-forest-edge-art.mjs && node scripts/gen-forest2-art.mjs && node scripts/gen-town-art.mjs",
+    "assets:vfx": "node scripts/vfx/build.mjs",
+    "assets:sfx": "node scripts/sfx/generate.mjs",
     "assets:sprites": "python -I scripts/author-mournfang.py && python -I scripts/author-yaric-sprites.py && python -I scripts/author_cast_build.py"
   },
   "dependencies": {

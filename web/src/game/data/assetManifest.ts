@@ -67,6 +67,21 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     finalPath: 'assets/battle/B01_BATTLE_V4.png', finalFrameSize: [160, 128],
     notes: 'Four original grid-authored key poses only, NOT finished animation. Runtime holds/reuses poses; no redraw or reference crop. Source JSON says DRAFT; registry review remains NEEDS_REVIEW.',
   },
+  // Phase 7 (Agent BA): atlas battle penuh dari desain resmi, dibuat skrip web/scripts/battle-art/build_{c02,b03,m05}.py. DRAFT/NEEDS_REVIEW.
+  // Format BattleAtlas penuh (frame_size, frames{rect,pivot,duration_ms}, event) -- dibaca BattleScene lewat `${id}:meta` + fullAtlas().
+  ...([
+    ['C02_BATTLE_V1', 'C02', 'characters/C02_Velthia/C02_TURNAROUND_SIDE.png', 'characters/C02_Velthia/C02_BATTLE_ATLAS_DRAFT.json', [116, 112], 13, 'cast', 'C02_BATTLE_V1', 3,
+      'Velthia (tanpa senjata), menghadap KIRI (sisi party). Re-pose boneka kertas dari turnaround samping resmi, dicerminkan; 13 gambar + alias attack=cast. Tangan diperbesar 1,2-1,3x pada pose sihir. Perlu redraw seniman.'],
+    ['B03_BATTLE_V1', 'B03', 'bosses/B03_Chronolith/B03_NEW_CONCEPT_DRAFT.png', 'bosses/B03_Chronolith/B03_BATTLE_ATLAS_DRAFT.json', [192, 140], 13, 'attack', 'B03_BATTLE_V1', 4,
+      'Chronolith, menghadap depan; busur+inti. 13 frame termasuk charge (tell), guard, special. Re-pose boneka kertas dari konsep resmi; perlu redraw seniman.'],
+    ['M05_BATTLE_V1', 'M05', 'monsters/M05_Oathguard/M05_NEW_CONCEPT_DRAFT.png', 'monsters/M05_Oathguard/M05_BATTLE_ATLAS_DRAFT.json', [160, 128], 10, 'attack', 'M05_BATTLE_V1', 3,
+      'Oathguard, menghadap kanan; 10 frame kontrak wajib. Re-pose boneka kertas dari konsep resmi (jatuh = rotasi kaku); perlu redraw seniman.'],
+  ] as const).map(([id, entity, img, json, fs, n, ev, out, evIdx, notes]): AtlasAsset => ({
+    id, entity, kind: 'battle_atlas', version: 'draft', status: 'NEEDS_REVIEW',
+    sourceImage: `assets/${img}`, sourceJson: `assets/${json}`,
+    frameSize: fs, atlasSize: [fs[0] * n, fs[1]], frameCount: n, eventFrame: { name: ev, index: evIdx },
+    publicPath: `assets/battle/${out}.png`, imported: true, notes,
+  })),
   {
     id: 'C01_YARIC_BATTLE',
     entity: 'C01',

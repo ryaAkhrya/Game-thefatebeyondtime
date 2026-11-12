@@ -1,6 +1,6 @@
 import type { Settings } from '../data/settingsSchema';
 import { findCue } from '../data/musicRegistry';
-import { BATTLE_SFX } from '../data/battleSfxRegistry';
+import { SFX_REGISTRY, type SfxCue } from '../data/sfxRegistry';
 import type { SettingsRepository } from './SettingsRepository';
 
 export type AudioChannel = 'bgm' | 'sfx';
@@ -20,6 +20,8 @@ export interface SoundBackend {
   stop(): void;
   setBgmVolume(volume: number): void;
   setSfxVolume?(volume: number): void;
+  /** Memutar SFX sekali dengan laju (playbackRate) tertentu. Bila tidak ada, AudioManager memakai playLoop(key, volume, false). */
+  playSfx?(key: string, volume: number, rate: number): void;
   /** Membuka AudioContext setelah gesture pemain. */
   resume(): void;
 }
@@ -30,6 +32,30 @@ export type PlayBgmResult =
   | 'silent_awaiting_composer'
   | 'silent_not_loaded'
   | 'silent_locked';
+
+/** Hasil playSfx: 'playing' atau alasan senyap. Tidak pernah melempar. */
+export type SfxResult = PlayBgmResult | 'silent_rate_limited' | 'silent_voice_cap' | 'silent_muted';
+
+export interface SfxPlayOptions {
+  /** pengali volume 0..1 di atas Settings x gain cue */
+  volume?: number;
+  /** laju pemutaran (1 = normal); dibatasi 0.5..2 */
+  rate?: number;
+}
+
+/** Batas suara SFX yang boleh terdengar bersamaan; selebihnya dilewati (bukan ditumpuk). */
+export const MAX_SFX_VOICES = 8;
+const RECENT_LOG = 24;
+
+export interface AudioDebug {
+  unlocked: boolean;
+  activeVoices: number;
+  totalPlayed: number;
+  played: Record<string, number>;
+  suppressed: Record<string, Record<string, number>>;
+  lastPlayed: string | null;
+  recent: Array<{ id: string; key: string; volume: number; rate: number; t: number }>;
+}
 
 /**
  * AudioManager: ID track -> file milik Game Director. Tanpa file, semuanya senyap tanpa error.
@@ -42,12 +68,26 @@ export class AudioManager {
   private currentTrack: string | null = null;
   private pendingTrack: string | null = null;
   private readonly warned = new Set<string>();
+  private readonly cueById: Map<string, SfxCue>;
+  private readonly lastPlayedAt = new Map<string, number>();
+  private readonly lastVariant = new Map<string, number>();
+  private voices: number[] = []; // waktu selesai (ms) tiap suara SFX aktif
+  private rngState = 0x9e3779b9;
+  private readonly playedCount: Record<string, number> = {};
+  private readonly suppressedCount: Record<string, Record<string, number>> = {};
+  private readonly recent: AudioDebug['recent'] = [];
+  private lastPlayedId: string | null = null;
+  private totalPlayed = 0;
 
   constructor(
     private readonly settings: SettingsRepository,
     private readonly backend: SoundBackend,
     private readonly log: (msg: string) => void = () => {},
+    private readonly now: () => number = () => (typeof performance !== 'undefined' ? performance.now() : Date.now()),
+    cues: readonly SfxCue[] = SFX_REGISTRY,
+    private readonly maxVoices: number = MAX_SFX_VOICES,
   ) {
+    this.cueById = new Map(cues.map(c => [c.id, c]));
     settings.subscribe(() => this.applyVolumes());
     this.applyVolumes();
   }
@@ -98,14 +138,96 @@ export class AudioManager {
     this.currentTrack = null;
   }
 
-  playSfx(id: string): PlayBgmResult {
-    const cue = BATTLE_SFX.find(c => c.id === id);
-    if (!cue) return 'silent_unknown_track';
-    if (!this.unlocked) return 'silent_locked';
-    if (cue.status !== 'READY') return 'silent_awaiting_composer';
-    if (!this.backend.has(id)) return 'silent_not_loaded';
-    this.backend.playLoop(id, effectiveVolume(this.settings.snapshot(), 'sfx'), false);
+  /**
+   * Memutar SFX ORIGINAL dari SFX_REGISTRY. Tidak pernah melempar; bila senyap mengembalikan alasannya.
+   * Urutan pemeriksaan: id dikenal -> sudah ada gesture -> cue READY -> file dimuat -> tidak mute -> interval minimum -> batas suara.
+   * Variasi (files.length > 1) dipilih acak deterministik tanpa pengulangan langsung.
+   */
+  playSfx(id: string, opts: SfxPlayOptions = {}): SfxResult {
+    try {
+      return this.playSfxUnsafe(id, opts);
+    } catch (err) {
+      this.suppress(id, 'error');
+      this.log(`[audio] ${id}: error ${String(err)}`);
+      return 'silent_not_loaded';
+    }
+  }
+
+  /** Versi boolean dari playSfx: true hanya bila suara benar-benar dimulai. */
+  tryPlaySfx(id: string, opts?: SfxPlayOptions): boolean {
+    return this.playSfx(id, opts) === 'playing';
+  }
+
+  /** Ringkasan untuk QA/E2E: berapa kali tiap id diputar atau ditahan (dan kenapa). */
+  debug(): AudioDebug {
+    const t = this.now();
+    this.voices = this.voices.filter(e => e > t);
+    return {
+      unlocked: this.unlocked,
+      activeVoices: this.voices.length,
+      totalPlayed: this.totalPlayed,
+      played: { ...this.playedCount },
+      suppressed: Object.fromEntries(Object.entries(this.suppressedCount).map(([k, v]) => [k, { ...v }])),
+      lastPlayed: this.lastPlayedId,
+      recent: this.recent.map(r => ({ ...r })),
+    };
+  }
+
+  resetDebug(): void {
+    for (const k of Object.keys(this.playedCount)) delete this.playedCount[k];
+    for (const k of Object.keys(this.suppressedCount)) delete this.suppressedCount[k];
+    this.recent.length = 0;
+    this.lastPlayedId = null;
+    this.totalPlayed = 0;
+  }
+
+  private playSfxUnsafe(id: string, opts: SfxPlayOptions): SfxResult {
+    const cue = this.cueById.get(id);
+    if (!cue) { this.suppress(id, 'unknown'); return this.silent(id, 'silent_unknown_track'); }
+    if (!this.unlocked) { this.suppress(id, 'locked'); return 'silent_locked'; }
+    if (cue.status !== 'READY') { this.suppress(id, 'not_ready'); return this.silent(id, 'silent_awaiting_composer'); }
+    const key = this.pickKey(cue);
+    if (key === null) { this.suppress(id, 'not_loaded'); return this.silent(id, 'silent_not_loaded'); }
+    const base = effectiveVolume(this.settings.snapshot(), 'sfx');
+    if (base <= 0) { this.suppress(id, 'muted'); return 'silent_muted'; }
+    const t = this.now();
+    const last = this.lastPlayedAt.get(id);
+    if (last !== undefined && t - last < cue.minIntervalMs) { this.suppress(id, 'rate_limited'); return 'silent_rate_limited'; }
+    this.voices = this.voices.filter(e => e > t);
+    if (this.voices.length >= this.maxVoices) { this.suppress(id, 'voice_cap'); return 'silent_voice_cap'; }
+    const rate = Math.min(2, Math.max(0.5, opts.rate ?? 1));
+    const volume = Math.min(1, Math.max(0, base * cue.gain * Math.min(1, Math.max(0, opts.volume ?? 1))));
+    if (this.backend.playSfx) this.backend.playSfx(key, volume, rate);
+    else this.backend.playLoop(key, volume, false);
+    this.lastPlayedAt.set(id, t);
+    this.voices.push(t + (cue.durationMs ?? 1000) / rate);
+    this.playedCount[id] = (this.playedCount[id] ?? 0) + 1;
+    this.totalPlayed++;
+    this.lastPlayedId = id;
+    this.recent.push({ id, key, volume, rate, t });
+    if (this.recent.length > RECENT_LOG) this.recent.shift();
     return 'playing';
+  }
+
+  /** Key Phaser: id (satu file) atau id#i (variasi). Memilih variasi yang sudah dimuat, berbeda dari yang terakhir bila bisa. */
+  private pickKey(cue: SfxCue): string | null {
+    const n = cue.files.length;
+    if (n === 0) return null;
+    const keyOf = (i: number) => (n === 1 ? cue.id : `${cue.id}#${i}`);
+    const loaded: number[] = [];
+    for (let i = 0; i < n; i++) if (this.backend.has(keyOf(i))) loaded.push(i);
+    if (loaded.length === 0) return null;
+    const last = this.lastVariant.get(cue.id);
+    const pool = loaded.length > 1 ? loaded.filter(i => i !== last) : loaded;
+    this.rngState = (Math.imul(this.rngState, 1664525) + 1013904223) >>> 0;
+    const pick = pool[Math.floor((this.rngState / 4294967296) * pool.length)]!;
+    this.lastVariant.set(cue.id, pick);
+    return keyOf(pick);
+  }
+
+  private suppress(id: string, reason: string): void {
+    const m = (this.suppressedCount[id] ??= {});
+    m[reason] = (m[reason] ?? 0) + 1;
   }
 
   private applyVolumes(): void {

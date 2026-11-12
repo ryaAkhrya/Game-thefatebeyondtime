@@ -2,17 +2,18 @@ import type { GameStateData } from '../systems/GameState';
 import { ITEMS, MAX_GOLD, MAX_ITEMS, SKILLS, type EquipmentSlot } from './definitions';
 import { effectiveStats } from './progression';
 import { useConsumable } from './inventory';
+import { memberVitals, setMemberVitals } from './vitals';
 
 export type RpgResult = { ok: true; data: GameStateData; message: string } | { ok: false; message: string };
 const fail = (message: string): RpgResult => ({ ok: false, message });
 export function useItem(data: GameStateData, id: string, characterId = 'C01'): RpgResult {
   if (!data.party.includes(characterId as GameStateData['party'][number])) return fail('Anggota tidak aktif.');
   const stats = effectiveStats(data, characterId);
-  const vitals = characterId === 'C03' ? data.partyVitals?.C03 : data.vitals;
+  const vitals = memberVitals(data, characterId);
   const effect = useConsumable(data.items, id, vitals ?? { hp: stats.HP, mp: stats.MP }, stats.HP);
   if (!effect) return fail('Barang tidak dapat dipakai saat ini.');
   const next = structuredClone(data); next.items = effect.items;
-  if (characterId === 'C03') next.partyVitals = { C03: effect.vitals }; else next.vitals = effect.vitals;
+  setMemberVitals(next, characterId, effect.vitals);
   return { ok: true, data: next, message: `Pulih ${effect.healed} HP. Potion terpakai 1.` };
 }
 export function equippedCount(data: GameStateData, id: string): number {
@@ -29,7 +30,7 @@ export function equip(data: GameStateData, slot: EquipmentSlot, id: string | nul
   }
   const next = structuredClone(data); next.rpg.characters[characterId]!.equipment[slot] = id;
   const stats = effectiveStats(next, characterId);
-  const vitals = characterId === 'C03' ? next.partyVitals?.C03 : next.vitals;
+  const vitals = memberVitals(next, characterId);
   if (vitals) { vitals.hp = Math.min(vitals.hp, stats.HP); vitals.mp = Math.min(vitals.mp, stats.MP); }
   return { ok: true, data: next, message: id ? `${ITEMS[id]!.name} dipasang.` : 'Perlengkapan dilepas. Tampilan tetap.' };
 }

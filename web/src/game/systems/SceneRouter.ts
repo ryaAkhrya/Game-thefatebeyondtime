@@ -1,5 +1,10 @@
 import type Phaser from 'phaser';
-import type { SceneKey } from '../data/ids';
+import { SCENE_KEYS, type SceneKey } from '../data/ids';
+import type { CoverKind } from '../scenes/TransitionScene';
+
+/** Pemutar transisi besar (TransitionScene); diakses lewat duck-typing agar router tidak bergantung pada kelas scene. */
+interface TransitionPlayer { isReady(): boolean; isCovered(): boolean; cover(kind: CoverKind, label?: string): Promise<void>; reveal(): Promise<void>; whenRevealed(): Promise<void> }
+export interface GotoOptions { transition?: CoverKind; label?: string }
 
 export interface OverlayData {
   returnTo: SceneKey;
@@ -22,12 +27,29 @@ export class SceneRouter {
   arrive(scene: Phaser.Scene): void {
     this.busy = false;
     this.overlays.length = 0; // scene baru = tumpukan overlay lama sudah tidak berlaku
+    const t = this.player(scene);
+    if (t?.isCovered()) { void t.reveal(); return; } // layar sedang tertutup transisi besar: buka, bukan fade biasa
     scene.cameras.main.fadeIn(FADE_MS, ...FADE_RGB);
   }
 
-  goto(from: Phaser.Scene, to: SceneKey, data?: object): boolean {
+  private player(scene: Phaser.Scene): TransitionPlayer | null {
+    const t = scene.scene.manager.getScene(SCENE_KEYS.Transition) as unknown as TransitionPlayer | null;
+    return t && typeof t.cover === 'function' && t.isReady() ? t : null;
+  }
+
+  /** Resolve setelah transisi besar selesai membuka layar (langsung bila tidak ada). Dipakai untuk menunda input battle. */
+  revealed(scene: Phaser.Scene): Promise<void> {
+    return this.player(scene)?.whenRevealed() ?? Promise.resolve();
+  }
+
+  goto(from: Phaser.Scene, to: SceneKey, data?: object, options?: GotoOptions): boolean {
     if (this.busy) return false;
     this.busy = true;
+    const big = options?.transition ? this.player(from) : null;
+    if (big) {
+      void big.cover(options!.transition!, options!.label).then(() => from.scene.start(to, data));
+      return true;
+    }
     const cam = from.cameras.main;
     cam.once('camerafadeoutcomplete', () => from.scene.start(to, data));
     // force=true: tetap berjalan walau fade-in scene ini belum selesai (hindari softlock bila Enter cepat).

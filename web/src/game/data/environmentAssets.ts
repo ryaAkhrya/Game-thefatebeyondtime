@@ -19,11 +19,21 @@ const FOREST_IMAGES: EnvImage[] = [
 const TOWN_ATLASES: EnvAtlas[] = [
   { key: 'town_aveloria', image: 'assets/environment/town/aveloria_atlas.png', json: 'assets/environment/town/aveloria_atlas.json' },
   { key: 'town_liora', image: 'assets/environment/town/liora_atlas.png', json: 'assets/environment/town/liora_atlas.json' },
+  // Aveloria krisis Chapter III: retakan, batu/air/api membeku, jam, panji, warga evakuasi (scripts/town-art/crisis-*.mjs)
+  { key: 'town_crisis', image: 'assets/environment/town/town_crisis_atlas.png', json: 'assets/environment/town/town_crisis_atlas.json' },
 ];
 const TOWN_IMAGES: EnvImage[] = [
   { key: 'town_aveloria_ground', url: 'assets/environment/town/aveloria_ground.png' },
   { key: 'town_liora_ground', url: 'assets/environment/town/liora_ground.png' },
 ];
 
-export const ENV_ATLASES: readonly EnvAtlas[] = [...FOREST_ATLASES, ...TOWN_ATLASES];
-export const ENV_IMAGES: readonly EnvImage[] = [...FOREST_IMAGES, ...TOWN_IMAGES];
+// ---- Kuil Jejak (Chapter III) ----
+const TEMPLE_ATLASES: EnvAtlas[] = [
+  { key: 'temple_props', image: 'assets/environment/temple/props.png', json: 'assets/environment/temple/props.json' },
+];
+const TEMPLE_IMAGES: EnvImage[] = [
+  { key: 'temple_ground', url: 'assets/environment/temple/ground.png' },
+];
+
+export const ENV_ATLASES: readonly EnvAtlas[] = [...FOREST_ATLASES, ...TOWN_ATLASES, ...TEMPLE_ATLASES];
+export const ENV_IMAGES: readonly EnvImage[] = [...FOREST_IMAGES, ...TOWN_IMAGES, ...TEMPLE_IMAGES];

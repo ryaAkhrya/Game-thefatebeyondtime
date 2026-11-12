@@ -11,6 +11,8 @@ export const BEAT_LABEL: Readonly<Record<string, string>> = {
   'C1-07': 'Laporan Azie', 'C1-08': 'Audiensi Velthia', 'C1-09': 'Lonceng menara', 'C1-DONE': 'Bab I selesai',
   'C2-01': 'Dua catatan Azie', 'C2-02': 'Bekal Velthia', 'C2-03': 'Desa Liora', 'C2-04': 'Hutan kedua', 'C2-05': 'Torvan bergabung',
   'C2-06': 'Belajar bersama', 'C2-07': 'Jalan Veyrath', 'C2-08': 'Fragmen ramalan', 'C2-09': 'Kembali melapor', 'C2-DONE': 'Bab II selesai',
+  'C3-01': 'Aveloria retak', 'C3-02': 'Menuju Kuil Jejak', 'C3-03': 'Di dalam kuil', 'C3-04': 'Teka-teki kuil', 'C3-05': 'Aula penjaga',
+  'C3-06': 'Chronolith', 'C3-07': 'Janji yang dilupakan', 'C3-DONE': 'Bab III selesai',
 };
 
 export function formatPlaytime(sec: number): string {
@@ -21,8 +23,9 @@ export function formatPlaytime(sec: number): string {
 }
 
 /** Nama tampilan anggota party; Yaric anonim sampai identitasnya terungkap. */
-export function partyName(id: 'C01' | 'C03', known: boolean): string {
+export function partyName(id: 'C01' | 'C02' | 'C03', known: boolean): string {
   if (id === 'C03') return 'Torvan';
+  if (id === 'C02') return 'Velthia';
   return known ? TRUE_NAME : UNKNOWN_LABEL;
 }
 

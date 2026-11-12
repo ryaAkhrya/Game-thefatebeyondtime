@@ -423,3 +423,15 @@ Diimpor ke `web/public/assets` (semua belum final; sumber di `assets/` tidak diu
 | environment/forest1/ground.png, props.png, props.json | dibuat kode: `web/scripts/gen-forest-art.mjs` | DRAFT dev art | Bukan aset final; tanpa aset luar. Mengganti file tidak mengubah peta/collision. |
 
 Atlas battle v3.3 (Yaric, Hollowling, Ground Slam) tetap `imported: false`. `web/scripts/asset-qa.mjs` menghasilkan lembar kontak dan metrik per frame (bbox, tepi sel, kecocokan kiri/kanan-cermin) untuk verifikasi aset sebelum diimpor.
+
+## Phase 7 battle atlases (Agent BA, 12 November 2026) — DRAFT / NEEDS_REVIEW
+
+Dibuat oleh `web/scripts/battle-art/build_{c02,b03,m05}.py` (+ `bakit.py`; `python -I`, Pillow/numpy/scipy; deterministik). Sumber resmi TIDAK diubah. Metode jujur: konsep/turnaround resmi dipotong menjadi bagian boneka kertas (polygon tangan) pada resolusi tinggi, di-pose (geser/rotasi/skala rigid), dikomposit, lalu di-area-average ke grid battle dengan SATU palet tertutup per atlas (k-means tetap + outline plum #1D1625), alfa keras, tanpa blur. Bukan gambar tangan frame demi frame: setiap pose = re-pose dari gambar yang sama, perlu seniman. Lembar kontak: `docs/production/sprint3/battle-contact-sheets/{C02,B03,M05}_BATTLE_V1_contact.png`. Uji: `web/tests/unit/battle-art-phase7.test.ts`.
+
+| Aset runtime | Sumber resmi | Frame | Status | Catatan jujur |
+|---|---|---|---|---|
+| `web/public/assets/battle/C02_BATTLE_V1.{png,json}` | `assets/characters/C02_Velthia/C02_TURNAROUND_SIDE.png` | 13 gambar 116x112 (+ alias `attack`=`cast`), pivot [58,108], menghadap KIRI, 27 warna | NEEDS_REVIEW | Velthia tanpa senjata/tongkat. Profil samping dicerminkan (arah cahaya sumber terbalik). Lengan bawah+tangan dipotong dan diputar; lengan atas = tabung lengan prosedural berwarna gaun; tangan diperbesar 1,2-1,3x pada pose sihir agar terbaca. Wajah profil 14 px, kecil. |
+| `web/public/assets/battle/B03_BATTLE_V1.{png,json}` | `assets/bosses/B03_Chronolith/B03_NEW_CONCEPT_DRAFT.png` | 13 frame 192x140, pivot [80,136], menghadap depan, 27 warna | NEEDS_REVIEW | Busur, kepala, torso, inti, dua lengan, kaki; kaki tetap kecuali defeated. Urat/inti memakai ramp ember 4 tingkat; tell charge = busur naik + inti menyala/melebar. Urat dilebarkan agar bertahan di grid (agak berbintik). `defeated` = runtuh rendah, busur jatuh kanan (kasar). |
+| `web/public/assets/battle/M05_BATTLE_V1.{png,json}` | `assets/monsters/M05_Oathguard/M05_NEW_CONCEPT_DRAFT.png` | 10 frame 160x128, pivot [84,123], menghadap kanan, 25 warna | NEEDS_REVIEW | Tombak-sabit+lengan, lengan menjangkau, helm, badan atas, badan bawah. Jatuh = rotasi kaku seluruh figur. Kaki kanan melayang ±8 px (perspektif konsep). Pose serang: tombak horizontal kasar. |
+
+Atlas DRAFT lama (`C02/B03/M05_BATTLE_ATLAS_DRAFT.*`, blob/lingkaran 4 pose) tetap utuh di `assets/` dan tidak dimuat game.

@@ -3,6 +3,7 @@ import { COLORS } from '../config/palette';
 import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { getServices } from '../systems/Services';
 import { MenuList } from '../../ui/components/MenuList';
+import { uiSfx } from '../../ui/kit/sfx';
 import { veil } from '../../ui/components/frame';
 import { Ui, TYPE, bindRelayout } from '../../ui/kit/ui';
 import { AREA_LABEL, formatPlaytime } from '../../ui/labels';
@@ -46,6 +47,7 @@ export class PauseScene extends Phaser.Scene {
     this.releaseInput = input.pushLayer('pause', (e) => {
       if (this.closing) return;
       if (e.intent === 'back') {
+        uiSfx(this, 'SFX_UI_CANCEL');
         if (this.mode === 'confirm') this.toggleConfirm();
         else this.resume();
         return;
@@ -108,7 +110,8 @@ export class PauseScene extends Phaser.Scene {
     this.menu = new MenuList(this, {
       ui, x: 36, y: 232, width: 240, rowHeight: 38, depth: 4, size: 15,
       items: [{ id: 'cancel', label: 'Batal' }, { id: 'yes', label: 'Ya, kembali' }],
-      onConfirm: (item) => { if (item.id === 'cancel') this.toggleConfirm(); else this.toTitle(); },
+      sfx: { confirm: false },
+      onConfirm: (item) => { uiSfx(this, item.id === 'cancel' ? 'SFX_UI_CANCEL' : 'SFX_UI_CONFIRM'); if (item.id === 'cancel') this.toggleConfirm(); else this.toTitle(); },
     });
   }
 

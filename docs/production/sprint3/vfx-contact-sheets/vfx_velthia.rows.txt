@@ -1,0 +1,10 @@
+1. motes: vmote_a, vmote_b, vmote_c, vmote_d
+2. velthia_pulse_palm: vpalm_1, vpalm_2, vpalm_3, vpalm_4
+3. velthia_pulse_arc: varc_1, varc_2, varc_3, varc_1_c, varc_2_c, varc_3_c
+4. velthia_pulse_hit: vhit_1, vhit_2, vhit_3, vhit_4, vhit_1_c, vhit_2_c
+5. velthia_mend_ring: vmend_1, vmend_2, vmend_3, vmend_4
+6. velthia_ward: vward_1, vward_2, vward_3, vward_4, vward_5, vward_6
+7. shield_hit_spark: vspark_1, vspark_2, vspark_3, vspark_4, vspark_1_c, vspark_2_c
+8. velthia_bloom: vbloom_1, vbloom_2, vbloom_3, vbloom_4, vbloom_5, vbloom_6, vbloom_7
+9. petals: vpetal_a, vpetal_b, vpetal_c
+10. concord: vnode_1, vnode_2, vnode_3, vsigil_1, vsigil_2, vsigil_3, vsigil_4

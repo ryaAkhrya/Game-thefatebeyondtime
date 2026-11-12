@@ -1,0 +1,6 @@
+1. particles: hshard_a, hshard_b, mshard_a, mshard_b, ysp_a, ysp_b
+2. hollowling_claw: hclaw_1, hclaw_2, hclaw_3, hclaw_4, hclaw_5
+3. mournfang_slash: mslash_1, mslash_2, mslash_3, mslash_4, mslash_5, mslash_6
+4. veyrath_strike: vstrike_1, vstrike_2, vstrike_3, vstrike_4, vstrike_5, vstrike_6
+5. status_poison_bubble: pbub_1, pbub_2, pbub_3, pbub_4
+6. status_poison_cloud: pcloud_1, pcloud_2, pcloud_3, pcloud_4

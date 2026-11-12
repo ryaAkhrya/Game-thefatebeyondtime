@@ -18,6 +18,7 @@ import { AVELORIA_SIGN, BEFORE_MOURNFANG, MOURNFANG_INTRO, MOURNFANG_RESPONSE, M
 import { BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, SLICE_COMPLETE, type EncounterId } from '../combat/encounters';
 import { AveloriaStory } from './AveloriaStory';
 import { Chapter2Story } from './Chapter2Story';
+import { Chapter3Story } from './Chapter3Story';
 import type { AreaId } from '../data/ids';
 
 /** Flag cerita kanonik (docs/narrative/STORY_AND_SCENES.md). Dinaikkan hanya setelah event benar-benar selesai. */
@@ -62,10 +63,16 @@ export type StoryAction =
   | { type: 'cityBell'; number: 1 | 2 }
   | { type: 'chapterEnd' }
   | { type: 'shop' }
-  | { type: 'changeArea'; area: Extract<AreaId, 'aveloria' | 'liora' | 'forest_2'> }
+  | { type: 'changeArea'; area: Extract<AreaId, 'aveloria' | 'liora' | 'forest_2' | 'temple'> }
   | { type: 'joinTorvan' }
   | { type: 'restParty' }
-  | { type: 'chapter2End' };
+  | { type: 'chapter2End' }
+  // ---- Chapter III (Phase 7) ----
+  /** Aksi view area generik (krisis Aveloria, Kuil Jejak); lihat world/AreaView3.ts. */
+  | { type: 'c3'; op: string; arg?: string | number }
+  /** Party aktif jadi Yaric + Velthia; Torvan jadi cadangan (progres tersimpan). */
+  | { type: 'joinVelthia' }
+  | { type: 'chapter3End' };
 
 export interface StoryContext {
   /** Salinan periodik (0 = pertama) untuk papan/semak/peti. */
@@ -111,6 +118,7 @@ export class Chapter1Story {
 
   /** Teks tujuan di HUD, diturunkan dari flag (selalu konsisten dengan state). */
   objective(): string | null {
+    if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).objective();
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).objective();
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).objective();
     if (!this.has(FLAG.introSeen)) return null;
@@ -125,6 +133,7 @@ export class Chapter1Story {
 
   /** Aksi saat game dimulai: intro C1-01 sekali. */
   onStart(): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).onStart();
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).onStart();
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).onStart();
     if (this.has(FLAG.mournfang) && !this.has(FLAG.mournfangVictorySeen)) return [
@@ -145,6 +154,7 @@ export class Chapter1Story {
   }
 
   interact(id: string, ctx: StoryContext): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).interact(id);
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).interact(id);
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).interact(id);
     const base = id.split('#')[0]!;
@@ -184,6 +194,7 @@ export class Chapter1Story {
   }
 
   trigger(id: string, _ctx: StoryContext): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).trigger(id);
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).trigger(id);
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).trigger(id);
     const base = id.split('#')[0]!;

@@ -1,0 +1,587 @@
+[
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L001",
+    "speaker_id": "C05",
+    "spoken_text": "Kita menemukan tanda yang sama pada pintu Kuil Jejak. Tidak ada laporan masuk selama bertahun-tahun.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C05_Azie/C05_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L002",
+    "speaker_id": "C06",
+    "spoken_text": "Jalurnya belum aman. Jika perlu dikirim orang, kirim pasukan kecil.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C06_Talric/C06_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L003",
+    "speaker_id": "C02",
+    "spoken_text": "Pasukan akan menimbulkan kepanikan di Liora. Dan tanda itu ada pada segel kerajaan lama.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L004",
+    "speaker_id": "C05",
+    "spoken_text": "Itu sebabnya kita perlu seseorang yang bisa mengenali catatan istana.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C05_Azie/C05_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L005",
+    "speaker_id": "C01",
+    "spoken_text": "Aku bisa membawa salinannya.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L006",
+    "speaker_id": "C02",
+    "spoken_text": "Ada tulisan yang tidak dicatat dalam salinan. Aku pernah melihatnya di ruang penyimpanan.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L007",
+    "speaker_id": "C06",
+    "spoken_text": "Yang Mulia—",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C06_Talric/C06_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L008",
+    "speaker_id": "C02",
+    "spoken_text": "Aku tahu risikonya, Talric.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L009",
+    "speaker_id": "C02",
+    "spoken_text": "Aku ikut. Ini urusan Aveloria, bukan sekadar rasa penasaranku.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L010",
+    "speaker_id": "C01",
+    "spoken_text": "Aku tidak akan menghalangimu.",
+    "emotion_id": "DETERMINED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_DETERMINED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-01",
+    "line_id": "C3-01-L011",
+    "speaker_id": "C02",
+    "spoken_text": "Bagus. Aku tidak sedang meminta izin.",
+    "emotion_id": "AMUSED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_AMUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-02",
+    "line_id": "C3-02-L001",
+    "speaker_id": "C03",
+    "spoken_text": "Jadi sekarang aku tidak ikut bertarung?",
+    "emotion_id": "CURIOUS",
+    "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_CURIOUS.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-02",
+    "line_id": "C3-02-L002",
+    "speaker_id": "C01",
+    "spoken_text": "Kau bisa ikut sampai jalur masuk, tapi kuil ini berbahaya.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-02",
+    "line_id": "C3-02-L003",
+    "speaker_id": "C03",
+    "spoken_text": "Aku juga bilang itu saat kau ingin lewat jembatan tadi. Kau tetap lewat.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-02",
+    "line_id": "C3-02-L004",
+    "speaker_id": "C02",
+    "spoken_text": "Aku perlu orang yang paham tanda pada batu, dan ruang untuk bertarung. Kau bisa menjaga barang di titik aman?",
+    "emotion_id": "SURPRISED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_SURPRISED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-02",
+    "line_id": "C3-02-L005",
+    "speaker_id": "C03",
+    "spoken_text": "Kalau ada makanan.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-02",
+    "line_id": "C3-02-L006",
+    "speaker_id": "C01",
+    "spoken_text": "Tentu saja.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-02",
+    "line_id": "C3-02-L007",
+    "speaker_id": "C03",
+    "spoken_text": "Baik. Tapi jangan menuduhku kalau kalian yang tersesat.",
+    "emotion_id": "DETERMINED",
+    "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_DETERMINED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L001",
+    "speaker_id": "C01",
+    "spoken_text": "Aku tidak menyangka kau bisa menyalakan api secepat itu.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L002",
+    "speaker_id": "C02",
+    "spoken_text": "Karena aku Ratu?",
+    "emotion_id": "SURPRISED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_SURPRISED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L003",
+    "speaker_id": "C01",
+    "spoken_text": "Karena tadi kayunya basah.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L004",
+    "speaker_id": "C02",
+    "spoken_text": "Jawaban yang aman.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L005",
+    "speaker_id": "C01",
+    "spoken_text": "Sudah belajar.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L006",
+    "speaker_id": "C02",
+    "spoken_text": "Di istana semua orang mengingat sesuatu untukku. Jadwal, nama, perjanjian.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L007",
+    "speaker_id": "C01",
+    "spoken_text": "Enak, dong.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L008",
+    "speaker_id": "C02",
+    "spoken_text": "Kadang. Tapi kalau aku lupa sesuatu yang tidak tertulis, tidak ada yang bisa mengembalikannya.",
+    "emotion_id": "VULNERABLE",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_VULNERABLE.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L009",
+    "speaker_id": "C01",
+    "spoken_text": "Aku baru sadar: aku iri pada orang yang tahu apa yang hilang.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L010",
+    "speaker_id": "C02",
+    "spoken_text": "Kau takut?",
+    "emotion_id": "VULNERABLE",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_VULNERABLE.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L011",
+    "speaker_id": "C01",
+    "spoken_text": "Iya.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L012",
+    "speaker_id": "C01",
+    "spoken_text": "Terutama kalau ternyata aku pernah menyakiti seseorang dan tidak bisa mengingatnya.",
+    "emotion_id": "SAD",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_SAD.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L013",
+    "speaker_id": "C02",
+    "spoken_text": "Kalau kau memang pernah, kau masih bisa memilih apa yang dilakukan setelah tahu.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L014",
+    "speaker_id": "C01",
+    "spoken_text": "Kau selalu menemukan cara membuat pekerjaan tambah banyak.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L015",
+    "speaker_id": "C02",
+    "spoken_text": "Itu bagian dari tugas seorang ratu.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L016",
+    "speaker_id": "C02",
+    "spoken_text": "Kau cepat sekali.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-03",
+    "line_id": "C3-03-L017",
+    "speaker_id": "C01",
+    "spoken_text": "Kebiasaan, mungkin.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-04",
+    "line_id": "C3-04-L001",
+    "speaker_id": "C01",
+    "spoken_text": "Dua jalur ini menuju lingkaran yang sama.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-04",
+    "line_id": "C3-04-L002",
+    "speaker_id": "C02",
+    "spoken_text": "Lihat bagian yang terkikis. Ada garis ketiga, tetapi ditutup belakangan.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-04",
+    "line_id": "C3-04-L003",
+    "speaker_id": "C02",
+    "spoken_text": "Lambang yang di arsip... benar.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 550
+  },
+  {
+    "scene_id": "C3-04",
+    "line_id": "C3-04-L004",
+    "speaker_id": "C01",
+    "spoken_text": "Kalau ini segel kerajaan, kenapa ada di sini?",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-04",
+    "line_id": "C3-04-L005",
+    "speaker_id": "C02",
+    "spoken_text": "Itu yang akan kita tanyakan setelah pintu terbuka.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-05",
+    "line_id": "C3-05-L001",
+    "speaker_id": "C01",
+    "spoken_text": "Kalau kita mundur?",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-05",
+    "line_id": "C3-05-L002",
+    "speaker_id": "C02",
+    "spoken_text": "Pintunya tertutup. Dan benda itu menjaga satu-satunya jalan keluar lain.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-05",
+    "line_id": "C3-05-L003",
+    "speaker_id": "C01",
+    "spoken_text": "Aku berharap ada jawaban yang lebih baik.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-05",
+    "line_id": "C3-05-L004",
+    "speaker_id": "C02",
+    "spoken_text": "Kalau menemukannya, beri tahu aku.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-05",
+    "line_id": "C3-05-L005",
+    "speaker_id": "C01",
+    "spoken_text": "Sekarang benar-benar berhenti?",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-05",
+    "line_id": "C3-05-L006",
+    "speaker_id": "C02",
+    "spoken_text": "Aku tidak berniat mendekat untuk memastikan.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-06",
+    "line_id": "C3-06-L001",
+    "speaker_id": "C01",
+    "spoken_text": "Jadi ada seseorang yang memasangnya.",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-06",
+    "line_id": "C3-06-L002",
+    "speaker_id": "C02",
+    "spoken_text": "Varlgrim... Nama itu ada dalam daftar penjaga lama. Tapi catatannya tidak lengkap.",
+    "emotion_id": "WORRIED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_WORRIED.png",
+    "pause_ms": 550
+  },
+  {
+    "scene_id": "C3-06",
+    "line_id": "C3-06-L003",
+    "speaker_id": "C01",
+    "spoken_text": "Kalau tujuannya melindungi, kenapa orang justru kehilangan ingatan?",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-06",
+    "line_id": "C3-06-L004",
+    "speaker_id": "C02",
+    "spoken_text": "Mungkin dia tak pernah melihat akibatnya. Atau melihat dan tidak mau mengaku.",
+    "emotion_id": "STERN",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_STERN.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-06",
+    "line_id": "C3-06-L005",
+    "speaker_id": "C01",
+    "spoken_text": "Kita akan tahu ketika bertemu dengannya.",
+    "emotion_id": "DETERMINED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_DETERMINED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L001",
+    "speaker_id": "C01",
+    "spoken_text": "Apa?",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L002",
+    "speaker_id": "C02",
+    "spoken_text": "Tadi... kau melakukan sesuatu yang terasa sangat biasa.",
+    "emotion_id": "WORRIED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_WORRIED.png",
+    "pause_ms": 550
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L003",
+    "speaker_id": "C01",
+    "spoken_text": "Menjauhkan kertas dari air?",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L004",
+    "speaker_id": "C02",
+    "spoken_text": "Iya.",
+    "emotion_id": "VULNERABLE",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_VULNERABLE.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L005",
+    "speaker_id": "C01",
+    "spoken_text": "Kebiasaan bagus. Bukan sesuatu yang aneh.",
+    "emotion_id": "HAPPY",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_HAPPY.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L006",
+    "speaker_id": "C02",
+    "spoken_text": "Aku tahu. Justru itu yang aneh.",
+    "emotion_id": "WORRIED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_WORRIED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L007",
+    "speaker_id": "C02",
+    "spoken_text": "Aku ingat pernah berkata sesuatu pada seseorang. Tentang tidak ingin ditinggalkan.",
+    "emotion_id": "VULNERABLE",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_VULNERABLE.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L008",
+    "speaker_id": "C01",
+    "spoken_text": "Siapa?",
+    "emotion_id": "CONFUSED",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L009",
+    "speaker_id": "C02",
+    "spoken_text": "Kalau aku tahu, aku akan bilang.",
+    "emotion_id": "WORRIED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_WORRIED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L010",
+    "speaker_id": "C03",
+    "spoken_text": "Kalian lama.",
+    "emotion_id": "SOLEMN",
+    "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_SOLEMN.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L011",
+    "speaker_id": "C01",
+    "spoken_text": "Kami punya beberapa pertanyaan baru.",
+    "emotion_id": "NEUTRAL",
+    "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L012",
+    "speaker_id": "C03",
+    "spoken_text": "Biasanya begitu kalau mencari jawaban.",
+    "emotion_id": "MISCHIEVOUS",
+    "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_MISCHIEVOUS.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L013",
+    "speaker_id": "C02",
+    "spoken_text": "Kau tahu jalan ke Benteng Kala?",
+    "emotion_id": "SURPRISED",
+    "portrait_asset_path": "assets/characters/C02_Velthia/C02_EXPRESSION_SURPRISED.png",
+    "pause_ms": 250
+  },
+  {
+    "scene_id": "C3-07",
+    "line_id": "C3-07-L014",
+    "speaker_id": "C03",
+    "spoken_text": "Jalannya ada. Belum tentu mudah dilewati.",
+    "emotion_id": "SOLEMN",
+    "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_SOLEMN.png",
+    "pause_ms": 250
+  }
+]

@@ -195,7 +195,7 @@ async function main() {
 
     check('Tidak ada error JS di sesi Title', s.errors.length === 0, s.errors.join(' | '));
     check('Tidak ada request gagal / 404 (aset)', s.failedReq.length === 0, s.failedReq.join(' | '));
-    check('Tidak ada request file musik (.ogg)', !s.requests.some((u) => /\.(ogg|mp3|wav)(\?|$)/.test(u)), s.requests.filter((u) => /\.(ogg|mp3|wav)/.test(u)).join(','));
+    check('Tidak ada request file musik (.ogg)', !s.requests.some((u) => (/\.(ogg|mp3|wav)(\?|$)/.test(u) && !/\/audio\/sfx\//.test(u))), s.requests.filter((u) => /\.(ogg|mp3|wav)/.test(u) && !/\/audio\/sfx\//.test(u)).join(','));
     await s.context.close();
   }
 

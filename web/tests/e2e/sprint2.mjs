@@ -227,7 +227,7 @@ try {
 
 check('Tidak ada error JS/console selama sprint2', errors.length === 0, errors.slice(0, 5).join(' | '));
 check('Tidak ada request gagal/404', failedRequests.length === 0, failedRequests.slice(0, 5).join(' | '));
-check('Tidak ada request audio', !requested.some(u => /\.(ogg|wav|mp3)(\?|$)/.test(u)));
+check('Tidak ada request audio', !requested.some(u => (/\.(ogg|wav|mp3)(\?|$)/.test(u) && !/\/audio\/sfx\//.test(u))));
 const passed = results.filter(r => r.ok).length;
 writeFileSync(resolve(out, 's2_report.json'), JSON.stringify({ passed, total: results.length, results }, null, 2));
 console.log(`${passed}/${results.length} Polish Sprint 2 passed`);

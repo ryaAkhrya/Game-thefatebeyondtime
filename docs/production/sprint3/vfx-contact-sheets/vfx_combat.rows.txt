@@ -1,0 +1,7 @@
+1. greatsword_trail: gs_1, gs_2, gs_3, gs_4, gs_5, gs_1_c, gs_2_c, gs_3_c, gs_4_c, gs_5_c
+2. particles: spark_a, spark_b, spark_c
+3. impact_hit: hit_1, hit_2, hit_3, hit_4, hit_1_c, hit_2_c
+4. impact_heavy: hvy_1, hvy_2, hvy_3, hvy_4, hvy_5, hvy_1_c, hvy_2_c
+5. debris: deb_stone_a, deb_stone_b, deb_stone_c, deb_dirt_a, deb_dirt_b, deb_slab, deb_pebble
+6. ground_slam_crack: crack_1, crack_2, crack_3, crack_4, crack_5, crack_6, crack_7
+7. dust_puff: dust_1, dust_2, dust_3, dust_4, dust_5

@@ -23,11 +23,14 @@ import { probeStorage } from './game/systems/StorageAdapter';
 import { SaveCoordinator } from './game/systems/SaveCoordinator';
 import { effectiveStats, applyReward } from './game/rpg/progression';
 import { HOLLOWLING_REWARD } from './game/rpg/definitions';
-import { BOSS_CHECKPOINT, BOSS_CHECKPOINT_FLAG, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFANG_FLAG, MOURNFANG_REWARD, MOURNFANG_VICTORY_SEEN } from './game/combat/encounters';
+import { BOSS_CHECKPOINT, BOSS_CHECKPOINT_FLAG, DUO_REWARD, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFANG_FLAG, MOURNFANG_REWARD, MOURNFANG_VICTORY_SEEN, VEYRATH_REWARD, type EncounterId } from './game/combat/encounters';
 import { CITY_FLAG } from './game/story/aveloriaFlags';
 import { C2, FOREST2_SPAWN, LIORA_SPAWN } from './game/story/chapter2Flags';
 import { IDENTITY_FLAG } from './game/story/identity';
-import { joinTorvan } from './game/rpg/party';
+import { enterChapter3, joinTorvan, joinVelthia } from './game/rpg/party';
+import { C3 } from './game/story/chapter3Flags';
+import { TEMPLE_BATTLE_RETURN, TEMPLE_FROM_FOREST } from './game/world/templeMaps';
+import type { GameStateData } from './game/systems/GameState';
 
 function boot(): void {
   document.title = GAME_TITLE;
@@ -54,12 +57,17 @@ function boot(): void {
     playLoop: (key, volume, loop) => {
       game.sound.play(key, { volume, loop });
     },
+    // SFX: volume per cue (gain) dan laju (rate) berlaku; BGM tidak melewati jalur ini.
+    playSfx: (key, volume, rate) => {
+      game.sound.play(key, { volume, rate });
+    },
     stop: () => game.sound.stopAll(),
     setBgmVolume: (volume) => {
       for (const s of game.sound.getAllPlaying()) if (!s.key.startsWith('SFX_')) (s as Phaser.Sound.WebAudioSound).setVolume(volume);
     },
     setSfxVolume: volume => {
-      for (const s of game.sound.getAllPlaying()) if (s.key.startsWith('SFX_')) (s as Phaser.Sound.WebAudioSound).setVolume(volume);
+      // Hanya SFX yang sedang berbunyi dan belum punya gain per-cue; efek singkat selesai sendiri.
+      for (const s of game.sound.getAllPlaying()) if (s.key.startsWith('SFX_') && !s.key.includes('#') && s.duration > 1) (s as Phaser.Sound.WebAudioSound).setVolume(volume);
     },
     resume: () => {
       const ctx = (game.sound as Phaser.Sound.WebAudioSoundManager).context;
@@ -174,6 +182,45 @@ function boot(): void {
           if (battle) game.scene.getScene('TitleScene').scene.start('BattleScene', { encounter: battle });
           else game.scene.getScene('TitleScene').scene.start('WorldScene');
         },
+        /**
+         * Bab III (hanya QA): 'start' = Aveloria krisis setelah Bab II selesai; 'temple' = Yaric+Velthia di gerbang Kuil;
+         * 'hall' = semua teka-teki selesai, gerbang terbuka, di depan aula Chronolith. `battle` langsung membuka battle.
+         */
+        chapter3: (stage: 'c2end' | 'start' | 'temple' | 'hall', battle?: EncounterId, hp?: Partial<Record<'C01' | 'C02', number>>) => {
+          services.checkpoints.reset();
+          let d: GameStateData = applyReward(applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data, MOURNFANG_REWARD).data;
+          d.chapter = 'II'; d.area = 'forest_2';
+          for (const f of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed', 'c1.hollowling_victory_seen', FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, ...Object.values(CITY_FLAG), C2.start, C2.depart, C2.farewell, C2.zira, C2.forest, IDENTITY_FLAG]) d.flags[f] = true;
+          d = joinTorvan(d);
+          for (const f of [C2.secondMarker, C2.tutorial, C2.veyrath, C2.fragmentA, C2.fragments, C2.complete]) d.flags[f] = true;
+          d = applyReward(applyReward(d, DUO_REWARD).data, VEYRATH_REWARD).data;
+          d.items.potion = 3;
+          if (stage === 'c2end') {
+            d.chapter = 'II'; d.area = 'aveloria'; d.position = { x: 640, y: 616, facing: 'up' };
+            services.gameState.load(d);
+            game.scene.getScene('TitleScene').scene.start('WorldScene');
+            return;
+          }
+          d = enterChapter3(d); d.area = 'aveloria'; d.position = { x: 640, y: 616, facing: 'up' };
+          if (stage !== 'start') {
+            d = joinVelthia(d);
+            for (const f of [C3.crisisSeen, C3.azieDemand, C3.velthiaRefuses, C3.evacOrdered, C3.evacDone, C3.decision, C3.torvanStays, C3.departed, C3.templeEntered]) d.flags[f] = true;
+            d.area = 'temple'; d.position = { ...TEMPLE_FROM_FOREST };
+          }
+          if (stage === 'hall') {
+            for (const f of [C3.puzzleA, C3.puzzleB, C3.puzzleC, C3.gateOpen, C3.checkpoint]) d.flags[f] = true;
+            d.position = { ...TEMPLE_BATTLE_RETURN.chronolith };
+          }
+          if (hp?.C01 !== undefined) d.vitals = { ...d.vitals, hp: hp.C01 };
+          if (hp?.C02 !== undefined && d.partyVitals?.C02) d.partyVitals = { ...d.partyVitals, C02: { ...d.partyVitals.C02, hp: hp.C02 } };
+          services.gameState.load(d);
+          if (battle) { game.scene.getScene('TitleScene').scene.start('BattleScene', { encounter: battle }); }
+          else game.scene.getScene('TitleScene').scene.start('WorldScene');
+        },
+        /** Uji transisi besar tanpa battle: tutup layar dengan kategori tertentu, lalu `revealTransition`. */
+        coverTransition: (kind: 'normal' | 'scripted' | 'boss' | 'temporal' | 'return', label?: string) => (game.scene.getScene('TransitionScene') as import('./game/scenes/TransitionScene').TransitionScene).cover(kind, label).then(() => true),
+        openSliceEnd: () => services.router.openOverlay(game.scene.getScene('WorldScene'), 'SliceEndScene'),
+        revealTransition: () => (game.scene.getScene('TransitionScene') as import('./game/scenes/TransitionScene').TransitionScene).reveal().then(() => true),
         shop: () => {
           const data = services.gameState.startNewGame(); data.rpg.gold = 48;
           data.items.qa_staff = 1; data.items.qa_key = 1;
@@ -219,6 +266,8 @@ function boot(): void {
     },
     display: () => game.registry.get('display'),
     router: () => services.router.debug(),
+    transition: () => (game.scene.getScene('TransitionScene') as import('./game/scenes/TransitionScene').TransitionScene | null)?.debug() ?? null,
+    audio: () => services.audio.debug(),
     battleProbe: (id: string) => (game.scene.isActive('BattleScene') ? (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).qaProbe(id) : null),
     battleHide: (id: string, hidden: boolean) => { if (game.scene.isActive('BattleScene')) (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).qaHide(id, hidden); },
     /** Kotak piksel buram (alpha > 0) sebuah frame spritesheet pada tekstur yang BENAR-BENAR dimuat browser. */
