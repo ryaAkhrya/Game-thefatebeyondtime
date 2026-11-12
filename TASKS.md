@@ -1,6 +1,18 @@
 # TASKS — STATUS SEBENARNYA
 
-## Phase 7 — Chapter III + combat sinematik + SFX asli (12 November 2026)
+## Phase 8 — Chapter IV: The Fate (13 November 2026)
+
+- [x] Chapter IV playable end-to-end (Mulai Bab IV → Gerbang Luar → Aula Lonceng → Arsip (Perlindungan) → Ruang Uji → Koridor Retakan → Serambi/lentera checkpoint → Varlgrim 3 fase → Heart terbuka (dua pengunci) → menara runtuh → Ruang Gema → Torvan → pulang ke Aveloria → "Bab IV selesai"); 36 baris canon C4-01..07 verbatim.
+- [x] Varlgrim (tongkat kayu berpilin, bukan jam pasir), meteor bertelegraf penuh satu giliran, Ultimate Perlindungan (tanpa MP, muatan 1, jendela dibuka `meteor_call`), tanpa softlock (grid 864 keadaan + fuzz 400 pertarungan), ulang cepat dari fase meteor, retry penuh dari checkpoint, tanpa hadiah ganda.
+- [x] Level cap 5→10 (EXP data-driven 800), ledger EXP idempoten untuk save lama (hanya menaikkan), pasif L6–10, zirah Benteng.
+- [x] 23 id SFX asli Bab IV (registry 67 id); VFX 5 atlas baru; art battle B04/M04/M06 DRAFT. Tanpa BGM.
+- [x] Tes: unit 1531, tsc bersih; Edge produksi regresi 906 (identik baseline) + Phase 8 168 (1366 penuh + 1920 singkat) + Phase 8 penuh 1920 119; Chrome Phase 8 119. Lihat `PHASE8_REPORT.md`.
+- [ ] Review manusia: seni DRAFT (Varlgrim/Riftborn/Gravorn/Benteng/VFX), bunyi SFX, balance Varlgrim (margin L8 tipis menurut simulasi), pacing, performa GPU nyata.
+- [ ] Keputusan Game Director: Modern Interlude/Epilog (belum dimulai, menunggu instruksi), BGM dari komposer (AWAITING_COMPOSER).
+
+Lihat `docs/production/PHASE8_REPORT.md`.
+
+## Riwayat — Phase 7 — Chapter III + combat sinematik + SFX asli (12 November 2026)
 
 - [x] Chapter III playable end-to-end (Aveloria krisis → Velthia bergabung → Kuil Jejak 3 teka-teki → Chronolith → akhir bab); 65 baris canon verbatim; tanpa Bab IV.
 - [x] Velthia (5 jurus, tanpa senjata) + party switch (Torvan cadangan terjaga) + save tanpa migrasi.

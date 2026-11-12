@@ -19,16 +19,30 @@ import { derrriaShop } from '../rpg/derrria';
 import { loadForest2, loadLiora } from '../world/chapter2Maps';
 import { Chapter2View } from '../world/Chapter2View';
 import { FOREST2_SPAWN, LIORA_SPAWN, RETURN_SPAWN } from '../story/chapter2Flags';
-import { joinTorvan, joinVelthia, restChapter2Party, restChapter3Party } from '../rpg/party';
+import { joinTorvan, joinVelthia, restChapter2Party, restChapter3Party, restChapter4Party, returnToAveloria } from '../rpg/party';
 import { loadTemple, TEMPLE_BATTLE_RETURN, TEMPLE_FROM_FOREST } from '../world/templeMaps';
 import { TempleView } from '../world/TempleView';
 import { AveloriaCrisisView } from '../world/AveloriaCrisisView';
 import type { AreaView3 } from '../world/AreaView3';
 import { C3 } from '../story/chapter3Flags';
+import { C4, C4_ENCOUNTERS, type C4EncounterId } from '../story/chapter4Flags';
+import { Vfx } from '../vfx';
+import { loadFortress, FORTRESS_BATTLE_RETURN, FORTRESS_SPAWN, FORTRESS_VISTA } from '../world/fortressMaps';
+import { FortressView } from '../world/FortressView';
+import { loadAveloriaC4, AVELORIA_C4_SPAWN } from '../world/aveloriaC4';
+import { AveloriaC4View } from '../world/AveloriaC4View';
 import { DISPLAY_EVENT, getDisplay } from '../systems/DisplayController';
 import { SPRINT_SPEED, WALK_SPEED } from '../world/movement';
 import { playState, registerCharacterAnims, type AnimState, type CharacterAnimMeta } from '../world/CharacterAnims';
 
+
+/** SFX yang diputar WorldScene untuk op `{type:'c4'}` (op lain hanya animasi view). Diselaraskan dengan catatan F/A4. */
+const C4_OP_SFX: Readonly<Record<string, string>> = {
+  seal_on: 'SFX_SEAL_ACTIVATE', seal_solved: 'SFX_SEAL_ACTIVATE', seal_reset: 'SFX_SEAL_ERROR', rift_solved: 'SFX_SEAL_ACTIVATE', anchor_touch: 'SFX_TIME_DISTORTION',
+  door_open: 'SFX_FORTRESS_DOOR_ANCIENT', lever_pull: 'SFX_FORTRESS_DOOR_ANCIENT', lock_yaric: 'SFX_HEART_LOCK', lock_velthia: 'SFX_HEART_LOCK',
+  heart_open: 'SFX_HEART_UNSEAL', relic_glow: 'SFX_ECHO_MEMORY', echo_a: 'SFX_ECHO_MEMORY', echo_b: 'SFX_ECHO_MEMORY',
+};
+const isFortressEncounter = (id: string): id is C4EncounterId => (C4_ENCOUNTERS as readonly string[]).includes(id);
 
 const MAX_DT = 50; // ms; batas langkah waktu supaya tidak ada lompatan saat tab melambat
 const DIR_ROW: Record<Facing, number> = { down: 0, left: 1, right: 2, up: 3 };
@@ -74,6 +88,7 @@ export class WorldScene extends Phaser.Scene {
   /** Chapter III: Aveloria krisis atau Kuil Jejak (kontrak AreaView3); `react` hanya ada pada Aveloria krisis. */
   private view3?: AreaView3 & { react?(speaker: string, line: string): void };
   private cityLine = '';
+  private fx?: Vfx;
 
   constructor() {
     super(SCENE_KEYS.World);
@@ -86,8 +101,9 @@ export class WorldScene extends Phaser.Scene {
     if (!gameState.isActive) gameState.startNewGame();
     this.story = new Chapter1Story(gameState);
     const area = gameState.snapshot()!.area;
-    this.loaded = area === 'aveloria' ? loadAveloria() : area === 'liora' ? loadLiora() : area === 'forest_2' ? loadForest2() : area === 'forest_edge' ? loadForestEdge() : area === 'temple' ? loadTemple() : loadForest1();
-    this.city = undefined; this.view3 = undefined; this.chapter2 = undefined; this.cityLine = '';
+    const chapter4 = gameState.snapshot()!.chapter === 'IV';
+    this.loaded = area === 'fortress' ? loadFortress() : area === 'aveloria' && chapter4 ? loadAveloriaC4() : area === 'aveloria' ? loadAveloria() : area === 'liora' ? loadLiora() : area === 'forest_2' ? loadForest2() : area === 'forest_edge' ? loadForestEdge() : area === 'temple' ? loadTemple() : loadForest1();
+    this.fx = undefined; this.city = undefined; this.view3 = undefined; this.chapter2 = undefined; this.cityLine = '';
     this.nambo = undefined; this.bossSprite = undefined;
     this.busy = false;
     this.started = false;
@@ -107,7 +123,7 @@ export class WorldScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => this.game.events.off(DISPLAY_EVENT, onDisplay));
 
     // ---- dasar peta (fallback polos bila gambar gagal dimuat) ----
-    if (map.id === 'aveloria' || map.id === 'liora' || map.id === 'forest_2' || map.id === 'temple') { /* ground is drawn with area view below */ }
+    if (map.id === 'aveloria' || map.id === 'liora' || map.id === 'forest_2' || map.id === 'temple' || map.id === 'fortress') { /* ground is drawn with area view below */ }
     else if (map.id === 'forest_edge') drawForestEdgeGround(this, map);
     else if (this.textures.exists(ENV.groundKey)) this.add.image(0, 0, ENV.groundKey).setOrigin(0, 0).setDepth(-1000);
     else this.add.rectangle(0, 0, map.width, map.height, 0x2e4934).setOrigin(0, 0).setDepth(-1000);
@@ -139,9 +155,11 @@ export class WorldScene extends Phaser.Scene {
 
     // ---- keadaan dinamis dari flag ----
     this.interactables = this.loaded.interactables.map((i) => ({ ...i }));
-    if (map.id === 'aveloria' && gameState.hasFlag(C3.start)) this.view3 = new AveloriaCrisisView(this, this.loaded, this.interactables);
+    if (map.id === 'aveloria' && chapter4) this.view3 = new AveloriaC4View(this, this.loaded, this.interactables);
+    else if (map.id === 'aveloria' && gameState.hasFlag(C3.start)) this.view3 = new AveloriaCrisisView(this, this.loaded, this.interactables);
     else if (map.id === 'aveloria') this.city = new AveloriaView(this, this.loaded, this.interactables);
     if (map.id === 'temple') this.view3 = new TempleView(this, this.loaded, this.interactables);
+    if (map.id === 'fortress') this.view3 = new FortressView(this, this.loaded, this.interactables);
     if (map.id === 'liora' || map.id === 'forest_2') this.chapter2 = new Chapter2View(this, this.loaded, this.interactables);
     this.syncNamboInteractable();
     this.applyFlagState();
@@ -173,7 +191,7 @@ export class WorldScene extends Phaser.Scene {
     });
 
     // Musik hutan: BGM_FOREST_01 berstatus AWAITING_COMPOSER -> senyap tanpa error, dimulai hanya setelah gesture.
-    audio.playBgm(map.id === 'temple' ? 'BGM_TEMPLE' : map.id === 'aveloria' ? 'BGM_AVELORIA_DAY' : map.id === 'liora' ? 'BGM_LIORA' : map.id === 'forest_2' ? 'BGM_FOREST_02' : 'BGM_FOREST_01');
+    audio.playBgm(map.id === 'fortress' || (map.id === 'aveloria' && chapter4) ? 'BGM_CRISIS' : map.id === 'temple' ? 'BGM_TEMPLE' : map.id === 'aveloria' ? 'BGM_AVELORIA_DAY' : map.id === 'liora' ? 'BGM_LIORA' : map.id === 'forest_2' ? 'BGM_FOREST_02' : 'BGM_FOREST_01');
 
     // fade-in: pembukaan C1-01 pelan (bangun), selanjutnya singkat
     const firstTime = !this.story.objective();
@@ -335,7 +353,7 @@ export class WorldScene extends Phaser.Scene {
     } finally {
       this.busy = false;
       this.hud.setObjective(this.story.objective());
-      if (completed && actions.some(a => a.type === 'setFlag' || a.type === 'giveItem' || a.type === 'rest' || a.type === 'joinTorvan' || a.type === 'joinVelthia' || a.type === 'restParty')) this.services.checkpoints.requestAutosave();
+      if (completed && actions.some(a => a.type === 'setFlag' || a.type === 'giveItem' || a.type === 'rest' || a.type === 'joinTorvan' || a.type === 'joinVelthia' || a.type === 'restParty' || a.type === 'restParty4')) this.services.checkpoints.requestAutosave();
     }
   }
 
@@ -347,7 +365,7 @@ export class WorldScene extends Phaser.Scene {
         const next = gameState.snapshot()!;
         const previous = next.area;
         next.area = a.area;
-        next.position = a.area === 'temple' ? { ...TEMPLE_FROM_FOREST } : a.area === 'liora' ? previous === 'forest_2' ? { x: 480, y: 160, facing: 'down' } : { ...LIORA_SPAWN }
+        next.position = a.area === 'fortress' ? { ...FORTRESS_SPAWN } : a.area === 'temple' ? { ...TEMPLE_FROM_FOREST } : a.area === 'liora' ? previous === 'forest_2' ? { x: 480, y: 160, facing: 'down' } : { ...LIORA_SPAWN }
           : a.area === 'forest_2' ? { ...FOREST2_SPAWN }
           : previous === 'forest_2' ? { ...RETURN_SPAWN } : { x: 640, y: 1312, facing: 'up' };
         gameState.load(next); this.services.checkpoints.requestAutosave();
@@ -362,7 +380,31 @@ export class WorldScene extends Phaser.Scene {
         gameState.load(joinVelthia(gameState.snapshot()!)); this.applyFlagState();
         break;
       case 'restParty':
-        gameState.load(gameState.snapshot()!.chapter === 'III' ? restChapter3Party(gameState.snapshot()!) : restChapter2Party(gameState.snapshot()!)); this.applyFlagState();
+        gameState.load(gameState.snapshot()!.chapter === 'IV' ? restChapter4Party(gameState.snapshot()!) : gameState.snapshot()!.chapter === 'III' ? restChapter3Party(gameState.snapshot()!) : restChapter2Party(gameState.snapshot()!)); this.applyFlagState();
+        break;
+      case 'restParty4':
+        gameState.load(restChapter4Party(gameState.snapshot()!)); this.applyFlagState();
+        break;
+      case 'c4': {
+        this.actionLog.push(`c4:${a.op}${a.arg === undefined ? '' : `:${a.arg}`}`);
+        if (a.op === 'to_aveloria') {
+          this.leaving = true;
+          gameState.load(returnToAveloria(gameState.snapshot()!, { ...AVELORIA_C4_SPAWN })); this.services.checkpoints.requestAutosave();
+          this.services.router.goto(this, SCENE_KEYS.World);
+          await new Promise<void>(() => undefined);
+          break;
+        }
+        if (a.op === 'tower_fall') { await this.towerFall(); break; }
+        const sfx = C4_OP_SFX[a.op];
+        if (sfx) this.services.audio.playSfx(sfx);
+        await this.view3?.handleAction(a.op, a.arg);
+        break;
+      }
+      case 'chapter4End':
+        gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'aveloria');
+        this.services.checkpoints.setSafe(true); this.services.checkpoints.requestAutosave();
+        if (this.services.checkpoints.flush()?.ok === false) this.hud.toast('Simpan otomatis gagal.');
+        this.services.router.openOverlay(this, SCENE_KEYS.SliceEnd);
         break;
       case 'c3':
         this.actionLog.push(`c3:${a.op}${a.arg === undefined ? '' : `:${a.arg}`}`);
@@ -447,6 +489,7 @@ export class WorldScene extends Phaser.Scene {
       case 'setFlag':
         if (gameState.setFlag(a.flag)) this.actionLog.push(`flag:${a.flag}`);
         if (this.city || this.view3 || this.chapter2 || a.flag === FLAG.awake || a.flag === FLAG.victorySeen) this.applyFlagState();
+        if (a.flag === C4.complete) await this.runAction({ type: 'chapter4End' }); // kartu "Bab IV selesai" (tanpa epilog/modern)
         break;
       case 'objective':
         this.hud.setObjective(this.story.objective());
@@ -455,10 +498,10 @@ export class WorldScene extends Phaser.Scene {
         this.hud.toast(a.text);
         break;
       case 'giveItem':
-        if (!gameState.hasFlag(FLAG.chestReward)) {
+        if (!gameState.hasFlag(a.flag ?? FLAG.chestReward)) {
           gameState.addItem(a.item, a.count);
           this.services.audio.playSfx('SFX_ITEM_PICKUP');
-          gameState.setFlag(FLAG.chestReward);
+          gameState.setFlag(a.flag ?? FLAG.chestReward);
           this.actionLog.push(`item:${a.item}`);
         }
         break;
@@ -484,6 +527,11 @@ export class WorldScene extends Phaser.Scene {
           const back = TEMPLE_BATTLE_RETURN[a.encounter];
           this.player.x = back.x; this.player.y = back.y; this.player.facing = back.facing;
           gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'temple');
+        } else if (a.encounter && isFortressEncounter(a.encounter)) {
+          if (a.encounter === 'varlgrim') gameState.load(restChapter4Party(gameState.snapshot()!)); // pemulihan penuh sebelum bos: retry ramah, tanpa grinding
+          const back = FORTRESS_BATTLE_RETURN[a.encounter];
+          this.player.x = back.x; this.player.y = back.y; this.player.facing = back.facing;
+          gameState.setPosition(this.player.x, this.player.y, this.player.facing, 'fortress');
         } else if (a.encounter === 'mournfang') {
           gameState.load(restBeforeMournfang(gameState.snapshot()!));
           this.player.x = BOSS_CHECKPOINT.x; this.player.y = BOSS_CHECKPOINT.y; this.player.facing = BOSS_CHECKPOINT.facing;
@@ -499,7 +547,7 @@ export class WorldScene extends Phaser.Scene {
         this.services.checkpoints.setSafe(false);
         this.leaving = true;
         const pres = presentationFor(a.encounter ?? 'hollowling', gameState.snapshot()!.flags);
-        this.services.router.goto(this, SCENE_KEYS.Battle, { encounter: a.encounter ?? 'hollowling' }, { transition: pres.kind, label: pres.name });
+        this.services.router.goto(this, SCENE_KEYS.Battle, { encounter: a.encounter ?? 'hollowling' }, { transition: pres.kind, label: pres.name, ...(pres.subtitle ? { subtitle: pres.subtitle } : {}) });
         // router.goto menghentikan scene ini; tunggu tanpa melakukan apa pun lagi
         await new Promise<void>(() => undefined);
         break;
@@ -521,6 +569,19 @@ export class WorldScene extends Phaser.Scene {
     const boss = map.solidRects.find(s => s.id === 'mournfang_block');
     if (boss) collision.setDynamic(boss.id, this.services.gameState.hasFlag(MOURNFANG_FLAG) ? null : rectOf(boss));
     for (const i of this.interactables) if (i.id.startsWith('forest_exit')) i.enabled = this.services.gameState.hasFlag(FLAG.victorySeen);
+  }
+
+  /** C4-04: kamera mengarah ke jendela busur, debu menara runtuh dari kejauhan, lalu kembali. Tanpa goyang kamera. */
+  private async towerFall(): Promise<void> {
+    const cam = this.cameras.main;
+    cam.stopFollow();
+    await this.panTo(FORTRESS_VISTA.x, FORTRESS_VISTA.y + 60, 700);
+    this.fx ??= new Vfx(this, { reducedFlashes: () => this.services.settings.get('reduced_flashes') });
+    this.services.audio.playSfx('SFX_TOWER_COLLAPSE_DISTANT');
+    this.fx.play('tower_dust', FORTRESS_VISTA.x, FORTRESS_VISTA.y);
+    await this.view3?.handleAction('tower_fall');
+    await this.panTo(this.player.x, this.player.y - 24, 600);
+    cam.startFollow(this.player.sprite, true, 0.14, 0.14);
   }
 
   private panTo(x: number, y: number, duration: number): Promise<void> {

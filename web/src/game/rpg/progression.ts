@@ -8,8 +8,17 @@ export const STAT_KEYS: readonly (keyof Stats)[] = ['HP', 'MP', 'ATK', 'DEF', 'M
 export function levelForExp(exp: number, profile: ProgressionProfile = YARIC_PROFILE): number {
   return profile.thresholds.reduce((level, threshold, index) => exp >= threshold ? index + 1 : level, 1);
 }
+/** Level maksimum dan batas EXP profil (data-driven dari `thresholds`). */
+export const levelCapOf = (profile: ProgressionProfile): number => profile.thresholds.length;
+export const expCapOf = (profile: ProgressionProfile): number => profile.thresholds[profile.thresholds.length - 1]!;
+/**
+ * Stat dasar pada level tertentu: `growth` per level sampai `lateFromLevel`, lalu `lateGrowth` (bila ada) untuk level di atasnya.
+ * Level <= lateFromLevel identik dengan rumus lama (save lama tetap sah). API dan nama tetap (dipakai balancing Varlgrim).
+ */
 export function baseStatsAt(level: number, profile: ProgressionProfile = YARIC_PROFILE): Stats {
-  return Object.fromEntries(STAT_KEYS.map(key => [key, profile.base[key] + profile.growth[key] * (level - 1)])) as unknown as Stats;
+  const from = profile.lateGrowth ? profile.lateFromLevel ?? level : level;
+  const early = Math.max(0, Math.min(level, from) - 1), late = Math.max(0, level - from);
+  return Object.fromEntries(STAT_KEYS.map(key => [key, profile.base[key] + profile.growth[key] * early + (profile.lateGrowth?.[key] ?? profile.growth[key]) * late])) as unknown as Stats;
 }
 /** Jurus cost-0 tanpa prasyarat terbuka otomatis menurut level (tidak mengubah Yaric/Torvan: semuanya level 1). */
 function autoSkills(profile: ProgressionProfile, level: number, known: readonly string[] = []): string[] {
@@ -17,7 +26,7 @@ function autoSkills(profile: ProgressionProfile, level: number, known: readonly 
 }
 /** `startExp` memungkinkan bergabung pada level tertentu (Velthia). Poin jurus = level - 1 (belum dibelanjakan). */
 export function createCharacter(profile: ProgressionProfile = YARIC_PROFILE, startExp = 0): CharacterProgress {
-  const exp = Math.max(0, Math.min(profile.thresholds.at(-1)!, startExp)), level = levelForExp(exp, profile);
+  const exp = Math.max(0, Math.min(expCapOf(profile), startExp)), level = levelForExp(exp, profile);
   const eq = STARTING_EQUIPMENT[profile.id] ?? { weapon: null, armor: null };
   return { classId: profile.classId, level, exp, baseStats: baseStatsAt(level, profile), skillPoints: level - 1,
     unlockedSkills: autoSkills(profile, level), equipment: { weapon: eq.weapon, armor: eq.armor } };
@@ -39,7 +48,7 @@ export function effectiveStats(data: Pick<GameStateData, 'rpg'>, id = 'C01'): St
 }
 export function gainExp(character: CharacterProgress, amount: number, profile: ProgressionProfile = YARIC_PROFILE): CharacterProgress {
   if (!Number.isSafeInteger(amount) || amount < 0) throw new Error('Invalid EXP');
-  const next = structuredClone(character), cap = profile.thresholds.at(-1)!;
+  const next = structuredClone(character), cap = expCapOf(profile);
   next.exp = Math.min(cap, next.exp + amount); next.level = levelForExp(next.exp, profile);
   next.baseStats = baseStatsAt(next.level, profile); next.skillPoints += next.level - character.level;
   for (const id of autoSkills(profile, next.level, next.unlockedSkills)) if (!next.unlockedSkills.includes(id)) next.unlockedSkills.push(id);

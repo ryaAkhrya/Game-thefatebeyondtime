@@ -12,7 +12,7 @@ export type ExpressionId =
   | 'SAD'
   | 'EMBARRASSED'
   | 'STERN' | 'AMUSED' | 'WORRIED' | 'SUSPICIOUS' | 'SKEPTICAL' | 'ALARMED'
-  | 'VULNERABLE' | 'MISCHIEVOUS' | 'CURIOUS' | 'SOLEMN' | 'UPSET' | 'CAUTIOUS';
+  | 'VULNERABLE' | 'MISCHIEVOUS' | 'CURIOUS' | 'SOLEMN' | 'UPSET' | 'CAUTIOUS' | 'REMORSE';
 
 /**
  * speech  = ucapan ke orang lain

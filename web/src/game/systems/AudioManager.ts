@@ -43,6 +43,12 @@ export interface SfxPlayOptions {
   rate?: number;
 }
 
+/** Menjepit angka ke [lo, hi]; NaN/Infinity/bukan-angka -> fallback (tidak pernah meneruskan NaN ke backend). */
+function clampFinite(x: number | undefined, lo: number, hi: number, fallback: number): number {
+  if (typeof x !== 'number' || !Number.isFinite(x)) return fallback;
+  return Math.min(hi, Math.max(lo, x));
+}
+
 /** Batas suara SFX yang boleh terdengar bersamaan; selebihnya dilewati (bukan ditumpuk). */
 export const MAX_SFX_VOICES = 8;
 const RECENT_LOG = 24;
@@ -186,8 +192,9 @@ export class AudioManager {
     if (!cue) { this.suppress(id, 'unknown'); return this.silent(id, 'silent_unknown_track'); }
     if (!this.unlocked) { this.suppress(id, 'locked'); return 'silent_locked'; }
     if (cue.status !== 'READY') { this.suppress(id, 'not_ready'); return this.silent(id, 'silent_awaiting_composer'); }
-    const key = this.pickKey(cue);
-    if (key === null) { this.suppress(id, 'not_loaded'); return this.silent(id, 'silent_not_loaded'); }
+    const pick = this.pickKey(cue);
+    if (pick === null) { this.suppress(id, 'not_loaded'); return this.silent(id, 'silent_not_loaded'); }
+    const key = pick.key;
     const base = effectiveVolume(this.settings.snapshot(), 'sfx');
     if (base <= 0) { this.suppress(id, 'muted'); return 'silent_muted'; }
     const t = this.now();
@@ -195,10 +202,14 @@ export class AudioManager {
     if (last !== undefined && t - last < cue.minIntervalMs) { this.suppress(id, 'rate_limited'); return 'silent_rate_limited'; }
     this.voices = this.voices.filter(e => e > t);
     if (this.voices.length >= this.maxVoices) { this.suppress(id, 'voice_cap'); return 'silent_voice_cap'; }
-    const rate = Math.min(2, Math.max(0.5, opts.rate ?? 1));
-    const volume = Math.min(1, Math.max(0, base * cue.gain * Math.min(1, Math.max(0, opts.volume ?? 1))));
+    const rate = clampFinite(opts.rate, 0.5, 2, 1);
+    const volume = Math.min(1, Math.max(0, base * cue.gain * clampFinite(opts.volume, 0, 1, 1)));
     if (this.backend.playSfx) this.backend.playSfx(key, volume, rate);
     else this.backend.playLoop(key, volume, false);
+    // Status variasi hanya di-commit bila suara BENAR-BENAR dimulai: percobaan yang ditahan (rate limit/voice cap/mute)
+    // tidak boleh menggeser "variasi terakhir" sehingga pemutaran berikutnya mengulang variasi yang sama.
+    this.lastVariant.set(id, pick.index);
+    this.rngState = pick.rngState;
     this.lastPlayedAt.set(id, t);
     this.voices.push(t + (cue.durationMs ?? 1000) / rate);
     this.playedCount[id] = (this.playedCount[id] ?? 0) + 1;
@@ -209,8 +220,11 @@ export class AudioManager {
     return 'playing';
   }
 
-  /** Key Phaser: id (satu file) atau id#i (variasi). Memilih variasi yang sudah dimuat, berbeda dari yang terakhir bila bisa. */
-  private pickKey(cue: SfxCue): string | null {
+  /**
+   * Key Phaser: id (satu file) atau id#i (variasi). Memilih variasi yang sudah dimuat, berbeda dari yang terakhir diputar bila bisa.
+   * Murni (tanpa efek samping): pemanggil meng-commit `index`/`rngState` hanya setelah suara dimulai.
+   */
+  private pickKey(cue: SfxCue): { key: string; index: number; rngState: number } | null {
     const n = cue.files.length;
     if (n === 0) return null;
     const keyOf = (i: number) => (n === 1 ? cue.id : `${cue.id}#${i}`);
@@ -219,10 +233,9 @@ export class AudioManager {
     if (loaded.length === 0) return null;
     const last = this.lastVariant.get(cue.id);
     const pool = loaded.length > 1 ? loaded.filter(i => i !== last) : loaded;
-    this.rngState = (Math.imul(this.rngState, 1664525) + 1013904223) >>> 0;
-    const pick = pool[Math.floor((this.rngState / 4294967296) * pool.length)]!;
-    this.lastVariant.set(cue.id, pick);
-    return keyOf(pick);
+    const rngState = (Math.imul(this.rngState, 1664525) + 1013904223) >>> 0;
+    const index = pool[Math.floor((rngState / 4294967296) * pool.length)]!;
+    return { key: keyOf(index), index, rngState };
   }
 
   private suppress(id: string, reason: string): void {

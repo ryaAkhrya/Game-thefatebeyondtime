@@ -13,7 +13,7 @@ function rich() { const d = createNewGameData(); d.rpg.gold = 100; d.items.potio
 
 describe('Progression and single victory transaction', () => {
   it('level one effective stats preserve the already tested tutorial balance', () => { expect(effectiveStats(createNewGameData())).toEqual(YARIC_STATS); });
-  it.each([[0, 1], [24, 1], [25, 2], [69, 2], [70, 3], [140, 4], [235, 5], [999, 5]])('%i EXP maps to level %i', (exp, level) => { expect(levelForExp(exp)).toBe(level); });
+  it.each([[0, 1], [24, 1], [25, 2], [69, 2], [70, 3], [140, 4], [235, 5], [299, 5], [300, 6], [800, 10], [999, 10]])('%i EXP maps to level %i', (exp, level) => { expect(levelForExp(exp)).toBe(level); });
   it('Hollowling grants 25 EXP, level 2, 8 gold and one point exactly once', () => {
     const d = createNewGameData(), first = applyReward(d, HOLLOWLING_REWARD), before = structuredClone(first.data);
     expect(first.receipt).toMatchObject({ exp: 25, gold: 8, beforeLevel: 1, afterLevel: 2, skillPoints: 1 });
@@ -25,7 +25,7 @@ describe('Progression and single victory transaction', () => {
     expect(next.vitals).toEqual({ hp: 27, mp: 2 }); expect(effectiveStats(next)).toEqual({ HP: 108, MP: 14, ATK: 23, DEF: 9, MAG: 6, MDEF: 8, SPD: 11 });
   });
   it('large reward caps level/EXP and grants every earned point once', () => {
-    const c = gainExp(createCharacter(), 10000); expect(c.level).toBe(5); expect(c.exp).toBe(235); expect(c.skillPoints).toBe(4); expect(gainExp(c, 100).skillPoints).toBe(4);
+    const c = gainExp(createCharacter(), 10000); expect(c.level).toBe(10); expect(c.exp).toBe(800); expect(c.skillPoints).toBe(9); expect(gainExp(c, 100).skillPoints).toBe(9);
   });
   it.each([-1, NaN, Infinity, 1.5])('rejects invalid EXP %s', exp => { expect(() => gainExp(createCharacter(), exp)).toThrow(); });
   it('gold reward respects cap', () => { const d = rich(); d.rpg.gold = MAX_GOLD - 1; expect(applyReward(d, HOLLOWLING_REWARD).receipt?.gold).toBe(1); });

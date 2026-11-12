@@ -447,3 +447,34 @@ Atlas DRAFT lama (`C02/B03/M05_BATTLE_ATLAS_DRAFT.*`, blob/lingkaran 4 pose) tet
 | SFX asli (44 id / 53 WAV) | `web/public/assets/audio/sfx/*.wav` | `node web/scripts/sfx/generate.mjs` (`npm run assets:sfx`) | FUNCTIONAL; kualitas AUDIO-REVIEW PENDING; bukan BGM |
 
 Atlas battle C02/B03/M05 dicatat di bagian "Phase 7 battle atlases" di atas.
+
+
+## Phase 8 battle atlases (Agent BA, 13 November 2026) — DRAFT / NEEDS_REVIEW
+
+Dibuat oleh `web/scripts/battle-art/build_{b04,m04,m06}.py` (pustaka sama `bakit.py`; `python -I`, Pillow/numpy/scipy; deterministik; tanpa jaringan). Metode identik dengan Phase 7: konsep/turnaround resmi dipotong menjadi bagian boneka kertas (polygon/warna), di-pose rigid pada resolusi tinggi, di-area-average ke grid battle, SATU palet tertutup per atlas (k-means tetap + outline plum #1D1625), alfa keras, tanpa blur; BUKAN gambar tangan frame demi frame dan BUKAN crop referensi mentah. Sumber `assets/` tidak diubah. Lembar kontak: `docs/production/sprint4/battle-contact-sheets/{B04,M04,M06}_BATTLE_V1_contact.png`. Uji: `web/tests/unit/battle-art-phase8.test.ts`.
+
+| Aset runtime | Sumber resmi | Frame | Status | Catatan jujur |
+|---|---|---|---|---|
+| `web/public/assets/battle/B04_BATTLE_V1.{png,json}` (71676 B / 4027 B; sha256 `54af44417d8f...` / `47643caec576...`) | `assets/characters/C04_Varlgrim/C04_TURNAROUND_SIDE.png` + `C04_WEAPON_WOODEN_STAFF.png` | 13 frame 208x176, pivot [88,171], menghadap KANAN (menuju party; tidak dicerminkan), 30 warna | NEEDS_REVIEW | Varlgrim = id aktor `C04`. Standar 10 + `plant`, `raise`, `cast`. Tongkat kayu berpilin dari gambar tongkat resmi (pita merah + liontin emas ikut), bukan jam pasir. Lengan atas = tabung prosedural berwarna lengan mantel; satu kepalan saja (tangan jauh pada `cast` = salinan gelap kepalan yang sama). `defeated` = tubuh diturunkan + sepatu belakang diputar, kepala tertunduk, bertumpu pada tongkat; keterbacaan "berlutut" lemah (tungkai tertutup jubah). Wajah profil ~12 px. |
+| `web/public/assets/battle/M04_BATTLE_V1.{png,json}` (75186 B / 3264 B; `e2df66395a7d...` / `593dbbde7b83...`) | `assets/monsters/M04_Gravorn/M04_NEW_CONCEPT_DRAFT.png` | 11 frame 176x136, pivot [88,131], depan condong kanan, 25 warna | NEEDS_REVIEW | Standar 9 + `guard` (kedua lengan batu di depan kepala/dada). Lengan kiri/kanan, kepala, badan+bahu, kaki sebagai bagian terpisah; lubang kepala di badan diisi batu tetangga. Batu-di-atas-batu: kontras lengan vs badan rendah pada `attack`/`guard`. `defeated` = badan runtuh di antara kaki. |
+| `web/public/assets/battle/M06_BATTLE_V1.{png,json}` (52475 B / 2999 B; `d7097038e676...` / `dc0115798a8f...`) | `assets/monsters/M06_Riftborn/M06_NEW_CONCEPT_DRAFT.png` | 10 frame 160x128, pivot [72,124], depan menyentak kanan, `hover_px` 6, 27 warna | NEEDS_REVIEW | "Penguji" memakai atlas yang sama. Dua lapisan (rift ungu + busur/serpihan batu, dipisah menurut warna); pose = putaran berlawanan/skala/terjang. Melayang: baris terbawah = pivot.y-6 kecuali `defeated` (di tanah). `defeated` = tumpukan serpihan jarang (~1100 px, lemah). Serpihan batu agak berbintik. |
+
+Eksplorasi/portrait Varlgrim (turunan; sumber tidak diubah):
+
+| Aset runtime | Sumber | Catatan |
+|---|---|---|
+| `web/public/assets/characters/C04_explore.{png,json}` (salinan lama, 2937 B / 4781 B; `1fec06b8752e...` / `852a95650b7f...`) | `assets/characters/C04_Varlgrim/C04_EXPLORATION_ATLAS_DRAFT.{png,json}` | byte-identik dengan sumber (`web/scripts/prepare-c04-assets.mjs`) |
+| `web/public/assets/characters/normalized/C04_explore.{png,json}` (2238 B; `737303a19af1...`) | idem | `normalize-exploration-sprites.mjs` (garis kaki y=46, pivot 16/46, satu offset-x per arah) |
+| `web/public/assets/characters/final/C04_explore.{png,json}` (288x192 = 9 kolom x 4 arah, 3271 B / 13157 B; `854fc493b755...` / `3cc3ee6dba5a...`) | idem | `author_cast_build.py C04` (jalur "fallback": kolom 0-5 = salinan atlas ternormalisasi, kolom 6-8 = idle turunan; `anims` berbasis data). Sprite prototipe kasar (badan sama untuk keempat arah, hanya kepala berbeda, tongkat tidak ada); perlu redraw. Manifest: id `C04_CITY_EXPLORE` (kunci spritesheet BootScene, meta `C04_CITY_EXPLORE:meta`; `${entity}_CITY_EXPLORE` bekerja). |
+| `web/public/assets/portraits_hd/C04_{NEUTRAL,ANGRY,STERN,REMORSE,DETERMINED,SAD,SURPRISED,SUSPICIOUS}.png` (tinggi 352) + `C02_ANGRY.png` | `assets/characters/C04_Varlgrim/C04_EXPRESSION_*.png`, `C02_Velthia/C02_EXPRESSION_ANGRY.png` | `node web/scripts/prepare-ui-assets.mjs` (`UI_ONLY_NEW=1` = hanya yang belum ada); pipeline resize yang sama dengan portrait lain; tanpa redraw |
+
+## Phase 8 — aset kode-native tambahan (lead, 13 November 2026) — DRAFT / NEEDS_REVIEW
+
+| Aset | Lokasi | Pembuat/skrip | Status |
+|---|---|---|---|
+| Warden Fortress (lantai 1792x2432 + atlas 93 frame, palet tertutup 24 warna, tidak berbagi warna dengan Kuil Jejak) | `web/public/assets/environment/fortress/{ground.png,props.png,props.json}` | `node web/scripts/gen-fortress-art.mjs` (+ `scripts/lib/fortressSprites.mjs`) | DRAFT code-native; lembar kontak `docs/production/sprint4/fortress-contact-sheets/` |
+| Aveloria sesudah menara runtuh (atlas 45 frame) | `web/public/assets/environment/town/town_c4_atlas.{png,json}` | `node web/scripts/gen-town-c4-art.mjs` | DRAFT code-native; memakai ulang `town_aveloria` dan `town_crisis` |
+| VFX Bab IV (5 atlas, 23 efek: varlgrim, rift, meteor, aegis, heart) | `web/public/assets/vfx/vfx_{varlgrim,rift,meteor,aegis,heart}.{png,json}` | `node web/scripts/vfx/build.mjs` | DRAFT code-native; atlas Phase 7 byte-identik; total ≈ 11 MB GPU |
+| SFX Bab IV (23 id / 33 WAV; registry kini 67 id / 86 berkas) | `web/public/assets/audio/sfx/*.wav` | `node web/scripts/sfx/generate.mjs`; analisis `node web/scripts/sfx/analyze.mjs` | FUNCTIONAL; kualitas AUDIO-REVIEW PENDING; bukan BGM |
+
+Atlas battle B04 (Varlgrim), M04 (Gravorn), M06 (Riftborn), eksplorasi `C04_CITY_EXPLORE` dan portrait C04 dicatat di bagian "Phase 8 battle atlases" di atas (agen BA). Tidak ada BGM.

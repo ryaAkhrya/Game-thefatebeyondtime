@@ -1,0 +1,4 @@
+1. particles: hmote_a, hmote_b, hmote_c, hdust_a
+2. heart_lock_glow: hlock_1, hlock_2, hlock_3, hlock_4, hlock_x1, hlock_x2, hlock_x3
+3. heart_unseal: hunseal_1, hunseal_2, hunseal_3, hunseal_3_c, hunseal_4, hunseal_4_c, hunseal_5, hunseal_5_c, hunseal_6, hunseal_6_c, hunseal_7
+4. tower_dust: tdustf_1, tdustf_2, tdustf_3, tdustf_4, tdustf_5, tdustf_6, tdustf_7, tdustf_8

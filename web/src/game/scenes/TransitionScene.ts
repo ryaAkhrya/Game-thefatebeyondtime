@@ -51,7 +51,7 @@ export class TransitionScene extends Phaser.Scene {
   }
 
   /** Tutup layar. Resolve ketika layar tertutup penuh dan plakat (bila ada) selesai ditahan. */
-  cover(kind: CoverKind, label?: string): Promise<void> {
+  cover(kind: CoverKind, label?: string, subtitle?: string): Promise<void> {
     const spec = kind === 'return' ? RETURN_SPEC : TRANSITIONS[kind];
     this.tween?.stop(); this.spec = spec; this.mode = 'covering';
     this.scene.bringToTop();
@@ -66,7 +66,7 @@ export class TransitionScene extends Phaser.Scene {
         onUpdate: () => this.draw(),
         onComplete: () => {
           this.progress = 1; this.mode = 'covered'; this.draw();
-          if (spec.nameplate && label) this.showPlate(label);
+          if (spec.nameplate && label) this.showPlate(label, subtitle);
           if (spec.flashy && !calm) this.flashPulse();
           this.time.delayedCall(spec.holdMs, () => resolve());
         },
@@ -122,10 +122,10 @@ export class TransitionScene extends Phaser.Scene {
     if (spec.steps > 0 && p > 0) { g.fillStyle(0xd9c27a, 0.8); g.fillRect(0, Math.round(H / 2), W, Math.max(1, Math.round(l.uiScale * 0.6))); }
   }
 
-  private showPlate(label: string): void {
+  private showPlate(label: string, subtitle?: string): void {
     const ui = new Ui(this);
     const name = ui.text(ui.dw / 2, ui.dh / 2 - 8, label.toUpperCase(), { size: TYPE.display + 6, weight: '700', family: 'display', originX: 0.5, originY: 0.5, color: COLORS.bitterLime, depth: 3, alpha: 0 });
-    const rule = ui.text(ui.dw / 2, ui.dh / 2 + 22, '—  ✦  —', { size: TYPE.body, originX: 0.5, originY: 0.5, color: COLORS.paper, depth: 3, alpha: 0 });
+    const rule = ui.text(ui.dw / 2, ui.dh / 2 + 22, subtitle ?? '—  ✦  —', { size: TYPE.body, originX: 0.5, originY: 0.5, color: COLORS.paper, depth: 3, alpha: 0 });
     this.plate = [name, rule];
     this.tweens.add({ targets: this.plate, alpha: 1, duration: 220 });
   }

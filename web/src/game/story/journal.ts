@@ -3,6 +3,7 @@ import { C2 } from './chapter2Flags';
 import { FIRST_HOLLOWLING_FLAG } from '../combat/BattleSession';
 import { MOURNFANG_FLAG } from '../combat/encounters';
 import { IDENTITY_FLAG } from './identity';
+import { C4 } from './chapter4Flags';
 
 /**
  * Catatan Jurnal, diturunkan dari flag (selalu konsisten dengan save). Naskah kerja DRAFT_IMPL, bukan dialog approved.
@@ -55,6 +56,27 @@ const NOTES: readonly NoteDef[] = [
     text: 'Catatan penjaga lama menyebut Varlgrim dan sebuah segel. Baris ramalan di bawahnya dicoret.' },
   { id: 'report', title: 'Laporan', when: has(C2.complete),
     text: 'Aku menyerahkan temuan itu kepada Velthia. Penyelidikan masih jauh dari selesai.' },
+  // ---- Bab IV (Phase 8): catatan DRAFT_IMPL, tanpa kehidupan modern ----
+  { id: 'c4_fortress', title: 'Benteng Penjaga', when: has(C4.start),
+    text: 'Benteng tua di atas tebing retak. Lorongnya bergeser kembali sendiri, dan satu jam berbunyi terlalu cepat. Talric dan Azie tinggal mengawal evakuasi kota.' },
+  { id: 'c4_dispatch', title: 'Kabar dari kota', when: has(C4.reportA),
+    text: 'Talric mengirim laporan lewat pos kurir: warga kota tua dipindahkan bertahap, dan Azie mencatat setiap rombongan yang keluar.' },
+  { id: 'c4_aegis', title: 'Pusaka yang bergema', when: has(C4.aegisLearned),
+    text: 'Di arsip penjaga, pusaka Velthia bergema. Ia berkata ada satu cara melindungi kami dari sesuatu yang tak bisa ditangkis biasa, dan ia harus mengerjakannya sendiri.' },
+  { id: 'c4_confront', title: 'Varlgrim', when: has(C4.confront),
+    text: 'Varlgrim berdiri dekat simbol Heart. Ia melihat menara runtuh sebelum kami datang dan yakin kami penyebabnya. Velthia menunjuk titik segel sebagai asal kerusakan.' },
+  { id: 'c4_defeated', title: 'Penjaga yang kalah', when: has(C4.varlgrim),
+    text: 'Varlgrim jatuh bertumpu pada tongkatnya. Keyakinannya belum patah, tetapi untuk pertama kali ia ragu.' },
+  { id: 'c4_heart', title: 'Heart dibuka', when: has(C4.heartOpen),
+    text: 'Aku dan Velthia membuka dua pengunci Heart bersama. Retakan mereda. Menara tua tetap runtuh; dari kejauhan hanya terlihat debunya.' },
+  { id: 'c4_memory', title: 'Ingatan lama', when: has(C4.oldMemory),
+    text: 'Heart menggemakan ingatan lama: kami pernah berdiri di tempat ini dan saling memilih. Bukan karena ramalan.' },
+  { id: 'c4_torvan', title: 'Torvan', when: has(C4.creatorReveal),
+    text: 'Torvan mengaku ia yang membuat dunia ini, tetapi bukan dia yang menentukan apa yang kami lakukan di dalamnya. Lalu ia pergi, sesederhana itu.' },
+  { id: 'c4_stays', title: 'Sisa retakan', when: has(C4.varlgrimStays),
+    text: 'Varlgrim memilih tinggal menahan sisa retakan. Velthia belum memaafkannya. Nasibnya belum diputuskan.' },
+  { id: 'c4_return', title: 'Kembali ke Aveloria', when: has(C4.returnSeen),
+    text: 'Warga kota tua selamat; tidak semua bangunan bertahan. Perbaikan dimulai besok. Aku akan membantu, mungkin salah jalan sekali dua kali.' },
 ];
 
 /** Catatan yang sudah terbuka, yang terbaru di atas. */

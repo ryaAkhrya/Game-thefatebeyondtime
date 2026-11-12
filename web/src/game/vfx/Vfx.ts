@@ -1,12 +1,13 @@
 import type Phaser from 'phaser';
-import { VFX_MAX_LIVE, VFX_SPECS, type AnimLayer, type BurstLayer, type LinkLayer, type TravelLayer, type VfxLayer, type VfxSpec } from './vfxSpecs';
+import { VFX_MAX_LIVE, VFX_SPECS, type AnimLayer, type BurstLayer, type DescentLayer, type LinkLayer, type TravelLayer, type VfxLayer, type VfxSpec } from './vfxSpecs';
 
 /**
  * Sistem VFX pixel-art untuk panggung battle (kamera stage, depth < 20).
  *  - partikel = sprite diskret dari frame atlas (tanpa Graphics, tanpa tween berat, tanpa blur/bloom);
  *  - simulasi langkah tetap 33 ms (posisi dibulatkan ke piksel bulat -> gerak "on twos/threes" khas pixel art);
  *  - pool objek, batas global VFX_MAX_LIVE (64) sprite aktif; bila penuh, partikel baru dilewati (bukan menumpuk);
- *  - Reduced Flashes: efek `flashy` diganti varian tenang (frame redup, partikel setengah, tanpa pop putih).
+ *  - Reduced Flashes: efek `flashy` diganti varian tenang (frame redup, partikel setengah, tanpa pop putih);
+ *  - Phase 8: `start()` untuk efek persisten (stop() = peluruhan piksel), layer 'descent' (meteor), `level` 1..3 (retak Perlindungan).
  */
 export interface VfxPlayOptions {
   /** cermin horizontal: true bila sumber berdiri di kanan dan menghadap kiri (Yaric). Seni default menghadap kanan. */
@@ -21,12 +22,24 @@ export interface VfxPlayOptions {
   onDone?: () => void;
   /** benih RNG agar tes/rekaman deterministik */
   seed?: number;
+  /** tingkat efek bertingkat 1..3 (aegis_stress: retak/tekanan; layer dengan minLevel hanya muncul bila level >= minLevel). Bawaan 1. */
+  level?: number;
+  /** efek 'descent' (meteor_descent): titik awal jatuh (koordinat panggung). Bawaan: (x, y - fallPx*scale), lurus di atas titik tabrak. */
+  from?: { x: number; y: number };
+  /**
+   * efek 'descent': durasi jatuh dalam ms (lead memakai ~1000-1400).
+   * efek persisten via start(): berhenti otomatis setelah ms ini (opsional; tanpa ini hanya stop() yang menghentikan).
+   */
+  durationMs?: number;
 }
 export interface VfxOptions {
   reducedFlashes: () => boolean;
   /** hubungkan ke Effects.shake(scene, ms, intensity) (yang sudah menghormati pengaturan Screen Shake) */
   screenShake?: (ms: number, intensity: number) => void;
 }
+/** Pegangan efek dari Vfx.start(): stop() = peluruhan piksel lalu bersih; aman dipanggil berulang atau setelah clear(). */
+export interface VfxHandle { stop(): void }
+const NOOP_HANDLE: VfxHandle = { stop: () => undefined };
 
 /** Permukaan minimal sprite yang dipakai (Phaser.GameObjects.Image memenuhinya). */
 export interface VfxSprite {
@@ -63,8 +76,15 @@ interface Inst {
   events: { at: number; run: () => void }[];
   live: number;
   onDone?: () => void;
+  level: 1 | 2 | 3;
+  from?: { x: number; y: number };
+  durOverride?: number;
+  /** batas paksa (ms sejak mulai); persisten yang belum di-stop = Infinity */
+  limit: number;
+  stopping: boolean;
+  autoStopAt?: number;
 }
-type PartKind = 'anim' | 'burst' | 'travel' | 'ghost' | 'node' | 'end';
+type PartKind = 'anim' | 'burst' | 'travel' | 'ghost' | 'node' | 'end' | 'descent';
 interface Part {
   obj: VfxSprite;
   inst: Inst;
@@ -72,11 +92,13 @@ interface Part {
   t: number;
   frame: string;
   // anim
-  layerAnim?: AnimLayer; x: number; y: number;
+  layerAnim?: AnimLayer; frames?: readonly string[]; x: number; y: number;
   // burst
   layerBurst?: BurstLayer; vx: number; vy: number; life: number; groundY?: number; phase: number; baseX: number; sx: number; sy: number; cx: number; cy: number;
   // travel
   layerTravel?: TravelLayer; trailAcc: number; ex: number; ey: number;
+  // descent
+  layerDescent?: DescentLayer; dsx: number; dsy: number; dex: number; dey: number; dur: number;
   // link
   layerLink?: LinkLayer; u: number; index: number; total: number; lastIdx?: number;
 }
@@ -112,12 +134,44 @@ export class Vfx {
   running(): number { return this.insts.length; }
   has(id: string): boolean { return id in VFX_SPECS; }
 
-  /** Mainkan efek `id` di (x,y) koordinat panggung. id tak dikenal diabaikan (tidak throw). */
+  /** Mainkan efek `id` di (x,y) koordinat panggung. id tak dikenal diabaikan (tidak throw). Spec persisten berhenti otomatis di durationMs. */
   play(id: string, x: number, y: number, o: VfxPlayOptions = {}): void {
     if (this.dead) return;
     const spec = VFX_SPECS[id];
     if (!spec) return;
-    this.start(spec, x, y, o, false);
+    this.begin(spec, x, y, o, false, false);
+  }
+
+  /**
+   * Mulai efek dan kembalikan pegangan (dipakai untuk efek persisten: meteor_sky_hold, aegis_hold, fracture_mark, heart_lock_glow).
+   * stop() = peluruhan piksel (frame exit spec) lalu bersih; efek non-persisten dihentikan seketika. Menghitung ke cap 64;
+   * dibersihkan oleh clear()/destroy()/shutdown scene. id tak dikenal atau sistem sudah mati -> pegangan no-op.
+   */
+  start(id: string, x: number, y: number, o: VfxPlayOptions = {}): VfxHandle {
+    if (this.dead) return NOOP_HANDLE;
+    const spec = VFX_SPECS[id];
+    if (!spec) return NOOP_HANDLE;
+    const inst = this.begin(spec, x, y, o, false, true);
+    return { stop: () => this.stopInst(inst) };
+  }
+
+  /** Hentikan satu efek: persisten -> frame exit; lainnya -> lepas seketika. Aman bila sudah selesai atau sudah di-clear. */
+  private stopInst(inst: Inst): void {
+    if (inst.stopping || !this.insts.includes(inst)) return;
+    inst.stopping = true;
+    const exit = inst.spec.persistent?.exit;
+    inst.events = [];
+    if (!exit) {
+      for (const p of [...this.parts]) if (p.inst === inst) this.drop(p);
+      return;
+    }
+    inst.limit = inst.t + exit.frames.length * exit.frameMs + KILL_GRACE_MS;
+    for (const p of this.parts) {
+      if (p.inst !== inst || p.kind !== 'anim' || !p.layerAnim?.loop) continue;
+      p.layerAnim = { kind: 'anim', frames: exit.frames, frameMs: exit.frameMs };
+      p.frames = undefined;
+      p.t = 0;
+    }
   }
 
   /** Hentikan dan lepas SEMUA efek (tanpa memanggil onDone). Objek kembali ke pool. */
@@ -148,7 +202,7 @@ export class Vfx {
   }
 
   // ------------------------------------------------------------ mulai efek
-  private start(spec: VfxSpec, x: number, y: number, o: VfxPlayOptions, forceCalm: boolean): void {
+  private begin(spec: VfxSpec, x: number, y: number, o: VfxPlayOptions, forceCalm: boolean, viaStart: boolean): Inst {
     const facing: 1 | -1 = o.flip ? -1 : 1;
     const scale = Math.max(1, Math.round(o.scale ?? 1));
     const reach = spec.layers.find((l): l is TravelLayer => l.kind === 'travel')?.defaultReach ?? 0;
@@ -159,7 +213,17 @@ export class Vfx {
       calm: forceCalm || (spec.flashy && this.opts.reducedFlashes()),
       rng: mulberry32(o.seed ?? (this.seq++ * 7919 + 13)),
       events: [], live: 0, onDone: o.onDone,
+      level: Math.max(1, Math.min(3, Math.round(o.level ?? 1))) as 1 | 2 | 3,
+      from: o.from ? { x: Math.round(o.from.x), y: Math.round(o.from.y) } : undefined,
+      durOverride: o.durationMs !== undefined ? Math.max(100, Math.round(o.durationMs)) : undefined,
+      limit: spec.durationMs + KILL_GRACE_MS, stopping: false,
     };
+    if (spec.persistent) {
+      // persisten: via play() berhenti sendiri di durationMs; via start() hanya bila opts.durationMs diberikan
+      inst.limit = Number.POSITIVE_INFINITY;
+      inst.autoStopAt = viaStart ? inst.durOverride : spec.durationMs;
+    }
+    for (const l of spec.layers) if (l.kind === 'descent') inst.limit = Math.max(inst.limit, (l.delayMs ?? 0) + (inst.durOverride ?? l.defaultDurationMs) + (l.trail?.lifeMs ?? 0) + 120 + KILL_GRACE_MS);
     this.insts.push(inst);
     for (const layer of spec.layers) this.schedule(inst, layer);
     for (const c of spec.children ?? []) {
@@ -168,7 +232,7 @@ export class Vfx {
       const anchor = c.at === 'target' ? { x: inst.tx, y: inst.ty } : { x: inst.x, y: inst.y };
       inst.events.push({
         at: c.delayMs ?? 0,
-        run: () => this.start(child, anchor.x + (c.dx ?? 0) * facing * scale, anchor.y + (c.dy ?? 0) * scale, { flip: o.flip, scale, depth: inst.depth, target: { x: inst.tx, y: inst.ty } }, inst.calm),
+        run: () => this.begin(child, anchor.x + (c.dx ?? 0) * facing * scale, anchor.y + (c.dy ?? 0) * scale, { flip: o.flip, scale, depth: inst.depth, target: { x: inst.tx, y: inst.ty }, level: inst.level }, inst.calm, false),
       });
     }
     if (spec.shake && this.opts.screenShake) {
@@ -177,6 +241,7 @@ export class Vfx {
     }
     inst.events.sort((a, b) => a.at - b.at);
     this.pump(inst);
+    return inst;
   }
 
   private frameName(inst: Inst, f: string): string { return inst.calm ? inst.spec.calm?.frameMap[f] ?? f : f; }
@@ -186,15 +251,17 @@ export class Vfx {
   }
 
   private schedule(inst: Inst, layer: VfxLayer): void {
+    if (layer.minLevel && inst.level < layer.minLevel) return;
     const d = layer.delayMs ?? 0;
     if (layer.kind === 'anim') {
+      const frames = layer.byLevel ? layer.byLevel[inst.level - 1] ?? layer.byLevel[0]! : layer.frames;
       for (const i of layer.instances ?? [{ dx: 0, dy: 0 }]) {
         inst.events.push({ at: d + (i.delayMs ?? 0), run: () => {
           const a = this.anchor(inst, layer);
           const px = a.x + i.dx * inst.facing * inst.scale, py = a.y + i.dy * inst.scale;
-          const first = this.frameName(inst, layer.frames[0]!);
+          const first = this.frameName(inst, frames[0]!);
           const obj = this.acquire(inst, inst.spec.atlas, first, px, py, inst.depth + (layer.depth ?? 0) + (i.depth ?? 0), (inst.facing < 0) !== !!i.flip);
-          if (obj) this.parts.push({ ...this.blank(obj, inst, 'anim', first), layerAnim: layer, x: px, y: py });
+          if (obj) this.parts.push({ ...this.blank(obj, inst, 'anim', first), layerAnim: layer, frames, x: px, y: py });
         } });
       }
     } else if (layer.kind === 'burst') {
@@ -207,13 +274,21 @@ export class Vfx {
         const obj = this.acquire(inst, inst.spec.atlas, frame, a.x, a.y, inst.depth + (layer.depth ?? 0), inst.facing < 0);
         if (obj) this.parts.push({ ...this.blank(obj, inst, 'travel', frame), layerTravel: layer, x: a.x, y: a.y, ex: inst.tx, ey: inst.ty });
       } });
+    } else if (layer.kind === 'descent') {
+      inst.events.push({ at: d, run: () => {
+        const end = this.anchor(inst, layer);
+        const start = inst.from ?? { x: end.x + (layer.defaultDx ?? 0) * inst.facing * inst.scale, y: end.y - layer.fallPx * inst.scale };
+        const frame = this.frameName(inst, layer.frames[0]!);
+        const obj = this.acquire(inst, inst.spec.atlas, frame, start.x, start.y, inst.depth + (layer.depth ?? 0), inst.facing < 0);
+        if (obj) this.parts.push({ ...this.blank(obj, inst, 'descent', frame), layerDescent: layer, x: start.x, y: start.y, dsx: start.x, dsy: start.y, dex: end.x, dey: end.y, dur: inst.durOverride ?? layer.defaultDurationMs });
+      } });
     } else {
       inst.events.push({ at: d, run: () => this.spawnLink(inst, layer) });
     }
   }
 
   private blank(obj: VfxSprite, inst: Inst, kind: PartKind, frame: string): Part {
-    return { obj, inst, kind, t: 0, frame, x: 0, y: 0, vx: 0, vy: 0, life: 0, phase: 0, baseX: 0, sx: 0, sy: 0, cx: 0, cy: 0, trailAcc: 0, ex: 0, ey: 0, u: 0, index: 0, total: 0 };
+    return { obj, inst, kind, t: 0, frame, x: 0, y: 0, vx: 0, vy: 0, life: 0, phase: 0, baseX: 0, sx: 0, sy: 0, cx: 0, cy: 0, trailAcc: 0, ex: 0, ey: 0, u: 0, index: 0, total: 0, dsx: 0, dsy: 0, dex: 0, dey: 0, dur: 0 };
   }
 
   private spawnBurst(inst: Inst, l: BurstLayer): void {
@@ -293,11 +368,13 @@ export class Vfx {
   // ------------------------------------------------------------ simulasi
   private step(): void {
     const dt = STEP_MS / 1000;
-    for (const inst of [...this.insts]) { inst.t += STEP_MS; this.pump(inst); }
+    for (const inst of [...this.insts]) {
+      inst.t += STEP_MS; this.pump(inst);
+      if (inst.autoStopAt !== undefined && !inst.stopping && inst.t >= inst.autoStopAt) this.stopInst(inst);
+    }
     for (const p of [...this.parts]) this.stepPart(p, dt);
     for (const inst of [...this.insts]) {
-      const forced = inst.t >= inst.spec.durationMs + KILL_GRACE_MS;
-      if (forced) {
+      if (inst.t >= inst.limit) {
         for (const p of [...this.parts]) if (p.inst === inst) this.drop(p);
         inst.events = [];
       }
@@ -316,11 +393,42 @@ export class Vfx {
     switch (p.kind) {
       case 'anim': {
         const l = p.layerAnim!;
-        const n = l.frames.length, loops = l.loops ?? 1;
+        const frames = p.frames ?? l.frames;
+        const n = frames.length, loops = l.loops ?? 1;
+        const dur = (i: number): number => (Array.isArray(l.frameMs) ? (l.frameMs as readonly number[])[i % n]! : (l.frameMs as number));
+        if (l.loop) {
+          let cycle = 0;
+          for (let i = 0; i < n; i++) cycle += dur(i);
+          let tt = p.t % cycle, idx = 0;
+          for (; idx < n - 1; idx++) { if (tt < dur(idx)) break; tt -= dur(idx); }
+          this.setFrame(p, this.frameName(inst, frames[idx]!));
+          return;
+        }
         let idx = 0, acc = 0;
-        for (; idx < n * loops; idx++) { acc += Array.isArray(l.frameMs) ? (l.frameMs as readonly number[])[idx % n]! : (l.frameMs as number); if (p.t < acc) break; }
+        for (; idx < n * loops; idx++) { acc += dur(idx); if (p.t < acc) break; }
         if (idx >= n * loops) { this.drop(p); return; }
-        this.setFrame(p, this.frameName(inst, l.frames[idx % n]!));
+        this.setFrame(p, this.frameName(inst, frames[idx % n]!));
+        return;
+      }
+      case 'descent': {
+        const l = p.layerDescent!;
+        const f = Math.min(1, p.t / p.dur);
+        const e = f * f; // jatuh dipercepat
+        const x = p.dsx + (p.dex - p.dsx) * e, y = p.dsy + (p.dey - p.dsy) * e;
+        p.obj.setPosition(Math.round(x), Math.round(y));
+        this.setFrame(p, this.frameName(inst, l.frames[Math.min(l.frames.length - 1, Math.floor(f * l.frames.length))]!));
+        if (l.trail && f < 1) {
+          p.trailAcc += STEP_MS;
+          if (p.trailAcc >= l.trail.everyMs) {
+            p.trailAcc -= l.trail.everyMs;
+            const gf = this.frameName(inst, l.trail.frames[Math.floor(inst.rng() * l.trail.frames.length)]!);
+            const sp = (l.trail.spread ?? 0) * inst.scale;
+            const gx = x + (inst.rng() * 2 - 1) * sp, gy = y - inst.rng() * sp;
+            const g = this.acquire(inst, inst.spec.atlas, gf, gx, gy, inst.depth + (l.depth ?? 0) - 1, false);
+            if (g) this.parts.push({ ...this.blank(g, inst, 'ghost', gf), x: gx, y: gy, life: l.trail.lifeMs });
+          }
+        }
+        if (f >= 1) this.drop(p);
         return;
       }
       case 'burst': {
@@ -395,7 +503,7 @@ export class Vfx {
   }
 }
 
-/** Pintasan bertipe untuk Phaser.Scene (Image memenuhi VfxSprite). */
+/** Pintasan bertipe untuk Phaser.Scene (Image memenuhinya). */
 export function createVfx(scene: Phaser.Scene, opts: VfxOptions): Vfx {
   return new Vfx(scene, opts);
 }

@@ -111,6 +111,19 @@ Checklist di bawah mencakup fase lain juga; save/EXP/leveling/random encounter b
 - [ ] Meteor telegraph visible with reduced flashes; Velthia mandatory and shield reachable on first and later meteor cycles.
 - [ ] Reload cannot softlock; silent BGM fallback; private data absent from public build.
 
+## Phase 8 — Chapter IV / Varlgrim / Meteor / Perlindungan evidence
+
+- [x] Mulai Bab IV dari ending Bab III → "Bab IV selesai" via keyboard (Edge 1366 penuh, 1920 penuh, Chrome 1366 penuh); canon C4-01..07 verbatim.
+- [x] Teka-teki Segel (salah mereset aman, benar membuka pintu) dan Jangkar Retakan; peti, lentera istirahat, checkpoint pra-boss.
+- [x] Varlgrim: tiga fase dimainkan nyata; meteor ditelegraf (langit ditahan, banner, intent) sebelum dampak; Perlindungan terfokus di menu utama; party selamat dengan perisai; tanpa perisai = kekalahan sah.
+- [x] Kekalahan: "Ulang dari fase meteor" dan "Coba Lagi" (checkpoint penuh); tidak menyentuh save/flag/hadiah; EXP tidak ganda; transisi masuk tidak diputar ulang pada ulang cepat.
+- [x] Regresi sprite: lima battle berurutan (Hollowling → Mournfang → Veyrath → Chronolith → Varlgrim) semua sprite terlihat (piksel nyata), tidak di (0,0), tanpa VFX sisa.
+- [x] Aksesibilitas: Shake ON + Reduced Flashes OFF dan Shake OFF + Reduced Flashes ON; meteor tidak menambah kilat penuh layar.
+- [x] Save/muat di Benteng, refresh, ledger EXP; slot Bab I–III lama tetap terbaca; tidak ada BGM dimuat.
+- [ ] Review manusia: seni DRAFT, bunyi SFX, balance (bot strategis menang; bot sederhana kalah), pacing, performa GPU nyata, kenyamanan menu Perlindungan.
+
+Rincian: `docs/production/PHASE8_REPORT.md`.
+
 ## Phase 7 — Chapter III / combat sinematik / SFX evidence
 
 - [x] Mulai Bab III dari ending Bab II → akhir Bab III via keyboard (Edge 1366/1920, Chrome 1366); Torvan cadangan terjaga, Velthia bergabung sekali.

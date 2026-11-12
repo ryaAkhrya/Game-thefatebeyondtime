@@ -45,7 +45,7 @@ describe('Velthia profile and progression', () => {
     const s = effectiveStats(d, 'C02');
     expect(s.MAG).toBeGreaterThan(s.ATK); expect(s.HP).toBeLessThan(effectiveStats(d, 'C01').HP); expect(s.MP).toBeGreaterThan(effectiveStats(d, 'C01').MP);
   });
-  it('actual progression numbers: level cap is 5 (EXP 235), mandatory Chapter I-II rewards put Yaric at level 4', () => {
+  it('actual progression numbers: (cap level kini 10, lihat progression-level10.test.ts) mandatory Chapter I-II rewards put Yaric at level 4', () => {
     const d = chapter2End();
     expect(d.rpg.characters.C01!.exp).toBe(183); expect(d.rpg.characters.C01!.level).toBe(4);
     expect(d.rpg.characters.C03!.exp).toBe(113); expect(d.rpg.characters.C03!.level).toBe(3);
@@ -435,13 +435,13 @@ describe('Chronolith (B03)', () => {
     const { gs, session, start } = bossSession(d => { d.items.potion = 3; });
     const r = simulate(session.engine, smartPolicy);
     expect(r.outcome).toBe('victory'); expect(r.rounds).toBeGreaterThanOrEqual(6); expect(r.rounds).toBeLessThanOrEqual(10);
-    expect(session.previewReward()).toMatchObject({ exp: 235 - 183, gold: CHRONOLITH_REWARD.gold }); // EXP terpotong cap level 5
+    expect(session.previewReward()).toMatchObject({ exp: CHRONOLITH_REWARD.exp, gold: CHRONOLITH_REWARD.gold }); // Phase 8: cap level 10, EXP tidak lagi terpotong di 235
     expect(session.commitVictory()).toBe(true);
     const won = gs.snapshot()!;
     const added = Object.keys(won.flags).filter(f => !start.flags[f]).sort();
     expect(added).toEqual([C3.chronolith, CHRONOLITH_REWARD.id].sort());
     expect(won.rpg.gold - start.rpg.gold).toBe(CHRONOLITH_REWARD.gold);
-    expect(won.rpg.characters.C01!.level).toBe(5); expect(won.rpg.characters.C02!.level).toBe(5);
+    expect(won.rpg.characters.C01!.exp).toBe(183 + CHRONOLITH_REWARD.exp); expect(won.rpg.characters.C01!.level).toBe(6); expect(won.rpg.characters.C02!.level).toBe(6);
     expect(won.chapter).toBe('III'); expect(won.storyBeat).toBe('C3-06'); expect(won.party).toEqual(['C01', 'C02']);
     expect(session.commitVictory()).toBe(false); expect(gs.snapshot()).toEqual(won);
     expect(new BattleSession(gs, 'chronolith').commitVictory()).toBe(false);

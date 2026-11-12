@@ -1,0 +1,8 @@
+1. particles: mrock_a, mrock_b, mrock_c, mrock_d, mem_a, mem_b, mem_c, mash_a, mash_b
+2. smoke: msmk_1, msmk_2, msmk_3, msmk_4
+3. meteor_sky_hold: mhold_1, mhold_2, mhold_3, mhold_4, mhold_5, mhold_6, mhold_x1, mhold_x2, mhold_x3
+4. meteor_descent: mdesc_1, mdesc_2, mdesc_3, mdesc_4, mdesc_5, mdesc_6
+5. meteor_impact_burst: mimp_1, mimp_1_c, mimp_2, mimp_2_c, mimp_3, mimp_4, mimp_5, mimp_6
+6. meteor_impact_ring: mring_1, mring_2, mring_3, mring_4, mring_5, mring_6
+7. meteor_impact_crack: mcrack_1, mcrack_2, mcrack_3, mcrack_4, mcrack_5
+8. meteor_aftermath: maft_1, maft_2, maft_3, maft_4, maft_5

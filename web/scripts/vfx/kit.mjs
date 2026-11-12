@@ -160,30 +160,41 @@ export const arcPt = (cx, cy, r, deg) => [cx + r * Math.cos((deg * Math.PI) / 18
 export const arcPts = (cx, cy, r, d0, d1, n = 24) => Array.from({ length: n + 1 }, (_, i) => arcPt(cx, cy, r, d0 + ((d1 - d0) * i) / n));
 
 /** Atlas: rak sederhana. frames: [{name, cv, pivotY}] -> {pixels(RGBA), json, w,h, placed} */
-export function buildAtlas(key, imageFile, palette, frames, width = 256) {
+export function buildAtlas(key, imageFile, palette, frames, width = 256, packed = false) {
   const gap = 2;
+  // packed (atlas Phase 8): frame dipangkas ke kotak isi (trimmed: true, spriteSourceSize/sourceSize utuh, pivot terhadap sourceSize)
+  // dan rak diurutkan menurut tinggi agar atlas padat; urutan JSON tidak berarti.
+  const boxOf = (cv) => {
+    if (!packed) return { x: 0, y: 0, w: cv.w, h: cv.h };
+    let x0 = cv.w, y0 = cv.h, x1 = -1, y1 = -1;
+    for (let j = 0; j < cv.h; j++) for (let i = 0; i < cv.w; i++) if (cv.d[j * cv.w + i]) { x0 = Math.min(x0, i); x1 = Math.max(x1, i); y0 = Math.min(y0, j); y1 = Math.max(y1, j); }
+    return { x: x0, y: y0, w: x1 - x0 + 1, h: y1 - y0 + 1 };
+  };
+  let items = frames.map((f) => ({ f, b: boxOf(f.cv) }));
+  if (packed) items = items.sort((a, b) => b.b.h - a.b.h || b.b.w - a.b.w);
   let x = gap, y = gap, rowH = 0;
   const placed = [];
-  for (const f of frames) {
-    if (x + f.cv.w + gap > width) { x = gap; y += rowH + gap; rowH = 0; }
-    placed.push({ f, x, y });
-    x += f.cv.w + gap;
-    rowH = Math.max(rowH, f.cv.h);
+  for (const it of items) {
+    if (x + it.b.w + gap > width) { x = gap; y += rowH + gap; rowH = 0; }
+    placed.push({ f: it.f, b: it.b, x, y });
+    x += it.b.w + gap;
+    rowH = Math.max(rowH, it.b.h);
   }
   const H = y + rowH + gap;
   const px = new Uint8Array(width * H * 4);
   const jsonFrames = {};
-  for (const { f, x: fx, y: fy } of placed) {
-    for (let j = 0; j < f.cv.h; j++)
-      for (let i = 0; i < f.cv.w; i++) {
-        const v = f.cv.d[j * f.cv.w + i];
+  for (const { f, b, x: fx, y: fy } of placed) {
+    for (let j = 0; j < b.h; j++)
+      for (let i = 0; i < b.w; i++) {
+        const v = f.cv.d[(b.y + j) * f.cv.w + b.x + i];
         if (!v) continue;
         const o = ((fy + j) * width + fx + i) * 4, c = palette.rgb[v];
         px[o] = c[0]; px[o + 1] = c[1]; px[o + 2] = c[2]; px[o + 3] = 255;
       }
+    const trimmed = b.w !== f.cv.w || b.h !== f.cv.h;
     jsonFrames[f.name] = {
-      frame: { x: fx, y: fy, w: f.cv.w, h: f.cv.h }, rotated: false, trimmed: false,
-      spriteSourceSize: { x: 0, y: 0, w: f.cv.w, h: f.cv.h }, sourceSize: { w: f.cv.w, h: f.cv.h },
+      frame: { x: fx, y: fy, w: b.w, h: b.h }, rotated: false, trimmed,
+      spriteSourceSize: { x: b.x, y: b.y, w: b.w, h: b.h }, sourceSize: { w: f.cv.w, h: f.cv.h },
       pivot: { x: 0.5, y: f.pivotY ?? 0.5 },
     };
   }

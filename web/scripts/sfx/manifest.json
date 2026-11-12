@@ -108,7 +108,7 @@
     "id": "SFX_UI_DIALOGUE_ADVANCE",
     "category": "ui",
     "minIntervalMs": 60,
-    "gain": 0.35,
+    "gain": 0.4,
     "files": [
       {
         "file": "SFX_UI_DIALOGUE_ADVANCE.wav",
@@ -138,7 +138,7 @@
     "id": "SFX_UI_SHOP_BUY",
     "category": "ui",
     "minIntervalMs": 100,
-    "gain": 0.6,
+    "gain": 0.42,
     "files": [
       {
         "file": "SFX_UI_SHOP_BUY.wav",
@@ -153,7 +153,7 @@
     "id": "SFX_UI_SHOP_SELL",
     "category": "ui",
     "minIntervalMs": 100,
-    "gain": 0.6,
+    "gain": 0.42,
     "files": [
       {
         "file": "SFX_UI_SHOP_SELL.wav",
@@ -719,6 +719,421 @@
         "peakDb": -3,
         "rmsDb": -15.6,
         "sha256": "f01e63c15fc0f17081908b701a34cf9cb4ccc1fc44b20c0694ecc1e9f376dfdd"
+      }
+    ]
+  },
+  {
+    "id": "SFX_FORTRESS_DOOR_ANCIENT",
+    "category": "world",
+    "minIntervalMs": 1500,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_FORTRESS_DOOR_ANCIENT.wav",
+        "durationMs": 3000,
+        "peakDb": -3,
+        "rmsDb": -19.3,
+        "sha256": "373776617c02792880ea26d26d834e72bb5e01333b5a544ad312e8ae5721693b"
+      }
+    ]
+  },
+  {
+    "id": "SFX_SEAL_ACTIVATE",
+    "category": "world",
+    "minIntervalMs": 400,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_SEAL_ACTIVATE.wav",
+        "durationMs": 2000,
+        "peakDb": -3,
+        "rmsDb": -19.6,
+        "sha256": "4e813ffd3f5e00b4e4a2c1f5f36860c6afe6a4c3def6e7204e30725ca5f018a4"
+      }
+    ]
+  },
+  {
+    "id": "SFX_SEAL_ERROR",
+    "category": "world",
+    "minIntervalMs": 300,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_SEAL_ERROR_01.wav",
+        "durationMs": 750,
+        "peakDb": -3,
+        "rmsDb": -19.1,
+        "sha256": "4883a4f28915f87451f2837662e93b75a6813600fc8776448a22d2b97e5c5ed1"
+      },
+      {
+        "file": "SFX_SEAL_ERROR_02.wav",
+        "durationMs": 750,
+        "peakDb": -3,
+        "rmsDb": -18.5,
+        "sha256": "86ed249a31dc33b70502160c1813ba8615d2c446e620c1f4808267c26d6d5efa"
+      }
+    ]
+  },
+  {
+    "id": "SFX_ECHO_MEMORY",
+    "category": "world",
+    "minIntervalMs": 1500,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_ECHO_MEMORY.wav",
+        "durationMs": 3400,
+        "peakDb": -3,
+        "rmsDb": -16.8,
+        "sha256": "844cdbe90df67ab7d79dbde39836043023e86a65e720ff7f5c67b9ee9edd2b71"
+      }
+    ]
+  },
+  {
+    "id": "SFX_HEART_LOCK",
+    "category": "world",
+    "minIntervalMs": 800,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_HEART_LOCK.wav",
+        "durationMs": 1900,
+        "peakDb": -3,
+        "rmsDb": -15.9,
+        "sha256": "1dcf0bb0c258a82dd8f0b4a02fadca5a61081ce1a0cd537808f46f754f1ab403"
+      }
+    ]
+  },
+  {
+    "id": "SFX_HEART_UNSEAL",
+    "category": "world",
+    "minIntervalMs": 2000,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_HEART_UNSEAL.wav",
+        "durationMs": 3400,
+        "peakDb": -3,
+        "rmsDb": -18.8,
+        "sha256": "b517494fb8aa9ce43cf98c6cebf4cdfc38b1d324b125aa74a3d267a323411426"
+      }
+    ]
+  },
+  {
+    "id": "SFX_TOWER_COLLAPSE_DISTANT",
+    "category": "world",
+    "minIntervalMs": 3000,
+    "gain": 0.62,
+    "files": [
+      {
+        "file": "SFX_TOWER_COLLAPSE_DISTANT.wav",
+        "durationMs": 4400,
+        "peakDb": -3,
+        "rmsDb": -17.5,
+        "sha256": "fbe8033ebd82f6f421f767283b3b5ac56998dbb2cefc28ec6eb3603a4cc9e378"
+      }
+    ]
+  },
+  {
+    "id": "SFX_VARLGRIM_STAFF_SWING",
+    "category": "boss",
+    "minIntervalMs": 250,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_VARLGRIM_STAFF_SWING_01.wav",
+        "durationMs": 700,
+        "peakDb": -3,
+        "rmsDb": -16.9,
+        "sha256": "b313fbcb378a6177cc6411fb8453b9124ba5e791b423a32517a65405b6d2dd15"
+      },
+      {
+        "file": "SFX_VARLGRIM_STAFF_SWING_02.wav",
+        "durationMs": 700,
+        "peakDb": -3,
+        "rmsDb": -16.4,
+        "sha256": "ec28beb2e034e463240cb9679b85328c20a902a4b12d34abf62bdee32ab2ec35"
+      }
+    ]
+  },
+  {
+    "id": "SFX_VARLGRIM_STAFF_IMPACT",
+    "category": "boss",
+    "minIntervalMs": 200,
+    "gain": 1,
+    "files": [
+      {
+        "file": "SFX_VARLGRIM_STAFF_IMPACT_01.wav",
+        "durationMs": 1200,
+        "peakDb": -3,
+        "rmsDb": -19.4,
+        "sha256": "4a4a9abbdf40932f8c19d4066163ea6ae8204ef01227e4f5f10f1a0dc2755173"
+      },
+      {
+        "file": "SFX_VARLGRIM_STAFF_IMPACT_02.wav",
+        "durationMs": 1200,
+        "peakDb": -3,
+        "rmsDb": -19.5,
+        "sha256": "a1606f01b9e7511270b5d938cada96a3a74bb5aa3591d57374298df6b224b327"
+      }
+    ]
+  },
+  {
+    "id": "SFX_TEMPORAL_BIND",
+    "category": "boss",
+    "minIntervalMs": 500,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_TEMPORAL_BIND_01.wav",
+        "durationMs": 1400,
+        "peakDb": -3,
+        "rmsDb": -17.1,
+        "sha256": "ec27764e7cb4c4469b26e9a2b699bec3b2b333b9237e4d9b235f057b73fa19f2"
+      },
+      {
+        "file": "SFX_TEMPORAL_BIND_02.wav",
+        "durationMs": 1400,
+        "peakDb": -3,
+        "rmsDb": -17,
+        "sha256": "360f17b095a98eb5733fd49a1e4a76424f17403ee01957c9d8b449b92369b9db"
+      }
+    ]
+  },
+  {
+    "id": "SFX_TIME_DISTORTION",
+    "category": "boss",
+    "minIntervalMs": 1000,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_TIME_DISTORTION.wav",
+        "durationMs": 2200,
+        "peakDb": -3,
+        "rmsDb": -18.7,
+        "sha256": "0acf536704f77833dff8393df58413bcdd674efea849a9218f3c6744ebc17f45"
+      }
+    ]
+  },
+  {
+    "id": "SFX_BOSS_PHASE_SHIFT",
+    "category": "boss",
+    "minIntervalMs": 1500,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_BOSS_PHASE_SHIFT.wav",
+        "durationMs": 2200,
+        "peakDb": -3,
+        "rmsDb": -14.4,
+        "sha256": "e036424bbe6c13c847be34e59f3881bb5ba1cdc68dc8ada46df86ad29d6bf240"
+      }
+    ]
+  },
+  {
+    "id": "SFX_FRACTURE_MARK",
+    "category": "boss",
+    "minIntervalMs": 400,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_FRACTURE_MARK_01.wav",
+        "durationMs": 1000,
+        "peakDb": -3,
+        "rmsDb": -16.8,
+        "sha256": "97ddd52b347c3657ab2dca04a89eeaec71936185940fd9332e65e170d3e9a1cd"
+      },
+      {
+        "file": "SFX_FRACTURE_MARK_02.wav",
+        "durationMs": 1000,
+        "peakDb": -3,
+        "rmsDb": -17.2,
+        "sha256": "c2d02bd8d248f619e1ef835698a89f347552f4b8c1af237a331cdd25dae90af3"
+      }
+    ]
+  },
+  {
+    "id": "SFX_METEOR_CHARGE",
+    "category": "meteor",
+    "minIntervalMs": 1500,
+    "gain": 0.65,
+    "files": [
+      {
+        "file": "SFX_METEOR_CHARGE.wav",
+        "durationMs": 2600,
+        "peakDb": -3,
+        "rmsDb": -18.2,
+        "sha256": "7432c3b25fcadb849ab8643577469539671efcb72a9e995b12d40e7053e04c55"
+      }
+    ]
+  },
+  {
+    "id": "SFX_METEOR_DESCENT",
+    "category": "meteor",
+    "minIntervalMs": 1500,
+    "gain": 0.7,
+    "files": [
+      {
+        "file": "SFX_METEOR_DESCENT.wav",
+        "durationMs": 2000,
+        "peakDb": -3,
+        "rmsDb": -16.9,
+        "sha256": "68aab28ef668631a1d69367b7a561506fd9a122594477cfdd01de6e12d75b3af"
+      }
+    ]
+  },
+  {
+    "id": "SFX_METEOR_IMPACT",
+    "category": "meteor",
+    "minIntervalMs": 3000,
+    "gain": 1,
+    "files": [
+      {
+        "file": "SFX_METEOR_IMPACT.wav",
+        "durationMs": 3600,
+        "peakDb": -3,
+        "rmsDb": -19.4,
+        "sha256": "60c2d9236171afed529bc14c985101f7f5d20c44ffcdbc01cb868075ca5a5391"
+      }
+    ]
+  },
+  {
+    "id": "SFX_AEGIS_CAST",
+    "category": "aegis",
+    "minIntervalMs": 2000,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_AEGIS_CAST.wav",
+        "durationMs": 2800,
+        "peakDb": -3,
+        "rmsDb": -17.5,
+        "sha256": "1ba5968f5c752c7d2a0d000e9312f4af4bcc35dcb2bb0386a19177b7f69266ca"
+      }
+    ]
+  },
+  {
+    "id": "SFX_AEGIS_FORM",
+    "category": "aegis",
+    "minIntervalMs": 1000,
+    "gain": 0.8,
+    "files": [
+      {
+        "file": "SFX_AEGIS_FORM.wav",
+        "durationMs": 2200,
+        "peakDb": -3,
+        "rmsDb": -19.6,
+        "sha256": "f60cab27f15df94674c8e30facbcbf028ec063de89ad06a01f9afc07239ef102"
+      }
+    ]
+  },
+  {
+    "id": "SFX_AEGIS_STRESS",
+    "category": "aegis",
+    "minIntervalMs": 800,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_AEGIS_STRESS_01.wav",
+        "durationMs": 2400,
+        "peakDb": -3,
+        "rmsDb": -17,
+        "sha256": "da87920d753f6b39b32d5ffd0229be5fcdf18d4c9be51ab5199aba6889dbd405"
+      },
+      {
+        "file": "SFX_AEGIS_STRESS_02.wav",
+        "durationMs": 2400,
+        "peakDb": -3,
+        "rmsDb": -16.5,
+        "sha256": "5027f4bed1ecf52a1a27484c384402b36bf02912b2612aa4d98b6b84ed21b9f5"
+      }
+    ]
+  },
+  {
+    "id": "SFX_AEGIS_FADE",
+    "category": "aegis",
+    "minIntervalMs": 1500,
+    "gain": 0.75,
+    "files": [
+      {
+        "file": "SFX_AEGIS_FADE.wav",
+        "durationMs": 2600,
+        "peakDb": -3,
+        "rmsDb": -19.2,
+        "sha256": "4e8d82e054004831193bfb473df0fe59ecad97c8b01446c7f5a6166024bedef8"
+      }
+    ]
+  },
+  {
+    "id": "SFX_RIFTBORN_ATTACK",
+    "category": "boss",
+    "minIntervalMs": 150,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_RIFTBORN_ATTACK_01.wav",
+        "durationMs": 600,
+        "peakDb": -3,
+        "rmsDb": -17.3,
+        "sha256": "3ab07e8ab624188b553cd9ee2073d6d06cde2c576d8418024f4a1141976ae42b"
+      },
+      {
+        "file": "SFX_RIFTBORN_ATTACK_02.wav",
+        "durationMs": 600,
+        "peakDb": -3,
+        "rmsDb": -17.1,
+        "sha256": "204abf7a2adae4da8ef872031eae35365c220f0fcd92cf79e6487791cd288f57"
+      },
+      {
+        "file": "SFX_RIFTBORN_ATTACK_03.wav",
+        "durationMs": 600,
+        "peakDb": -3,
+        "rmsDb": -16.8,
+        "sha256": "056de50031b21ee63520aacf114648b6d35856280edbefe4a0c2101c3d2d2139"
+      }
+    ]
+  },
+  {
+    "id": "SFX_GRAVORN_ATTACK",
+    "category": "boss",
+    "minIntervalMs": 200,
+    "gain": 0.9,
+    "files": [
+      {
+        "file": "SFX_GRAVORN_ATTACK_01.wav",
+        "durationMs": 950,
+        "peakDb": -3,
+        "rmsDb": -17,
+        "sha256": "be0f1aebfde45218e56b563a16f3b08f322bd6207cf0d08355a80f3d9fc3356d"
+      },
+      {
+        "file": "SFX_GRAVORN_ATTACK_02.wav",
+        "durationMs": 950,
+        "peakDb": -3,
+        "rmsDb": -17.3,
+        "sha256": "53467e1f6ab5d87eb8e6e49db3e173345adeca2c88e3e312e6ba349fd38973bf"
+      },
+      {
+        "file": "SFX_GRAVORN_ATTACK_03.wav",
+        "durationMs": 950,
+        "peakDb": -3,
+        "rmsDb": -18.1,
+        "sha256": "e4de7fdb67fc4b11e1e59da1a1499c7bf96b3969385018665b635d7c7878befc"
+      }
+    ]
+  },
+  {
+    "id": "SFX_BATTLE_TRANSITION_FINAL",
+    "category": "transition",
+    "minIntervalMs": 1500,
+    "gain": 0.85,
+    "files": [
+      {
+        "file": "SFX_BATTLE_TRANSITION_FINAL.wav",
+        "durationMs": 1600,
+        "peakDb": -3,
+        "rmsDb": -18.5,
+        "sha256": "8976d59604bac528a788592dd90657a6786fca6edebf3d891b1f637262034749"
       }
     ]
   }

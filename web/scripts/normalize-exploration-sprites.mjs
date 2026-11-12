@@ -57,6 +57,7 @@ const CHARACTERS = [
   },
   { id: 'C02', cols: 6, status: 'DRAFT', source: 'assets/characters/C02_Velthia/C02_EXPLORATION_ATLAS_DRAFT' },
   { id: 'C03', cols: 6, status: 'DRAFT', source: 'assets/characters/C03_Torvan/C03_EXPLORATION_ATLAS_DRAFT' },
+  { id: 'C04', cols: 6, status: 'DRAFT', source: 'assets/characters/C04_Varlgrim/C04_EXPLORATION_ATLAS_DRAFT' }, // Phase 8 (agen BA)
   { id: 'C05', cols: 6, status: 'DRAFT', source: 'assets/characters/C05_Azie/C05_EXPLORATION_ATLAS_DRAFT' },
   { id: 'C06', cols: 6, status: 'DRAFT', source: 'assets/characters/C06_Talric/C06_EXPLORATION_ATLAS_DRAFT' },
   { id: 'C07', cols: 6, status: 'DRAFT', source: 'assets/characters/C07_Zira/C07_EXPLORATION_ATLAS_DRAFT' },

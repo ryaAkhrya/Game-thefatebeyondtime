@@ -7,14 +7,20 @@ import { BRIAROOT_STATS, CHRONOLITH_REWARD, CHRONOLITH_STATS, DUO_REWARD, FIRST_
   OATHGUARD_REWARD, OATHGUARD_STATS, PATROL_REWARD, TEMPLE_MIXED_REWARD, VEYRATH_REWARD, VEYRATH_STATS, WISPLET_STATS, type EncounterId } from './encounters';
 import { C2 } from '../story/chapter2Flags';
 import { C3 } from '../story/chapter3Flags';
+import { AEGIS_COMMAND, C4, C4_ENCOUNTERS } from '../story/chapter4Flags';
+import { AEGIS_TRIAL_REWARD, FORTRESS_COURT_REWARD, FORTRESS_GUARD_REWARD, FORTRESS_HALL_REWARD, FORTRESS_RIFT_REWARD, VARLGRIM_REWARD } from '../rpg/chapter4Rewards';
+import { AEGIS } from './aegis';
+import { GRAVORN_PAIR_STATS, GRAVORN_STATS, RIFTBORN_PAIR_STATS, RIFTBORN_STATS, RIFTBORN_TRIAL_STATS } from './c4Enemies';
+import { VARLGRIM_STATS } from './varlgrim';
 import { TRUE_NAME, UNKNOWN_SELF, isNameKnown } from '../story/identity';
 
 export { FIRST_HOLLOWLING_FLAG } from './encounters';
 
-type EnemyId = 'M01' | 'M02' | 'M03' | 'M05' | 'B01' | 'B02' | 'B03';
+type EnemyId = 'M01' | 'M02' | 'M03' | 'M04' | 'M05' | 'M06' | 'B01' | 'B02' | 'B03' | 'C04';
 const CHAPTER3_ENCOUNTERS: readonly EncounterId[] = ['temple_oathguard', 'temple_mixed', 'chronolith'];
 type Reward = { id: string; exp: number; gold: number; items?: Readonly<Record<string, number>> };
-/** Setelah menang di Chapter III anggota yang tumbang bangkit dengan 25% HP agar tidak ada softlock di dunia. */
+const isChapter4Encounter = (e: EncounterId): boolean => (C4_ENCOUNTERS as readonly string[]).includes(e);
+/** Setelah menang di Chapter III/IV anggota yang tumbang bangkit dengan 25% HP agar tidak ada softlock di dunia. */
 export const REVIVE_FRACTION = 0.25;
 
 /** In-memory encounter checkpoint; SaveRepository remains the sole persistence boundary. */
@@ -30,6 +36,11 @@ export class BattleSession {
     if (encounter === 'veyrath' && (!checkpoint.flags[C2.tutorial] || !checkpoint.flags[C2.secondMarker])) throw new Error('Veyrath requires the old route');
     if (CHAPTER3_ENCOUNTERS.includes(encounter) && (checkpoint.chapter !== 'III' || checkpoint.area !== 'temple' || !checkpoint.flags[C3.velthiaJoined] || checkpoint.party.join() !== 'C01,C02')) throw new Error('Chapter III battle requires Velthia in the temple');
     if (encounter === 'chronolith' && !checkpoint.flags[C3.gateOpen]) throw new Error('Chronolith requires the opened hall gate');
+    if (isChapter4Encounter(encounter)) {
+      if (checkpoint.chapter !== 'IV' || checkpoint.area !== 'fortress' || !checkpoint.flags[C3.velthiaJoined] || !checkpoint.flags[C4.entered] || checkpoint.party.join() !== 'C01,C02') throw new Error('Chapter IV battle requires Velthia in the fortress');
+      if (encounter === 'fortress_aegis_trial' && !checkpoint.flags[C4.aegisLearned]) throw new Error('The Aegis trial requires the learned Aegis');
+      if (encounter === 'varlgrim' && (!checkpoint.flags[C4.checkpoint] || !checkpoint.flags[C4.confront])) throw new Error('Varlgrim requires the checkpoint and the confrontation');
+    }
     this.checkpoint = checkpoint;
     this.engine = this.createEngine();
   }
@@ -48,24 +59,36 @@ export class BattleSession {
       member.hp = vitals.hp; member.mp = vitals.mp;
       member.skills = [...this.checkpoint.rpg.characters[id]!.unlockedSkills]; players.push(member);
     }
-    const enemies = this.enemyIds.map(id => actor(id, 'enemy', id === 'B01' ? MOURNFANG_STATS : id === 'B02' ? VEYRATH_STATS : id === 'B03' ? CHRONOLITH_STATS
+    const enemies = this.enemyIds.map(id => actor(id, 'enemy', id === 'C04' ? VARLGRIM_STATS : id === 'M06' ? (this.encounter === 'fortress_aegis_trial' ? RIFTBORN_TRIAL_STATS : this.enemyIds.length > 1 ? RIFTBORN_PAIR_STATS : RIFTBORN_STATS) : id === 'M04' ? (this.enemyIds.length > 1 ? GRAVORN_PAIR_STATS : GRAVORN_STATS) : id === 'B01' ? MOURNFANG_STATS : id === 'B02' ? VEYRATH_STATS : id === 'B03' ? CHRONOLITH_STATS
       : id === 'M05' ? OATHGUARD_STATS : id === 'M02' ? BRIAROOT_STATS : id === 'M03' ? WISPLET_STATS : HOLLOWLING_STATS));
-    if (this.checkpoint.chapter === 'III') for (const p of players) if (p.hp <= 0) p.hp = Math.max(1, Math.ceil(p.stats.HP * REVIVE_FRACTION)); // pertahanan: save lama dengan 0 HP tidak menjebak
-    return new BattleEngine([...players, ...enemies], this.checkpoint.items, this.encounter === 'forest2_patrol' || this.encounter === 'temple_oathguard' || this.encounter === 'temple_mixed');
+    if (this.encounter === 'fortress_aegis_trial') for (const e of enemies) if (e.id === 'M06') { e.lethalSurge = true; e.intent = 'rift_gather'; }
+    const velthia = players.find(p => p.id === 'C02');
+    if (velthia && isChapter4Encounter(this.encounter) && this.checkpoint.flags[C4.aegisLearned]) {
+      if (!velthia.skills!.includes(AEGIS_COMMAND)) velthia.skills!.push(AEGIS_COMMAND); // dibuka oleh flag cerita, bukan level
+      if (this.encounter === 'fortress_aegis_trial' || this.encounter === 'varlgrim') velthia.aegis = AEGIS.fullCharge; // muatan penuh saat masuk
+    }
+    if (this.checkpoint.chapter === 'III' || this.checkpoint.chapter === 'IV') for (const p of players) if (p.hp <= 0) p.hp = Math.max(1, Math.ceil(p.stats.HP * REVIVE_FRACTION)); // pertahanan: save lama dengan 0 HP tidak menjebak
+    return new BattleEngine([...players, ...enemies], this.checkpoint.items, this.encounter === 'forest2_patrol' || this.encounter === 'temple_oathguard' || this.encounter === 'temple_mixed', undefined, { revivePotion: isChapter4Encounter(this.encounter) });
   }
   get enemyIds(): EnemyId[] {
     return this.encounter === 'mournfang' ? ['B01'] : this.encounter === 'duo_tutorial' ? ['M01', 'M02']
       : this.encounter === 'forest2_patrol' ? ['M02', 'M03'] : this.encounter === 'veyrath' ? ['B02']
-      : this.encounter === 'temple_oathguard' ? ['M05'] : this.encounter === 'temple_mixed' ? ['M05', 'M03'] : this.encounter === 'chronolith' ? ['B03'] : ['M01'];
+      : this.encounter === 'temple_oathguard' ? ['M05'] : this.encounter === 'temple_mixed' ? ['M05', 'M03'] : this.encounter === 'chronolith' ? ['B03']
+      : this.encounter === 'fortress_riftborn' || this.encounter === 'fortress_aegis_trial' ? ['M06'] : this.encounter === 'fortress_gravorn' ? ['M04']
+      : this.encounter === 'fortress_guardpost' ? ['M05', 'M06'] : this.encounter === 'fortress_rift' ? ['M04', 'M06'] : this.encounter === 'varlgrim' ? ['C04'] : ['M01'];
   }
   get enemyId(): EnemyId { return this.enemyIds[0] as EnemyId; }
   get completionFlag(): string { return this.encounter === 'mournfang' ? MOURNFANG_FLAG : this.encounter === 'duo_tutorial' ? C2.tutorial
     : this.encounter === 'forest2_patrol' ? C2.patrol : this.encounter === 'veyrath' ? C2.veyrath
-    : this.encounter === 'temple_oathguard' ? C3.templeFight1 : this.encounter === 'temple_mixed' ? C3.templeFight2 : this.encounter === 'chronolith' ? C3.chronolith : FIRST_HOLLOWLING_FLAG; }
+    : this.encounter === 'temple_oathguard' ? C3.templeFight1 : this.encounter === 'temple_mixed' ? C3.templeFight2 : this.encounter === 'chronolith' ? C3.chronolith
+    : this.encounter === 'fortress_riftborn' ? C4.fightCourt : this.encounter === 'fortress_gravorn' ? C4.fightHall : this.encounter === 'fortress_guardpost' ? C4.fightGuard
+    : this.encounter === 'fortress_rift' ? C4.fightRift : this.encounter === 'fortress_aegis_trial' ? C4.aegisTrial : this.encounter === 'varlgrim' ? C4.varlgrim : FIRST_HOLLOWLING_FLAG; }
   private get reward(): Reward {
     return this.encounter === 'mournfang' ? MOURNFANG_REWARD : this.encounter === 'duo_tutorial' ? DUO_REWARD
       : this.encounter === 'forest2_patrol' ? PATROL_REWARD : this.encounter === 'veyrath' ? VEYRATH_REWARD
-      : this.encounter === 'temple_oathguard' ? OATHGUARD_REWARD : this.encounter === 'temple_mixed' ? TEMPLE_MIXED_REWARD : this.encounter === 'chronolith' ? CHRONOLITH_REWARD : HOLLOWLING_REWARD;
+      : this.encounter === 'temple_oathguard' ? OATHGUARD_REWARD : this.encounter === 'temple_mixed' ? TEMPLE_MIXED_REWARD : this.encounter === 'chronolith' ? CHRONOLITH_REWARD
+      : this.encounter === 'fortress_riftborn' ? FORTRESS_COURT_REWARD : this.encounter === 'fortress_gravorn' ? FORTRESS_HALL_REWARD : this.encounter === 'fortress_guardpost' ? FORTRESS_GUARD_REWARD
+      : this.encounter === 'fortress_rift' ? FORTRESS_RIFT_REWARD : this.encounter === 'fortress_aegis_trial' ? AEGIS_TRIAL_REWARD : this.encounter === 'varlgrim' ? VARLGRIM_REWARD : HOLLOWLING_REWARD;
   }
   previewReward(): RewardReceipt | null { return applyReward(this.checkpoint, this.reward).receipt; }
   retry(): boolean {
@@ -76,6 +99,9 @@ export class BattleSession {
     this.engine = this.createEngine();
     return true;
   }
+  /** Ulang cepat dari awal fase meteor (snapshot dalam memori; tanpa disk, tanpa hadiah). Hanya sesudah kekalahan. */
+  get canRetryFromPhase(): boolean { return !this.committed && this.engine.snapshot().outcome === 'defeat' && this.engine.hasPhaseSnapshot; }
+  retryFromPhase(): boolean { return this.canRetryFromPhase && this.engine.restorePhase(); }
   /** Vitals, consumed items, completion and idempotent RPG reward commit together after victory. */
   commitVictory(): boolean {
     const result = this.engine.snapshot();
@@ -88,7 +114,7 @@ export class BattleSession {
       const member = result.actors.find(a => a.id === id)!;
       setMemberVitals(next, id, { hp: member.hp, mp: member.mp }); // Torvan cadangan tidak disentuh
     }
-    if (next.chapter === 'III') { // tanpa softlock: yang tumbang bangkit dengan sebagian HP setelah menang
+    if (next.chapter === 'III' || next.chapter === 'IV') { // tanpa softlock: yang tumbang bangkit dengan sebagian HP setelah menang
       for (const id of next.party) {
         const stats = effectiveStats(next, id), v = memberVitals(next, id)!;
         if (v.hp <= 0) setMemberVitals(next, id, { hp: Math.max(1, Math.ceil(stats.HP * REVIVE_FRACTION)), mp: v.mp });

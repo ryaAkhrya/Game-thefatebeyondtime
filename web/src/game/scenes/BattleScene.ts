@@ -1,14 +1,16 @@
 import Phaser from 'phaser';
 import { BattlePanel } from '../../ui/components/BattlePanel';
 import { Ui, TYPE } from '../../ui/kit/ui';
-import { BATTLE_TEXTURE, bossAtlas, draftPosePlayback, frameKeyFor, fullAtlas, type BattleAtlas, type PoseAtlas } from '../combat/BattleAtlas';
-import { enemyAI, intentHint, type Command, type EffectResult, type ImpactResult, type PendingAction } from '../combat/BattleEngine';
+import { BATTLE_TEXTURE, atlasHoverPx, bossAtlas, draftPosePlayback, frameKeyFor, fullAtlas, specialFrameKey, type BattleAtlas, type PoseAtlas } from '../combat/BattleAtlas';
+import { aegisStatus, enemyAI, intentHint, type Command, type EffectResult, type ImpactResult, type PendingAction } from '../combat/BattleEngine';
 import { BattleSession } from '../combat/BattleSession';
-import { TIMELINES, actionClassFor, effectiveHitstop, impactFx, presentationFor, type ActionClass, type PhaseName, type TimelineSpec } from '../combat/presentation';
+import { TIMELINES, actionClassFor, effectiveHitstop, fastTimeline, impactFxFor, presentationFor, type ActionClass, type PhaseName, type TimelineSpec } from '../combat/presentation';
+import { C4_BATTLE_CALLOUTS } from '../dialogue/chapter4';
+import { DISPLAY_NAMES } from '../dialogue/types';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS } from '../data/ids';
 import { isNameKnown } from '../story/identity';
-import { Vfx } from '../vfx';
+import { Vfx, type VfxHandle } from '../vfx';
 import { isVelthiaCommand, VELTHIA_SKILL_INFO } from '../rpg/velthia';
 import { DISPLAY_EVENT, getDisplay } from '../systems/DisplayController';
 import { claimHint } from '../systems/Hints';
@@ -58,6 +60,15 @@ export class BattleScene extends Phaser.Scene {
   private telegraphed: string | null = null;
   /** Log id VFX yang diputar (QA). */
   private fxLog: string[] = [];
+  /** Phase 8: efek persisten meteor/perisai/tanda, banner naskah, dan celah udara Riftborn. */
+  private skyHold?: VfxHandle;
+  private aegisHold?: VfxHandle;
+  private markHold?: VfxHandle;
+  private pendingCallout: string | null = null;
+  /** Banner naskah yang benar-benar ditampilkan (QA). */
+  private calloutLog: string[] = [];
+  private hover: Record<string, number> = {};
+  private fastMeteor = false;
   private impacts: { command: Command; turn: number; shake: boolean; flash: boolean }[] = [];
   private view = { w: 480, h: 270 };
   private uiCamera!: Phaser.Cameras.Scene2D.Camera;
@@ -82,7 +93,9 @@ export class BattleScene extends Phaser.Scene {
     this.draftPlayback = {};
     for (const id of ['C03', 'M02', 'M03', 'B02'] as const) this.draftPlayback[id] = draftPosePlayback(this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`) as PoseAtlas);
     // Atlas penuh Phase 7 (Velthia, Oathguard, Chronolith): sudah memuat durasi, pivot, dan kunci frame khusus sendiri.
-    for (const id of ['C02', 'M05', 'B03'] as const) { const meta = this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`); if (meta) this.draftPlayback[id] = fullAtlas(meta); }
+    this.hover = {};
+    for (const id of ['C02', 'M05', 'B03', 'C04', 'M04', 'M06'] as const) { const meta = this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`); if (meta) { this.draftPlayback[id] = fullAtlas(meta); this.hover[id] = atlasHoverPx(meta); } }
+    this.skyHold = undefined; this.aegisHold = undefined; this.markHold = undefined; this.pendingCallout = null; this.calloutLog = []; this.fastMeteor = false;
     this.partner = this.services.gameState.snapshot()!.party.find((id): id is 'C02' | 'C03' => id === 'C02' || id === 'C03') ?? null;
     this.closing = false; this.locked = true; this.phase = 'idle'; this.history = []; this.impacts = []; this.traces = []; this.telegraphed = null; this.idle = {}; this.targetId = null; this.stageObjs = []; this.shadows = {};
     this.services.router.arrive(this);
@@ -96,7 +109,7 @@ export class BattleScene extends Phaser.Scene {
     enemyIds.forEach((id) => this.sprites[id] = this.add.sprite(0, 0, BATTLE_TEXTURE[id], 0).setDepth(4));
     this.sprites.C01 = this.add.sprite(0, 0, BATTLE_TEXTURE.C01, 0).setDepth(4);
     if (this.partner) this.sprites[this.partner] = this.add.sprite(0, 0, BATTLE_TEXTURE[this.partner], 0).setDepth(4);
-    this.fx = new Vfx(this, { reducedFlashes: () => this.services.settings.get('reduced_flashes') });
+    this.fx = new Vfx(this, { reducedFlashes: () => this.services.settings.get('reduced_flashes'), screenShake: (ms, intensity) => { this.services.effects.shake(this, ms, intensity); } });
     this.vfx = this.add.sprite(0, 0, BATTLE_TEXTURE.slam, 0).setDepth(5).setVisible(false);
     this.activeCaret = this.add.triangle(0, 0, 0, 0, 9, 0, 4.5, 6, COLORS.bitterLime).setDepth(8).setVisible(false);
     this.targetCaret = this.add.triangle(0, 0, 0, 0, 9, 0, 4.5, 6, COLORS.rose).setDepth(8).setVisible(false);
@@ -110,14 +123,16 @@ export class BattleScene extends Phaser.Scene {
       if (command === 'continue') {
         if (this.session.engine.snapshot().outcome === 'escaped' || this.session.commitVictory()) { this.closing = true; this.services.router.goto(this, SCENE_KEYS.World, undefined, { transition: 'return' }); }
       } else if (command === 'title') { this.closing = true; this.services.router.goto(this, SCENE_KEYS.Title); }
-      else if (command === 'retry') {
-        if (this.session.retry()) {
+      else if (command === 'retry' || command === 'retry_phase') {
+        if (command === 'retry' ? this.session.retry() : this.session.retryFromPhase()) {
           this.panel.dismissResult();
           for (const [id, sprite] of Object.entries(this.sprites)) { sprite.setAlpha(1).setPosition(this.homes[id]!.x, this.homes[id]!.y); this.setFrame(id, 'idle_a'); }
           this.vfx.setVisible(false); this.idle = {}; this.fx.clear();
+          this.skyHold = undefined; this.aegisHold = undefined; this.markHold = undefined; this.pendingCallout = null; this.telegraphed = null;
+          this.fastMeteor = command === 'retry_phase'; // ulang cepat: telegraf meteor dipercepat, tanpa transisi masuk
           this.enemyShadow.setAlpha(0.4).setX(this.homes[this.session.enemyIds[0]!]!.x);
           this.services.audio.playBgm(presentationFor(this.encounter).bgm);
-          this.panel.say('Pilih Serang untuk menyerang musuh.'); this.nextTurn();
+          this.panel.say(command === 'retry_phase' ? 'Mengulang dari awal fase meteor. Perlindungan siap.' : 'Pilih Serang untuk menyerang musuh.'); this.nextTurn();
         }
       } else void this.act(command, targetId);
     }, enemyIds.length > 1 ? 'Dua musuh' : presentationFor(this.encounter).name === 'Musuh' ? 'Hollowling' : presentationFor(this.encounter).name,
@@ -167,7 +182,7 @@ export class BattleScene extends Phaser.Scene {
   private yForFoot(id: string, foot: number): number {
     const sprite = this.sprites[id]!;
     const meta = this.meta(id);
-    return Math.round(foot - (1 - sprite.originY) * meta.frame_size[1] + 1);
+    return Math.round(foot - (1 - sprite.originY) * meta.frame_size[1] + 1) - (this.hover[id] ?? 0);
   }
 
   private placeHomes(): void {
@@ -186,6 +201,8 @@ export class BattleScene extends Phaser.Scene {
     this.enemyShadow?.setPosition(this.homes[first]!.x, (enemyIds.length === 1 ? GROUND.enemySingle : GROUND.enemyTwo[0]) * h + 2);
     if (this.session.enemyIds.includes('B01')) this.enemyShadow?.setSize(116, 7); // bayangan boss selebar tubuhnya
     if (this.session.enemyIds.includes('B03')) this.enemyShadow?.setSize(150, 8);
+    if (this.session.enemyIds.includes('C04')) this.enemyShadow?.setSize(104, 7);
+    if (this.session.enemyIds.includes('M04')) this.enemyShadow?.setSize(86, 6);
     this.shadows.C01?.setPosition(this.homes.C01!.x, GROUND.C01 * h + 2);
     if (this.partner) this.shadows[this.partner]?.setPosition(this.homes[this.partner]?.x ?? 0, GROUND.C03 * h + 2);
   }
@@ -194,6 +211,8 @@ export class BattleScene extends Phaser.Scene {
     const { w, h } = this.view;
     this.stageObjs.forEach(o => o.destroy()); this.stageObjs = [];
     const add = <T extends Phaser.GameObjects.GameObject>(o: T): T => { this.stageObjs.push(o); return o; };
+    if (this.isFortressStage()) { this.drawFortressStage(add); }
+    else {
     // Reuse Phase 1 forest sprites. Muted green/earth support the plum/lime UI; no new character art.
     add(this.add.rectangle(0, h * 0.49, w, h * 0.6, 0x65533e).setOrigin(0).setDepth(-5));
     add(this.add.rectangle(0, h * 0.12, w, h * 0.38, 0x304734).setOrigin(0).setDepth(-8));
@@ -202,10 +221,37 @@ export class BattleScene extends Phaser.Scene {
     if (this.textures.exists(props)) {
       for (const [fx, fy] of [[0.025, 0.52], [0.15, 0.42], [0.35, 0.46], [0.56, 0.41], [0.86, 0.45], [0.985, 0.52]]) add(this.add.image(fx! * w, fy! * h, props, 'tree_a').setOrigin(0.5, 1).setDepth(-7));
     }
-    
+    }
+
     this.enemyShadow = add(this.add.ellipse(0, 0, 55, 6, 0x1d1625, 0.4).setDepth(-1));
     this.shadows = { C01: add(this.add.ellipse(0, 0, 50, 6, 0x1d1625, 0.4).setDepth(-1)) };
     if (this.partner) this.shadows[this.partner] = add(this.add.ellipse(0, 0, 36, 5, 0x1d1625, 0.4).setDepth(-1));
+  }
+
+  /** Encounter Bab IV berlatar aula Benteng Penjaga (bukan hutan). */
+  private isFortressStage(): boolean { return this.encounter === 'varlgrim' || this.encounter.startsWith('fortress_'); }
+
+  /** Latar battle Benteng: dinding batu gelap, lantai batu, tiang, obor/anglo; ruang Heart (Varlgrim) memajang lambang Heart. Seni DRAFT dari atlas `fortress_props`. */
+  private drawFortressStage(add: <T extends Phaser.GameObjects.GameObject>(o: T) => T): void {
+    const { w, h } = this.view;
+    add(this.add.rectangle(0, 0, w, h * 0.5, 0x1f1927).setOrigin(0).setDepth(-9));
+    add(this.add.rectangle(0, h * 0.08, w, h * 0.42, 0x2d2536).setOrigin(0).setDepth(-8));
+    add(this.add.rectangle(0, h * 0.49, w, h * 0.6, 0x554a42).setOrigin(0).setDepth(-5));
+    add(this.add.rectangle(0, h * 0.49, w, 3, 0x1d1625, 0.6).setOrigin(0).setDepth(-4));
+    for (let y = h * 0.14; y < h * 0.48; y += 22) add(this.add.rectangle(0, y, w, 1, 0x241d2c, 0.7).setOrigin(0).setDepth(-7));
+    for (let y = h * 0.55; y < h; y += 26) add(this.add.rectangle(0, y, w, 1, 0x4a4038, 0.8).setOrigin(0).setDepth(-5));
+    const atlas = 'fortress_props';
+    if (!this.textures.exists(atlas)) return;
+    const meta = this.cache.json.get(`${atlas}:meta`) as { frames: Record<string, { pivot: { x: number; y: number } }> } | undefined;
+    const put = (frame: string, fx: number, fy: number, depth: number): void => {
+      if (!this.textures.get(atlas).has(frame)) return;
+      const pv = meta?.frames[frame]?.pivot ?? { x: 0.5, y: 1 };
+      add(this.add.image(Math.round(fx * w), Math.round(fy * h), atlas, frame).setOrigin(pv.x, pv.y).setDepth(depth));
+    };
+    for (const fx of [0.04, 0.3, 0.62, 0.96]) put('column', fx, 0.5, -6);
+    if (this.encounter === 'varlgrim') put('heart_emblem_sealed', 0.5, 0.42, -6);
+    else for (const fx of [0.17, 0.46, 0.8]) put('banner_a', fx, 0.3, -6);
+    for (const fx of [0.17, 0.46, 0.8]) put('brazier_a', fx, 0.49, -3);
   }
 
   private onDisplayChanged(): void {
@@ -285,12 +331,25 @@ export class BattleScene extends Phaser.Scene {
     const engine = this.session.engine, me = this.selfName, c: string = pending.command;
     if (pending.actorId === 'C02') {
       return c === 'velthia_pulse' ? 'Velthia membuka telapak tangannya.' : c === 'velthia_mend' ? 'Velthia mengulurkan tangan, tenang.' : c === 'velthia_ward' ? 'Velthia merentangkan selubung cahaya.'
-        : c === 'velthia_bloom' ? 'Velthia memanggil tunas rimba.' : c === 'velthia_concord' ? `Velthia menyelaraskan langkah dengan ${me}.` : 'Velthia bersiap.';
+        : c === 'velthia_bloom' ? 'Velthia memanggil tunas rimba.' : c === 'velthia_concord' ? `Velthia menyelaraskan langkah dengan ${me}.` : c === 'velthia_aegis' ? 'Velthia merentangkan tangannya. Perisai Heart terbentuk.' : 'Velthia bersiap.';
     }
     if (pending.actorId === 'B03') {
       return c === 'chrono_charge' ? 'Lengkung dan inti Chronolith bergeser. Hantaman menyusul.' : c === 'chrono_slam' ? 'Chronolith menurunkan lengannya!' : c === 'chrono_sweep' ? 'Chronolith menyapukan lengannya.'
         : c === 'chrono_guard' ? 'Chronolith menutup diri.' : c === 'chrono_rewind' ? 'Waktu di sekitar Chronolith bergeser.' : 'Chronolith bergerak.';
     }
+    if (pending.actorId === 'C04') {
+      const t: Record<string, string> = {
+        keeper_stance: 'Varlgrim menanam tongkatnya dan menimbang langkah.', keeper_strike: 'Tongkat Varlgrim turun dengan beban penuh.',
+        time_bind: 'Varlgrim menanam tongkat. Garis waktu menahan satu dari kalian.', seal_pulse: 'Denyut segel merambat dari tongkat Varlgrim.',
+        fracture_mark: 'Varlgrim menandai satu dari kalian dengan retakan.', fracture_strike: 'Retakan yang ditandai menghantam!',
+        distortion_wave: 'Waktu di sekitar kalian bergelombang.', phase_shift: 'Varlgrim menegakkan diri. Pertarungan berubah.',
+        meteor_call: 'Varlgrim mengangkat tongkat. Langit ditahan.', meteor_hold: 'Meteor masih tergantung. Varlgrim menunggu.', meteor_fall: 'Meteor jatuh!',
+      };
+      return t[c] ?? 'Varlgrim bergerak.';
+    }
+    if (pending.actorId === 'M06') return c === 'rift_gather' ? 'Cincin retak Riftborn berhenti, lalu mengumpulkan waktu.' : c === 'rift_surge' ? 'Riftborn menyentak dengan lonjakan retakan!' : 'Riftborn menyambar.';
+    if (pending.actorId === 'M04') return c === 'gravorn_brace' ? 'Gravorn menyilangkan lengan batunya.' : c === 'gravorn_crush' ? 'Gravorn menurunkan lengannya dengan remuk!' : 'Gravorn mengayunkan lengan batunya.';
+    if (pending.actorId === 'C02' && c === 'velthia_aegis') return 'Velthia merentangkan tangannya. Perisai Heart terbentuk.';
     if (pending.actorId === 'M05') return c === 'oath_brace' ? 'Oathguard menahan perisai di depan tubuhnya.' : 'Oathguard maju sesuai sumpah lamanya.';
     return pending.actorId === 'B01' ? c === 'boss_windup' ? 'Mournfang merendahkan tanduknya.' : c === 'boss_recover' ? 'Mournfang terhuyung, lalu menarik napas.' : 'Mournfang menggeser kaki depannya.'
       : pending.actorId === 'B02' ? c === 'knight_guard' ? 'Veyrath menahan bilah. Ia mengunci arah ke Torvan.' : 'Veyrath bergerak sesuai sumpah lama.'
@@ -306,9 +365,11 @@ export class BattleScene extends Phaser.Scene {
     const me = snap.actors.find(a => a.id === p.actorId)!;
     const c: string = p.command;
     if (p.targetId) return [p.targetId];
-    if (c === 'velthia_bloom' || c === 'chrono_sweep') return this.alive(c === 'velthia_bloom' ? 'player' : 'player');
+    if (c === 'velthia_bloom' || c === 'chrono_sweep' || c === 'velthia_aegis' || c === 'seal_pulse' || c === 'distortion_wave' || c === 'meteor_fall') return this.alive('player');
     if (c === 'velthia_concord') return ['C01'];
     if (c === 'chrono_slam' && me.intentTargetId) return [me.intentTargetId];
+    if (c === 'keeper_stance' || c === 'phase_shift' || c === 'meteor_call' || c === 'meteor_hold' || c === 'rift_gather' || c === 'gravorn_brace') return [];
+    if ((c === 'keeper_strike' || c === 'fracture_strike' || c === 'rift_surge' || c === 'gravorn_crush') && me.intentTargetId) return [me.intentTargetId];
     if (c === 'chrono_charge' || c === 'chrono_guard' || c === 'chrono_rewind' || c === 'boss_windup' || c === 'boss_recover' || c === 'knight_guard' || c === 'knight_recover' || c === 'oath_brace' || c === 'defend') return [];
     if (me.side === 'player') return this.alive('enemy').slice(0, 1);
     const players = this.alive('player');
@@ -319,6 +380,12 @@ export class BattleScene extends Phaser.Scene {
   private eventPose(p: PendingAction): string | null {
     const id = p.actorId, c: string = p.command, meta = this.meta(id);
     if (isVelthiaCommand(c)) return frameKeyFor(meta, VELTHIA_SKILL_INFO[c].frameKey, 'attack');
+    if (c === 'keeper_stance' || c === 'time_bind' || c === 'phase_shift' || c === 'meteor_fall') return specialFrameKey(meta, 'plant');
+    if (c === 'meteor_call' || c === 'meteor_hold') return specialFrameKey(meta, 'raise');
+    if (c === 'seal_pulse' || c === 'distortion_wave' || c === 'fracture_mark') return specialFrameKey(meta, 'cast');
+    if (c === 'rift_gather') return null;
+    if (c === 'gravorn_brace') return specialFrameKey(meta, 'guard');
+    if (c === 'velthia_aegis') return frameKeyFor(meta, 'special', 'anticipation');
     if (c === 'chrono_charge') return frameKeyFor(meta, 'charge', 'anticipation');
     if (c === 'chrono_guard') return frameKeyFor(meta, 'guard', 'anticipation');
     if (c === 'chrono_rewind') return frameKeyFor(meta, 'special', 'anticipation');
@@ -344,6 +411,9 @@ export class BattleScene extends Phaser.Scene {
     else if (kind === 'shield') this.popup(targetId, 'Selubung', COLORS.mp, slot, false);
     else if (kind === 'mp') this.popup(targetId, `+${amount} MP`, COLORS.mp, slot, false);
     else if (kind === 'buff') this.popup(targetId, 'Selaras', COLORS.bitterLime, slot, false);
+    else if (kind === 'aegis') this.popup(targetId, 'Perlindungan', COLORS.bitterLime, slot, false);
+    else if (kind === 'revive') this.popup(targetId, `+${amount}`, COLORS.bitterLime, slot);
+    else if (kind === 'meteor') this.popup(targetId, amount > 0 ? `-${amount}` : 'Tertahan', amount > 0 ? COLORS.paper : COLORS.mp, slot, amount > 0);
   }
 
   /** VFX saat eksekusi (ayunan, rapal, pengumpulan) - sebelum dampak. */
@@ -365,6 +435,18 @@ export class BattleScene extends Phaser.Scene {
     else if (c === 'velthia_ward' && t0) { const k = this.center(t0); this.playFx('velthia_ward', k.x, k.y, { flip }); }
     else if (c === 'velthia_bloom') for (const id of targets) { const f = this.foot(id); this.playFx('velthia_bloom', f.x, f.y, { flip }); }
     else if (c === 'velthia_concord') { const y = this.center('C01'); this.playFx('velthia_concord', y.x, y.y - 6, { target: { x: me.x, y: me.y - 6 }, flip }); }
+    else if (c === 'keeper_stance') this.playFx('keeper_stance', me.x, me.y, { flip: false });
+    else if (c === 'time_bind' && tc) this.playFx('temporal_bind', tc.x, tc.y, { flip });
+    else if (c === 'seal_pulse') this.playFx('seal_pulse', me.x, me.y, { flip: false });
+    else if (c === 'distortion_wave') { const k = this.partyPoint(); this.playFx('time_distortion', k.x, k.y, { flip: false }); }
+    else if (c === 'fracture_mark' && tc) { this.markHold?.stop(); this.fxLog.push('fracture_mark'); this.markHold = this.fx.start('fracture_mark', tc.x, tc.y); }
+    else if (c === 'phase_shift') this.playFx('phase_shift', me.x, me.y, { flip: false });
+    else if (c === 'rift_lash' && tc) this.playFx('riftborn_lash', tc.x, tc.y, { flip });
+    else if (c === 'rift_surge' && tc) this.playFx('riftborn_surge', tc.x, tc.y, { flip });
+    else if (c === 'gravorn_heave' || c === 'gravorn_crush') { if (t0) { const f = this.foot(t0); this.playFx('gravorn_slam', f.x, f.y, { flip }); } }
+    else if (c === 'meteor_call' || c === 'meteor_hold') {
+      if (!this.skyHold) { const sky = this.skyPoint(); this.fxLog.push('meteor_sky_hold'); this.skyHold = this.fx.start('meteor_sky_hold', sky.x, sky.y); }
+    }
     else if (c === 'chrono_charge') this.playFx('chronolith_charge', me.x, me.y - 10, { flip: false });
     else if (c === 'chrono_rewind') this.playFx('chronolith_temporal', me.x, me.y, { flip: false });
   }
@@ -375,12 +457,17 @@ export class BattleScene extends Phaser.Scene {
     if (c === 'ground_slam') { const t = effects.find(e => e.kind === 'damage'); if (t) { const f = this.foot(t.targetId); this.playFx('ground_slam_crack', f.x, Math.round(GROUND.C01 * this.view.h)); } }
     else if (c === 'chrono_slam') { const t = effects.find(e => e.kind === 'damage'); if (t) { const f = this.foot(t.targetId); this.playFx('chronolith_slam', f.x, f.y, { flip: true }); } }
     else if (c === 'chrono_sweep') { const f = this.foot('C01'); this.playFx('chronolith_slam', f.x, f.y, { flip: true, scale: 1 }); }
+    if (c === 'keeper_strike' || c === 'fracture_strike') {
+      const t = effects.find(e => e.kind === 'damage');
+      if (t) { const k = this.center(t.targetId); this.markHold?.stop(); this.markHold = undefined; this.playFx('staff_impact', k.x, k.y, { flip: true }); if (c === 'fracture_strike') this.playFx('fracture_strike', k.x, k.y, { flip: true }); }
+    }
     for (const e of effects) {
       const k = this.center(e.targetId);
       if (e.kind === 'damage' && e.amount > 0 && c !== 'ground_slam' && !c.startsWith('chrono_')) this.playFx(heavy ? 'impact_heavy' : 'impact_hit', k.x, k.y, { flip: !this.isPlayerSide(e.targetId) });
-      else if (e.kind === 'damage' && e.amount > 0 && c.startsWith('chrono_')) this.playFx('impact_hit', k.x, k.y);
+      else if (e.kind === 'damage' && e.amount > 0 && (c.startsWith('chrono_') || c === 'keeper_strike' || c === 'fracture_strike')) { if (c.startsWith('chrono_')) this.playFx('impact_hit', k.x, k.y); }
       if (e.kind === 'damage' && (e.absorbed ?? 0) > 0) this.playFx('shield_hit_spark', k.x, k.y);
       if (e.kind === 'heal' && c !== 'velthia_mend') this.playFx('heal_sparkle', k.x, k.y);
+      if (e.kind === 'revive') this.playFx('heal_sparkle', k.x, k.y);
     }
   }
 
@@ -390,6 +477,9 @@ export class BattleScene extends Phaser.Scene {
       : c === 'ranting_nakal' || c === 'bukan_aku' || c === 'tunas_bandel' ? 'SFX_MAGIC_TORVAN'
       : c === 'velthia_ward' ? 'SFX_MAGIC_VELTHIA_SHIELD' : c === 'velthia_mend' ? 'SFX_MAGIC_VELTHIA_HEAL' : isVelthiaCommand(c) ? 'SFX_MAGIC_VELTHIA_CAST'
       : c === 'chrono_rewind' || c === 'chrono_guard' ? 'SFX_CHRONOLITH_TEMPORAL'
+      : c === 'keeper_strike' || c === 'fracture_strike' ? 'SFX_VARLGRIM_STAFF_SWING' : c === 'keeper_stance' ? 'SFX_VARLGRIM_STAFF_IMPACT' : c === 'time_bind' ? 'SFX_TEMPORAL_BIND'
+      : c === 'seal_pulse' || c === 'distortion_wave' ? 'SFX_TIME_DISTORTION' : c === 'fracture_mark' ? 'SFX_FRACTURE_MARK' : c === 'phase_shift' ? 'SFX_BOSS_PHASE_SHIFT'
+      : c === 'meteor_call' ? 'SFX_METEOR_CHARGE' : c === 'rift_lash' || c === 'rift_surge' ? 'SFX_RIFTBORN_ATTACK' : c === 'gravorn_heave' || c === 'gravorn_crush' ? 'SFX_GRAVORN_ATTACK'
       : c === 'defend' ? 'SFX_DEFEND' : (c === 'attack' || c === 'boss_sweep' || c === 'knight_thrust') && !this.isPlayerSide(p.actorId) ? 'SFX_ENEMY_ATTACK' : null;
     if (c === 'chrono_charge') a.playSfx('SFX_CHRONOLITH_CHARGE'); else if (sfx) a.playSfx(sfx);
     if (c === 'velthia_ward') a.playSfx('SFX_SHIELD');
@@ -402,7 +492,7 @@ export class BattleScene extends Phaser.Scene {
     const pending = engine.prepare(command, engine.snapshot().turn, targetId);
     if (!pending) { this.panel.say(engine.unavailable(command, targetId) ?? 'Aksi tidak tersedia.'); return; }
     const cls = actionClassFor(pending.command);
-    const spec = TIMELINES[cls];
+    const spec = this.fastMeteor && cls === 'meteor_telegraph' ? fastTimeline(TIMELINES[cls], 0.35) : TIMELINES[cls];
     const trace: ActionTrace = { actor: pending.actorId, command: pending.command, cls, start: this.time.now, marks: {}, total: 0 };
     this.locked = true; this.panel.busy(); this.panel.clearControlHint();
     this.phase = 'anticipation';
@@ -412,7 +502,7 @@ export class BattleScene extends Phaser.Scene {
     await this.sleep(spec.confirm);
     if (epoch !== this.epoch) return;
     let reaction: Promise<void> = Promise.resolve();
-    const heavy = cls === 'heavy' || cls === 'boss_special';
+    const heavy = cls === 'heavy' || cls === 'boss_special' || cls === 'boss_staff';
     const impact = (): void => {
       if (epoch !== this.epoch) return;
       const result: ImpactResult | null = engine.impact(pending.token);
@@ -423,7 +513,9 @@ export class BattleScene extends Phaser.Scene {
       const perTarget: Record<string, number> = {};
       for (const e of effects) { const slot = perTarget[e.targetId] ?? 0; perTarget[e.targetId] = slot + 1; this.popupFor(e, slot); }
       this.fxImpact(pending, effects, heavy);
-      const damaged = effects.filter(e => e.kind === 'damage' && e.amount > 0);
+      if (result.meteor) this.onMeteorEvent(result, cls);
+      if (result.phase) this.queueCallout(result.phase === 2 ? 'phase2' : 'phase3');
+      const damaged = effects.filter(e => (e.kind === 'damage' || e.kind === 'meteor') && e.amount > 0);
       if (damaged.length) {
         this.playImpactSfx(pending);
         const stop = effectiveHitstop(spec, this.services.settings.get('screen_shake'));
@@ -441,9 +533,11 @@ export class BattleScene extends Phaser.Scene {
           });
         });
         reaction = Promise.all(reactions).then(() => undefined);
-        const fx = impactFx({ reducedFlashes: this.services.settings.get('reduced_flashes'), screenShake: this.services.settings.get('screen_shake') }, heavy);
-        const shook = fx.shake ? this.services.effects.shake(this, 150, 0.007) : false;
-        const flashed = fx.flash ? this.services.effects.flash(this, 60) : false;
+        const fx = impactFxFor({ reducedFlashes: this.services.settings.get('reduced_flashes'), screenShake: this.services.settings.get('screen_shake') }, cls);
+        // meteor_fall: goyang dan kilat dikendalikan spec VFX (meteor_impact/aegis_stress); jangan digandakan di sini.
+        const own = cls !== 'meteor_fall';
+        const shook = own && fx.shake ? this.services.effects.shake(this, 150, 0.007) : false;
+        const flashed = own && fx.flash ? this.services.effects.flash(this, 60) : false;
         this.impacts.push({ command: pending.command, turn: pending.token, shake: shook, flash: flashed });
       }
       const healed = effects.some(e => e.kind === 'heal');
@@ -452,7 +546,9 @@ export class BattleScene extends Phaser.Scene {
       if (result.telegraph) this.telegraphed = result.telegraph.targetId;
       else if (pending.command === 'chrono_slam') this.telegraphed = null;
     };
-    await this.animate(pending, impact, spec, trace);
+    if (pending.command === 'meteor_fall') await this.animateMeteorFall(pending, impact, spec, trace);
+    else if (pending.command === 'velthia_aegis') await this.animateAegis(pending, impact, spec, trace);
+    else await this.animate(pending, impact, spec, trace);
     await reaction;
     if (epoch !== this.epoch) return;
     this.phase = 'recovery'; this.mark(trace, 'recovery');
@@ -479,6 +575,9 @@ export class BattleScene extends Phaser.Scene {
     if (c === 'ground_slam') a.playSfx('SFX_GROUND_SLAM');
     else if (c === 'attack' && pending.actorId === 'C01') a.playSfx('SFX_GREATSWORD_IMPACT');
     else if (c.startsWith('chrono_')) a.playSfx('SFX_CHRONOLITH_STRIKE');
+    else if (c === 'keeper_strike' || c === 'fracture_strike') a.playSfx('SFX_VARLGRIM_STAFF_IMPACT');
+    else if (c === 'seal_pulse' || c === 'distortion_wave') { /* SFX_TIME_DISTORTION sudah diputar saat eksekusi */ }
+    else if (c === 'rift_lash' || c === 'rift_surge' || c === 'gravorn_heave' || c === 'gravorn_crush') { /* SFX serangan musuh sudah diputar saat eksekusi */ }
     else if (!player) a.playSfx('SFX_ENEMY_ATTACK');
     a.playSfx(player ? 'SFX_ENEMY_DAMAGE' : 'SFX_DAMAGE');
   }
@@ -489,8 +588,9 @@ export class BattleScene extends Phaser.Scene {
   private async animate(p: PendingAction, impact: () => void, spec: TimelineSpec, trace: ActionTrace): Promise<void> {
     const id = p.actorId, c: string = p.command;
     const targets = this.targetsOf(p);
-    const melee = c === 'attack' || c === 'ground_slam' || c === 'boss_sweep' || c === 'knight_thrust' || c === 'chrono_slam';
-    const stationaryStrike = c === 'ranting_nakal' || c === 'velthia_pulse' || c === 'chrono_sweep';
+    const melee = c === 'attack' || c === 'ground_slam' || c === 'boss_sweep' || c === 'knight_thrust' || c === 'chrono_slam' || c === 'keeper_strike' || c === 'fracture_strike'
+      || c === 'rift_lash' || c === 'rift_surge' || c === 'gravorn_heave' || c === 'gravorn_crush';
+    const stationaryStrike = c === 'ranting_nakal' || c === 'velthia_pulse' || c === 'chrono_sweep' || c === 'seal_pulse' || c === 'distortion_wave';
     if (melee || stationaryStrike) {
       // antisipasi (pose siap) -> windup (maju) -> eksekusi (frame event = dampak) -> hitstop -> pemulihan
       this.mark(trace, 'anticipation');
@@ -512,7 +612,7 @@ export class BattleScene extends Phaser.Scene {
         await this.play(id, [pose], impact, spec.execution + spec.hitstop);
       } else {
         const target = this.sprites[targets[0]!]!;
-        const standOff = id === 'B01' ? 112 : id === 'B03' ? 130 : 76; // boss besar berhenti lebih jauh agar tubuhnya tidak menimpa target
+        const standOff = id === 'B01' ? 112 : id === 'B03' ? 130 : id === 'C04' ? 124 : id === 'M04' ? 96 : 76; // boss besar berhenti lebih jauh agar tubuhnya tidak menimpa target
         const x = this.isPlayerSide(id) ? target.x + (id === 'C01' ? 88 : 94) : target.x - standOff;
         await this.approach(id, x, spec.windup);
         this.execSfx(p); this.fxExecute(p, targets);
@@ -539,6 +639,99 @@ export class BattleScene extends Phaser.Scene {
     }
     this.setFrame(id, 'idle_a');
   }
+  // ---------------------------------------------------------------- Phase 8: meteor, Perlindungan, banner naskah
+
+  /** Titik tengah barisan pemain di garis tanah (pusat perisai dan titik tabrak meteor). */
+  private partyPoint(): { x: number; y: number } {
+    const ids = this.alive('player');
+    const pts = (ids.length ? ids : ['C01']).map(id => this.foot(id));
+    return { x: Math.round(pts.reduce((n, q) => n + q.x, 0) / pts.length), y: Math.round(pts.reduce((n, q) => n + q.y, 0) / pts.length) };
+  }
+  /** Pusat siluet meteor yang tergantung di langit: di atas barisan pemain. */
+  private skyPoint(): { x: number; y: number } {
+    // siluet besar: tengah panggung agak ke kanan dan cukup rendah agar badannya tidak terpotong tepi atas
+    return { x: Math.round(this.view.w * 0.55), y: Math.round(this.view.h * 0.3) };
+  }
+
+  /** Antre banner naskah (C4_BATTLE_CALLOUTS) untuk ditampilkan pada giliran pemain berikutnya. */
+  private queueCallout(key: string): void {
+    const c = C4_BATTLE_CALLOUTS[key];
+    if (!c) return;
+    this.pendingCallout = `${DISPLAY_NAMES[c.speaker] ?? ''}: "${c.text}"`;
+  }
+
+  /** Peristiwa meteor/Perlindungan dari engine: banner, penghentian efek persisten, dampak meteor. */
+  private onMeteorEvent(result: ImpactResult, cls: ActionClass): void {
+    const m = result.meteor!;
+    if (m.event === 'call') this.queueCallout('meteor_call');
+    else if (m.event === 'hold') this.queueCallout('meteor_hold');
+    else if (m.event === 'aegis_cast') { if (m.source === 'surge') this.queueCallout('aegis_taught'); }
+    else if (m.event === 'fall') {
+      const point = this.partyPoint();
+      const shield = point; // perisai berpusat di tengah garis tanah dua sekutu
+      this.playFx('meteor_impact', point.x, point.y);
+      this.services.audio.playSfx('SFX_METEOR_IMPACT');
+      if (!m.lethal) {
+        this.playFx('aegis_stress', shield.x, shield.y, { level: Math.max(1, m.stressMax) });
+        this.services.audio.playSfx('SFX_AEGIS_STRESS');
+        this.queueCallout('meteor_survived');
+      }
+      this.aegisHold?.stop(); this.aegisHold = undefined;
+      this.time.delayedCall(420, () => { if (this.fx) this.playFx('meteor_aftermath', point.x, point.y); });
+    }
+    void cls;
+  }
+
+  /** Perlindungan: antisipasi -> muatan -> pembentukan perisai (BEDA dari Selubung Kecil) -> kontur persisten sampai meteor jatuh. */
+  private async animateAegis(p: PendingAction, impact: () => void, spec: TimelineSpec, trace: ActionTrace): Promise<void> {
+    const id = p.actorId, meta = this.meta(id), epoch = this.epoch;
+    const me = this.center(id);
+    this.mark(trace, 'anticipation');
+    this.services.audio.playSfx('SFX_AEGIS_CAST');
+    this.playFx('aegis_charge', me.x, me.y - 10, { flip: true });
+    await this.play(id, ['anticipation'], undefined, spec.anticipation);
+    this.mark(trace, 'windup');
+    await this.play(id, [frameKeyFor(meta, 'special', 'anticipation')], undefined, spec.windup);
+    if (epoch !== this.epoch) return;
+    this.mark(trace, 'execution');
+    const mid = this.partyPoint();
+    this.services.audio.playSfx('SFX_AEGIS_FORM');
+    this.playFx('aegis_form', mid.x, mid.y, { flip: true });
+    impact();
+    await this.sleep(spec.execution);
+    if (epoch !== this.epoch) return;
+    this.aegisHold?.stop(); this.fxLog.push('aegis_hold'); this.aegisHold = this.fx.start('aegis_hold', mid.x, mid.y);
+    this.mark(trace, 'recovery');
+    await this.play(id, ['recovery'], undefined, spec.recovery + spec.reaction);
+    this.setFrame(id, 'idle_a');
+  }
+
+  /**
+   * Meteor jatuh (sinematik utama): tongkat ditanam, siluet langit turun, tabrakan, perisai menahan/retak atau barisan tumbang,
+   * debu, hening singkat. Angka dan efek berasal dari engine pada momen dampak; kamera goyang/kilat diatur spec VFX.
+   */
+  private async animateMeteorFall(p: PendingAction, impact: () => void, spec: TimelineSpec, trace: ActionTrace): Promise<void> {
+    const id = p.actorId, meta = this.meta(id), epoch = this.epoch;
+    this.mark(trace, 'anticipation');
+    const sky = this.skyPoint(), ground = this.partyPoint();
+    this.skyHold?.stop(); this.skyHold = undefined;
+    const descentMs = spec.anticipation + spec.windup;
+    this.services.audio.playSfx('SFX_METEOR_DESCENT');
+    this.fxLog.push('meteor_descent');
+    this.fx.play('meteor_descent', ground.x, ground.y, { from: sky, durationMs: descentMs });
+    await this.play(id, [specialFrameKey(meta, 'plant')], undefined, spec.anticipation);
+    this.mark(trace, 'windup');
+    await this.sleep(spec.windup);
+    if (epoch !== this.epoch) return;
+    this.mark(trace, 'execution');
+    impact();
+    await this.sleep(spec.execution);
+    if (epoch !== this.epoch) return;
+    this.mark(trace, 'recovery');
+    this.setFrame(id, 'idle_a');
+    await this.sleep(spec.recovery); // hening singkat sesudah dampak
+  }
+
   private approach(id: string, x: number, duration: number): Promise<void> {
     return new Promise(resolve => this.tweens.add({ targets: this.sprites[id], x, duration, onComplete: () => resolve() }));
   }
@@ -550,12 +743,19 @@ export class BattleScene extends Phaser.Scene {
     if (state.outcome) {
       this.phase = state.outcome; this.services.audio.stopBgm();
       if (state.outcome !== 'escaped') this.services.audio.playSfx(state.outcome === 'victory' ? 'SFX_VICTORY' : 'SFX_DEFEAT');
-      this.panel.result(state.outcome, state.outcome === 'victory' ? this.session.previewReward() : null); return;
+      this.skyHold?.stop(); this.aegisHold?.stop(); this.markHold?.stop(); this.skyHold = this.aegisHold = this.markHold = undefined;
+      const defeatC4 = state.outcome === 'defeat' && this.encounter === 'varlgrim';
+      const defeatHint = defeatC4 ? C4_BATTLE_CALLOUTS.defeat_hint?.text : undefined;
+      this.panel.result(state.outcome, state.outcome === 'victory' ? this.session.previewReward() : null,
+        { phaseRetry: state.outcome === 'defeat' && this.session.canRetryFromPhase, ...(defeatHint ? { hint: defeatHint } : {}) }); return;
     }
     if (engine.current.side === 'enemy') { void this.act(enemyAI(engine.current)); return; }
     this.panel.show(engine);
-    const hint = intentHint(state.actors.find(a => a.side === 'enemy' && a.hp > 0) ?? state.actors.find(a => a.side === 'enemy')!);
-    if (hint) this.panel.say(hint);
+    const hint = intentHint(state.actors.find(a => a.side === 'enemy' && a.hp > 0) ?? state.actors.find(a => a.side === 'enemy')!, { aegisCovered: aegisStatus(state).covered });
+    const callout = this.pendingCallout; this.pendingCallout = null;
+    if (callout) this.calloutLog.push(callout);
+    if (callout) this.panel.say(hint ? `${callout}\n${hint}` : callout);
+    else if (hint) this.panel.say(hint);
     else if (state.turn === 1) this.panel.say(this.encounter === 'mournfang' ? 'Amati gerak tanduknya sebelum sapuan berat.' : 'Pilih Serang untuk menyerang musuh.');
     else if (engine.current.hp < engine.current.stats.HP) this.panel.say('HP berkurang. Barang: Potion. Bertahan: kurangi kerusakan.');
   }
@@ -576,6 +776,7 @@ export class BattleScene extends Phaser.Scene {
     place(this.targetCaret, this.panel.mode === 'target' ? this.targetId : this.telegraphed);
     if (this.locked || this.phase !== 'idle') return;
     for (const id of Object.keys(this.sprites)) {
+      if (id === 'C04' && this.skyHold) { const k = specialFrameKey(this.meta(id), 'raise'); if (this.sprites[id]!.frame.name !== String(this.meta(id).frames[k]?.index_0_based)) this.setFrame(id, k); continue; }
       const idle = this.idle[id] ??= { elapsed: 0, frame: 'idle_a' };
       idle.elapsed += delta;
       if (idle.elapsed >= this.meta(id).frames[idle.frame]!.duration_ms) {
@@ -597,6 +798,15 @@ export class BattleScene extends Phaser.Scene {
       visible: s.visible, alpha: s.alpha, depth: s.depth, frame: String(s.frame.name), texture: s.texture.key };
   }
   qaHide(id: string, hidden: boolean): void { this.sprites[id]?.setVisible(!hidden); }
+  /** QA saja (dipanggil lewat `?qa=1`): atur HP satu aktor tanpa memainkan seluruh pertarungan. */
+  qaPatchHp(id: string, hp: number): void {
+    const snap = this.session.engine.snapshot();
+    const a = snap.actors.find(x => x.id === id);
+    if (!a) return;
+    a.hp = Math.max(0, Math.min(a.stats.HP, Math.round(hp)));
+    this.session.engine.restore(snap);
+    this.panel.refresh(this.session.engine);
+  }
 
   debugState(): Record<string, unknown> {
     return { ...this.session.engine.snapshot(), encounter: this.encounter, locked: this.locked, phase: this.phase, menu: this.panel.mode,
@@ -605,6 +815,8 @@ export class BattleScene extends Phaser.Scene {
       vfx: { visible: this.vfx.visible, frame: this.vfx.frame.name }, history: this.history.slice(-150),
       fx: { active: this.fx.active(), running: this.fx.running(), played: this.fxLog.slice(-40) }, telegraphed: this.telegraphed,
       impacts: this.impacts.slice(-30), traces: this.traces.slice(-20),
+      calloutLog: this.calloutLog.slice(-12),
+      meteorFx: { sky: !!this.skyHold, aegis: !!this.aegisHold, callout: this.pendingCallout, aegisStatus: aegisStatus(this.session.engine.snapshot()), canRetryFromPhase: this.session.canRetryFromPhase },
       stage: { zoom: this.cameras.main.zoom, w: this.view.w, h: this.view.h },
       effects: { shake: this.cameras.main.shakeEffect.isRunning, flash: this.cameras.main.flashEffect.isRunning } };
   }

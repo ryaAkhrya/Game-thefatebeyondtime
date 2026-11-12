@@ -1,5 +1,24 @@
 # Composer handoff — Game Director authored music only
 
+## Phase 8 — Chapter IV (Benteng, Varlgrim, Heart of Time): brief BGM, TIDAK dibuat
+
+Phase 8 tidak membuat atau memuat BGM apa pun (tidak ada file `BGM_*`; game berjalan senyap). Semua cue di bawah **AWAITING_COMPOSER**. Nama cue memakai registry yang sudah ada (`MUSIC_REGISTRY.json`); dua cue tambahan opsional ditandai *usulan* dan BELUM ada di registry (Game Director/komposer yang memutuskan).
+
+| Momen (kode) | Cue registry | Arahan untuk komposer |
+|---|---|---|
+| Benteng Penjaga: eksplorasi (area `fortress`) | `BGM_CRISIS` (dipakai ulang sampai ada cue khusus) atau *usulan* `BGM_FORTRESS` | Tua, berat, sepi; ostinato rendah dan satu dentang lonceng retak yang terlambat. Bukan horor, bukan aksi. Loop 60–90 s. |
+| Encounter Benteng (Riftborn, Gravorn, Oathguard) | `BGM_BATTLE` | Tidak ada perubahan; tempo battle biasa. |
+| Ruang Uji Segel (tutorial Perlindungan) | `BGM_BOSS` atau diam | Tekanan terukur, belajar sambil bermain; boleh senyap. |
+| Varlgrim: konfrontasi (C4-02) | `BGM_FINAL_BOSS` mulai halus | Tragis, bukan marah: tekad yang tertahan. |
+| Varlgrim: battle fase 1–2 | `BGM_FINAL_BOSS` | Disiplin penjaga waktu: perkusi terkendali, senar rendah; fase 2 menambah distorsi tempo halus (bukan kekacauan). |
+| Varlgrim: meteor (`meteor_call` → `meteor_fall`) | `BGM_FINAL_BOSS` | **Jeda singkat disengaja**: musik menipis saat langit ditahan, hening sesaat setelah tabrakan, lalu kembali. Registry sudah mencatat "intentional brief silence after meteor". SFX meteor/Perlindungan sudah ada dan tidak boleh tertutup musik. |
+| Heart dibuka bersama (C4-04) | `SILENCE` (SCENE_DIRECTION: diam yang disengaja) | Tanpa musik; hanya SFX Heart dan debu menara dari jauh. |
+| Ingatan Aveloria (C4-05) | *usulan* `BGM_HEART_ECHO` atau `BGM_CRISIS` | Sunyi, lega, sedikit takut kehilangan lagi; satu motif lembut yang hanya terdengar di ruang gema ini. |
+| Varlgrim dan Torvan (C4-06) | `BGM_CRISIS` mereda / diam | Tidak ada musik ilahi untuk pengakuan Torvan. |
+| Kembali ke Aveloria (C4-07) | `BGM_AVELORIA_DAY` versi tenang atau `BGM_CRISIS` | Warga selamat dengan luka; hangat tetapi letih. |
+
+Aturan: tidak ada musik "pahlawan" yang menang besar; Bab IV berakhir sebelum Modern Interlude (`BGM_MODERN`) dan Epilog (`BGM_EPILOGUE`), yang belum dikerjakan. SFX Phase 8 asli dari kode tercatat di `docs/production/SFX_DESIGN_AND_MANIFEST.md`.
+
 ## Phase 7 — SFX asli dan BGM Bab III
 
 Phase 7 mengotorisasi **SFX ORIGINAL** yang disintesis dari kode (44 id, `web/public/assets/audio/sfx/`, lihat `docs/production/SFX_DESIGN_AND_MANIFEST.md`). Itu BUKAN musik dan tidak menggantikan pekerjaan komposer: **tidak ada BGM yang dibuat/dimuat**. Cue BGM berikut tetap **AWAITING_COMPOSER**: `BGM_TEMPLE` (puzzle kuil, berhenti untuk Chronolith; sudah di registry), `BGM_BOSS` (Chronolith memakai cue boss yang sama), serta suasana Aveloria krisis (memakai `BGM_AVELORIA_DAY`; komposer dapat menentukan varian). Kualitas SFX asli belum didengar manusia; komposer/Game Director dapat mengganti file SFX mana pun dengan nama id yang sama tanpa perubahan kode.

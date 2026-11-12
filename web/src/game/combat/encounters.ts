@@ -1,6 +1,7 @@
 import type { Stats } from './BattleEngine';
+import type { C4EncounterId } from '../story/chapter4Flags';
 
-export type EncounterId = 'hollowling' | 'mournfang' | 'duo_tutorial' | 'forest2_patrol' | 'veyrath' | 'temple_oathguard' | 'temple_mixed' | 'chronolith';
+export type EncounterId = 'hollowling' | 'mournfang' | 'duo_tutorial' | 'forest2_patrol' | 'veyrath' | 'temple_oathguard' | 'temple_mixed' | 'chronolith' | C4EncounterId;
 export const FIRST_HOLLOWLING_FLAG = 'battle.first_hollowling';
 export const MOURNFANG_FLAG = 'boss.mournfang';
 export const MOURNFANG_STATS: Stats = { HP: 224, MP: 0, ATK: 18, DEF: 10, MAG: 3, MDEF: 6, SPD: 6 };
@@ -20,7 +21,7 @@ export const PATROL_REWARD = { id: 'reward.c2_forest2_patrol.rpg', exp: 18, gold
 export const VEYRATH_REWARD = { id: 'reward.c2_veyrath.rpg', exp: 85, gold: 32 } as const;
 
 /**
- * Chapter III (DRAFT, simulasi di tests/unit/chapter3-balance.test.ts). Rancangan: Yaric + Velthia, level ~4-5 (cap level 5, EXP 235).
+ * Chapter III (DRAFT, simulasi di tests/unit/chapter3-balance.test.ts). Rancangan: Yaric + Velthia, level ~4-5 saat masuk (cap level kini 10; lihat docs/production/PROGRESSION_LEVEL10.md).
  * Satu Oathguard, atau Oathguard + Wisplet; tanpa grind (hadiah sekali lewat flag battle.*). Chronolith: boss besar berpola tertelegraf.
  */
 export const OATHGUARD_STATS: Stats = { HP: 118, MP: 0, ATK: 17, DEF: 10, MAG: 3, MDEF: 6, SPD: 8 };
@@ -28,3 +29,7 @@ export const CHRONOLITH_STATS: Stats = { HP: 360, MP: 0, ATK: 38, DEF: 13, MAG: 
 export const OATHGUARD_REWARD = { id: 'reward.c3_temple_oathguard.rpg', exp: 26, gold: 10 } as const;
 export const TEMPLE_MIXED_REWARD = { id: 'reward.c3_temple_mixed.rpg', exp: 24, gold: 12, items: { potion: 1 } } as const;
 export const CHRONOLITH_REWARD = { id: 'reward.c3_chronolith.rpg', exp: 120, gold: 45, items: { potion: 2 } } as const;
+
+/** Chapter IV (Phase 8): stat musuh di c4Enemies.ts dan varlgrim.ts, hadiah di rpg/chapter4Rewards.ts. */
+export { GRAVORN_STATS, RIFTBORN_STATS, RIFTBORN_TRIAL_STATS } from './c4Enemies';
+export { VARLGRIM_STATS } from './varlgrim';

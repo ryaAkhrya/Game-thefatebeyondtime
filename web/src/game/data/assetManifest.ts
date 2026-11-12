@@ -50,7 +50,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
       ? 'Runtime = normalized derivative (feet baseline y=46, one x offset per direction); raw copy stays byte-identical to the DRAFT source. Crude prototype, not final art.'
       : 'Original DRAFT grid atlas copied byte-identically. Battle has four authored key poses, not a finished animation.',
   })),
-  ...[['C02', 'Velthia'], ['C05', 'Azie'], ['C06', 'Talric'], ['C09', 'Derrria']].map(([id, name]): AtlasAsset => ({
+  ...[['C02', 'Velthia'], ['C04', 'Varlgrim'], ['C05', 'Azie'], ['C06', 'Talric'], ['C09', 'Derrria']].map(([id, name]): AtlasAsset => ({
     id: `${id}_CITY_EXPLORE`, entity: id!, kind: 'exploration_atlas', version: 'draft', status: 'DRAFT',
     sourceImage: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.png`,
     sourceJson: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.json`,
@@ -82,6 +82,22 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     frameSize: fs, atlasSize: [fs[0] * n, fs[1]], frameCount: n, eventFrame: { name: ev, index: evIdx },
     publicPath: `assets/battle/${out}.png`, imported: true, notes,
   })),
+  // Phase 8 (Agent BA): atlas battle penuh Bab IV dari desain resmi (web/scripts/battle-art/build_{b04,m04,m06}.py). DRAFT/NEEDS_REVIEW.
+  // Aktor: C04 (= B04 Varlgrim, key `C04`), M04 Gravorn, M06 Riftborn (juga 'Penguji'). Pakai `fullAtlas(cache.json.get(`${id}:meta`))`.
+  ...([
+    ['B04_BATTLE_V1', 'C04', 'characters/C04_Varlgrim/C04_TURNAROUND_SIDE.png', 'characters/C04_Varlgrim/C04_BATTLE_ATLAS_DRAFT.json', [208, 176], 13, 'attack', 'B04_BATTLE_V1', 3,
+      'Varlgrim (B04/C04), menghadap KANAN (menuju party), tongkat kayu berpilin, bukan jam pasir. 13 frame: 10 standar + plant/raise/cast. Re-pose boneka kertas dari turnaround samping + gambar tongkat resmi; berlutut = tubuh diturunkan + sepatu belakang diputar. Perlu redraw seniman.'],
+    ['M04_BATTLE_V1', 'M04', 'monsters/M04_Gravorn/M04_NEW_CONCEPT_DRAFT.png', 'monsters/M04_Gravorn/M04_BATTLE_ATLAS_DRAFT.json', [176, 136], 11, 'attack', 'M04_BATTLE_V1', 3,
+      'Gravorn, menghadap depan condong ke kanan. 11 frame: 10 standar + guard (lengan disilang). Re-pose boneka kertas dari konsep resmi; perlu redraw seniman.'],
+    ['M06_BATTLE_V1', 'M06', 'monsters/M06_Riftborn/M06_NEW_CONCEPT_DRAFT.png', 'monsters/M06_Riftborn/M06_BATTLE_ATLAS_DRAFT.json', [160, 128], 10, 'attack', 'M06_BATTLE_V1', 3,
+      'Riftborn (juga Penguji), melayang HOVER 6 px di atas pivot (defeated di tanah). 10 frame kontrak. Dua lapisan (rift ungu + busur batu) dari konsep resmi; perlu redraw seniman.'],
+  ] as const).map(([id, entity, img, json, fs, n, ev, out, evIdx, notes]): AtlasAsset => ({
+    id, entity, kind: 'battle_atlas', version: 'draft', status: 'NEEDS_REVIEW',
+    sourceImage: `assets/${img}`, sourceJson: `assets/${json}`,
+    frameSize: fs, atlasSize: [fs[0] * n, fs[1]], frameCount: n, eventFrame: { name: ev, index: evIdx },
+    publicPath: `assets/battle/${out}.png`, imported: true, notes,
+  })),
+
   {
     id: 'C01_YARIC_BATTLE',
     entity: 'C01',

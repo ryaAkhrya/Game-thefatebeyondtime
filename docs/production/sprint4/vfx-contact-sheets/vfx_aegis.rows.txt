@@ -1,0 +1,8 @@
+1. particles: amote_a, amote_b, amote_c, ashard_a, ashard_b, ashard_c
+2. aegis_charge: acharge_1, acharge_2, acharge_3, acharge_4, acharge_4_c, acharge_5, acharge_5_c, acharge_6, acharge_6_c
+3. aegis_form: aform_1, aform_2, aform_3, aform_4, aform_5, aform_5_c, aform_6, aform_6_c, aform_7, aform_7_c, aform_8, aform_8_c
+4. aegis_hold: ahold_1, ahold_2, ahold_3, ahold_4
+5. aegis_stress_L1: astress1_1, astress1_2, astress1_3, astress1_4
+6. aegis_stress_L2: astress2_1, astress2_2, astress2_3, astress2_4
+7. aegis_stress_L3: astress3_1, astress3_2, astress3_3, astress3_4
+8. aegis_fade: afade_1, afade_2, afade_3, afade_4

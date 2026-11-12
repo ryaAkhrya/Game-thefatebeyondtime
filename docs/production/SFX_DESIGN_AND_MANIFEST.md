@@ -40,10 +40,10 @@ Dihasilkan otomatis oleh generator.
 | `SFX_UI_ITEM_USE` | ui | 1 | 200 | -3 | -16.7 | 0.6 | -21.1 | 120 |
 | `SFX_UI_SAVE_OK` | ui | 1 | 200 | -3 | -13.7 | 0.6 | -18.2 | 200 |
 | `SFX_UI_SAVE_FAIL` | ui | 1 | 200 | -3 | -17.3 | 0.55 | -22.5 | 200 |
-| `SFX_UI_DIALOGUE_ADVANCE` | ui | 1 | 55 | -3 | -15.1 | 0.35 | -24.2 | 60 |
+| `SFX_UI_DIALOGUE_ADVANCE` | ui | 1 | 55 | -3 | -15.1 | 0.4 | -23 | 60 |
 | `SFX_UI_DIALOGUE_CHOICE` | ui | 1 | 100 | -3 | -13.9 | 0.45 | -20.9 | 60 |
-| `SFX_UI_SHOP_BUY` | ui | 1 | 200 | -3 | -14.1 | 0.6 | -18.5 | 100 |
-| `SFX_UI_SHOP_SELL` | ui | 1 | 190 | -3 | -14 | 0.6 | -18.4 | 100 |
+| `SFX_UI_SHOP_BUY` | ui | 1 | 200 | -3 | -14.1 | 0.42 | -21.6 | 100 |
+| `SFX_UI_SHOP_SELL` | ui | 1 | 190 | -3 | -14 | 0.42 | -21.5 | 100 |
 | `SFX_STEP_GRASS` | step | 4 variasi | 110-110 | -3 | -18.5..-18 | 0.5 | -24.3 | 90 |
 | `SFX_STEP_DIRT` | step | 4 variasi | 100-100 | -3 | -15.7..-14.8 | 0.55 | -20.4 | 90 |
 | `SFX_STEP_STONE` | step | 4 variasi | 100-100 | -3 | -18..-17.2 | 0.5 | -23.6 | 90 |
@@ -159,3 +159,104 @@ Arah desain: sihir alam Torvan = udara/kayu (ketukan kayu, gemerisik daun, napas
 | Battle | `BattleScene`: `SFX_BATTLE_CONFIRM`, ayun/dampak (`GREATSWORD_*`, `GROUND_SLAM`, `ENEMY_ATTACK`), `DAMAGE`/`ENEMY_DAMAGE`, `DEFEND`, `HEAL`, `SHIELD`, `STATUS_POISON`, sihir (`MAGIC_TORVAN`, `MAGIC_VELTHIA_{CAST,HEAL,SHIELD}`), `CHRONOLITH_{CHARGE,STRIKE,TEMPORAL}`, `VICTORY`/`DEFEAT`. |
 
 Bukti pemanggilan: `window.__tfbt.audio()` (statistik per id) dan E2E `phase7.mjs`. Kualitas bunyi tetap belum ditinjau manusia.
+
+
+---
+
+# Phase 8 — Bab IV "The Fate" (23 id, 33 berkas)
+
+Status kualitas: **FUNCTIONAL / AUDIO-REVIEW PENDING — belum ditinjau manusia.** Semua angka di bawah adalah pengukuran objektif; tidak ada klaim bahwa bunyinya "bagus", elegan, atau cocok adegan (itu hanya bisa dinilai Game Director dengan telinga). Pipeline yang sama dengan Phase 7 (`web/scripts/sfx/`, sintesis kode, deterministik, WAV 44,1 kHz mono 16-bit, puncak -3 dBFS). Tidak ada BGM, tidak ada sampel/rekaman pihak ketiga, tidak ada melodi berkelanjutan (bunyi terpanjang 4,4 s, satu sapuan).
+
+- Phase 7 tidak berubah: 53 berkas lama byte-identik (hash dibekukan di `web/tests/unit/fixtures/sfx-phase7-hashes.json`, dijaga tes). Satu-satunya perubahan pada id lama adalah `gain` registry (bukan berkas): `SFX_UI_SHOP_BUY/SELL` 0.6 -> 0.42 (terlalu keras +4,9 dB di atas median UI pada analisis), `SFX_UI_DIALOGUE_ADVANCE` 0.35 -> 0.4 (terlalu pelan -4,6 dB).
+- Kategori baru (`SfxCategory`): `world` (Benteng: pintu/segel/Heart/gema/menara), `boss` (aksi Varlgrim dan musuh Bab IV), `meteor`, `aegis`; transisi final memakai `transition`.
+- Regenerasi dan analisis: `npm run assets:sfx` (dari `web/`), `node scripts/sfx/analyze.mjs [--patch-doc]`; laporan terukur ada di `docs/production/sprint4/S.md`.
+
+## Arah desain (ringkas)
+
+| Unsur | Arah |
+|---|---|
+| Staf Varlgrim | Kayu tua berat: resonansi kayu tak harmonik (1/1.58/2.43/3.71x), gedebuk, ketukan lantai batu; ayunan lambat dan rendah (bukan desing pedang). |
+| "Dry ticking" temporal | Tik kering halus dan makin renggang (bukan jam dinding/lonceng jam), kilau lonceng terbalik teredam, dengung rendah. Tik tidak pernah terdengar sebagai ritme tetap. |
+| Meteor | Tiga potongan: `CHARGE` = gemuruh jauh (telegraf) -> `DESCENT` = raungan membesar -> `IMPACT` = tabrakan besar yang meluruh ke senyap. Lead tidak memutar apa pun ~0,6 s sesudah impact. |
+| Perlindungan | Harmonik D-A (D3 A3 D4 A4 D5) masuk bertahap, denting; `STRESS` = tegangan + tiga retakan makin besar; `FADE` = denting turun, lega. Tidak ada sapuan sirene, tidak ada nada alarm. |
+| Dunia Benteng | Pintu batu (gerus + hantaman), segel (denting harmonik), Heart (palang berat + lonceng rendah), gema ingatan hangat (akor mengembang), menara runtuh jauh (sangat teredam). |
+| Musuh | Riftborn: robekan dan cambuk tipis; Gravorn: hantaman batu gelap, lebih kecil dari `SFX_GROUND_SLAM`. |
+| Kelelahan | Variasi (2-3 berkas) pada bunyi yang berulang; interval minimum 150-3000 ms; tidak ada bunyi untuk gerakan kecil; momen tunggal (impact, menara, Heart terbuka) berinterval panjang. |
+
+## Tabel durasi dan loudness (Phase 8)
+
+Dihasilkan otomatis oleh generator.
+
+<!-- SFX_P8_TABLE_START -->
+| id | kategori | file | durasi (ms) | puncak (dBFS) | RMS (dBFS) | gain | RMS efektif (dBFS) | interval min (ms) |
+|---|---|---|---:|---:|---:|---:|---:|---:|
+| `SFX_FORTRESS_DOOR_ANCIENT` | world | 1 | 3000 | -3 | -19.3 | 0.7 | -22.4 | 1500 |
+| `SFX_SEAL_ACTIVATE` | world | 1 | 2000 | -3 | -19.6 | 0.7 | -22.7 | 400 |
+| `SFX_SEAL_ERROR` | world | 2 variasi | 750-750 | -3 | -19.1..-18.5 | 0.7 | -21.9 | 300 |
+| `SFX_ECHO_MEMORY` | world | 1 | 3400 | -3 | -16.8 | 0.7 | -19.9 | 1500 |
+| `SFX_HEART_LOCK` | world | 1 | 1900 | -3 | -15.9 | 0.75 | -18.4 | 800 |
+| `SFX_HEART_UNSEAL` | world | 1 | 3400 | -3 | -18.8 | 0.7 | -21.9 | 2000 |
+| `SFX_TOWER_COLLAPSE_DISTANT` | world | 1 | 4400 | -3 | -17.5 | 0.62 | -21.7 | 3000 |
+| `SFX_VARLGRIM_STAFF_SWING` | boss | 2 variasi | 700-700 | -3 | -16.9..-16.4 | 0.85 | -18.1 | 250 |
+| `SFX_VARLGRIM_STAFF_IMPACT` | boss | 2 variasi | 1200-1200 | -3 | -19.5..-19.4 | 1 | -19.5 | 200 |
+| `SFX_TEMPORAL_BIND` | boss | 2 variasi | 1400-1400 | -3 | -17.1..-17 | 0.8 | -19 | 500 |
+| `SFX_TIME_DISTORTION` | boss | 1 | 2200 | -3 | -18.7 | 0.8 | -20.6 | 1000 |
+| `SFX_BOSS_PHASE_SHIFT` | boss | 1 | 2200 | -3 | -14.4 | 0.8 | -16.3 | 1500 |
+| `SFX_FRACTURE_MARK` | boss | 2 variasi | 1000-1000 | -3 | -17.2..-16.8 | 0.75 | -19.5 | 400 |
+| `SFX_METEOR_CHARGE` | meteor | 1 | 2600 | -3 | -18.2 | 0.65 | -21.9 | 1500 |
+| `SFX_METEOR_DESCENT` | meteor | 1 | 2000 | -3 | -16.9 | 0.7 | -20 | 1500 |
+| `SFX_METEOR_IMPACT` | meteor | 1 | 3600 | -3 | -19.4 | 1 | -19.4 | 3000 |
+| `SFX_AEGIS_CAST` | aegis | 1 | 2800 | -3 | -17.5 | 0.8 | -19.4 | 2000 |
+| `SFX_AEGIS_FORM` | aegis | 1 | 2200 | -3 | -19.6 | 0.8 | -21.6 | 1000 |
+| `SFX_AEGIS_STRESS` | aegis | 2 variasi | 2400-2400 | -3 | -17..-16.5 | 0.75 | -19.3 | 800 |
+| `SFX_AEGIS_FADE` | aegis | 1 | 2600 | -3 | -19.2 | 0.75 | -21.7 | 1500 |
+| `SFX_RIFTBORN_ATTACK` | boss | 3 variasi | 600-600 | -3 | -17.3..-16.8 | 0.85 | -18.5 | 150 |
+| `SFX_GRAVORN_ATTACK` | boss | 3 variasi | 950-950 | -3 | -18.1..-17 | 0.9 | -18.4 | 200 |
+| `SFX_BATTLE_TRANSITION_FINAL` | transition | 1 | 1600 | -3 | -18.5 | 0.85 | -19.9 | 1500 |
+<!-- SFX_P8_TABLE_END -->
+
+## Deskripsi, resep, dan pemicu yang diharapkan (Phase 8)
+
+Kolom "lokasi pemicu" = pemasangan oleh lead (BattleScene/TransitionScene/WorldScene/Benteng); agen S tidak memasang pemicu.
+
+<!-- SFX_P8_RECIPES_START -->
+| id | deskripsi bunyi | resep sintesis | lokasi pemicu |
+|---|---|---|---|
+| `SFX_FORTRESS_DOOR_ANCIENT` | Pintu batu tua: gerus batu panjang yang berat, berhenti dengan satu hantaman dalam dan debu halus. Beda dari SFX_DOOR_OPEN (kayu). | Noise coklat LP 240Hz AM 3Hz swell 0.7s + noise pink BP 150->430Hz Q3; parsial batu 62Hz; thump 95->38Hz + parsial batu 110Hz di 1.9s; crackle LP; reverb 1.6. | lead: Benteng Penjaga: gerbang batu kuno terbuka (Gerbang Luar, pintu ke Ruang Heart, pintasan Koridor Retakan) |
+| `SFX_SEAL_ACTIVATE` | Segel menyala: denting terbalik, dengung kuinta dua nada bertremolo pelan, klik batu, tiga denting harmonik (E5 A5 E6). Anggun, bukan alarm. | Lonceng 440Hz dibalik; hum sine 220+330Hz tremolo 4.5Hz; klik + thump 140Hz; lonceng 659/880/1318Hz berurutan; reverb 1.2. | lead: Ruang Uji Segel / Benteng: segel rune diaktifkan (pilar/alas/penyelarasan) |
+| `SFX_SEAL_ERROR` | Penolakan tumpul: dua nada segitiga disonan (sekunde kecil) turun, redam LP 700Hz, ketukan batu. Tidak tajam; dua variasi. | Triangle f & f*1.059 glide -12%, LP 700Hz tau 100ms; klik + thump 160Hz; parsial batu 330Hz; f=190Hz (+1.5 semiton variasi 2); reverb kecil. | lead: Benteng: urutan segel/teka-teki salah (satu kali per percobaan, bukan per langkah) |
+| `SFX_ECHO_MEMORY` | Gema ingatan hangat: akor D-A-D-F# berdetune halus yang mengembang, denting terbalik lalu satu denting lembut, napas udara. Satu sapuan, bukan melodi. | Sine 293.66/440/587.33/740Hz (+detune 0.3%) swell 1s LP 2.4k; lonceng 587Hz terbalik; lonceng 880Hz; noise BP 1.8k; reverb 1.6 wet 0.35. | lead: Ruang Gema: menyentuh objek kuno (dua objek, C4-05); pusaka Velthia bergema di Arsip |
+| `SFX_HEART_LOCK` | Pengunci Heart terpasang: klik palang berat, hantaman batu, lonceng rendah E3 dan dengung 82Hz. | Klik BP + thump 150->70Hz + parsial batu 110Hz tau x4; lonceng 164.8/329.6Hz; sine 82.4Hz; reverb 1.4. | lead: Ruang Heart: setiap pengunci Heart ditahan (Yaric, Velthia; dua kali per adegan) |
+| `SFX_HEART_UNSEAL` | Heart terbuka: mekanisme batu menggerus, enam denting harmonik menaik, akor lembut, hantaman dalam dan denting hangat penutup. | Noise coklat LP 260Hz AM 6Hz; lonceng D4-A4-D5-F#5-A5-D6 berjarak 180ms; hum 4 sine; thump 70->34Hz + klik + parsial batu di 1.55s; lonceng 587Hz; reverb 1.6. | lead: Ruang Heart: kedua pengunci dibuka bersama (C4 heartOpen) |
+| `SFX_TOWER_COLLAPSE_DISTANT` | Runtuhnya menara dari jauh: gemuruh coklat sangat teredam, empat dentum jauh yang makin kecil, serpihan samar. Disengaja redam dan "jauh" (gain rendah). | Noise coklat LP 140->90Hz swell 1.2s; empat thump 62->30Hz LP 140Hz (1/0.8/0.55/0.35); crackle LP 900Hz; sine 70->45Hz; reverb 2.0 lalu LP 480Hz. | lead: jendela busur Ruang Heart ke Aveloria (C4-04): menara runtuh dari kejauhan; sekali |
+| `SFX_VARLGRIM_STAFF_SWING` | Ayunan staf kayu besar: whoosh rendah menanjak 260->1300Hz lalu meredup, derit kayu, badan sine rendah. Lebih berat dan lambat dari SFX_GREATSWORD_SWING. | Noise BP 260->1300->520Hz Q1.3 swell 300ms + sine 150->80Hz + saw BP derit; dua variasi (badan 150/162Hz). | lead: BattleScene: keeper_strike / fracture_strike (anticipation -> swing), satu kali per ayunan; dua variasi |
+| `SFX_VARLGRIM_STAFF_IMPACT` | Hantaman kayu tua: gedebuk, resonansi kayu (parsial 170Hz), retak kayu, ketukan lantai batu. "Wood impact" dari SKILLS_AND_BOSSES. | Thump 130->42Hz + parsial kayu 170Hz (1/1.58/2.43/3.71x) + noise BP 900Hz + klik + parsial batu 95Hz; saturasi 1.4; reverb kering 0.6. | lead: BattleScene: kontak staf (keeper_strike / fracture_strike), sekali di kontak, bukan di telegraf |
+| `SFX_TEMPORAL_BIND` | "Dry ticking" halus: tongkat ditanam (gedebuk + kayu), sembilan tik kering makin renggang, kilau lonceng terbalik teredam, dengung rendah. Bukan jam dinding. | Thump 110->60Hz + parsial kayu; 9 tik deselerasi 1.5kHz HP 1.8k amp 0.35; lonceng 330/495Hz terbalik LP 2.2k; sine 82->70Hz. | lead: BattleScene: time_bind / saat status ikatan temporal menempel pada target (sekali) |
+| `SFX_TIME_DISTORTION` | Distorsi waktu: saw jatuh seperti pita berhenti, sapuan noise turun, tik tidak beraturan melambat, kilau terbalik, denyut sub 5Hz, hantaman penutup. | Saw 330->55Hz LP 1.8k turun; noise BP 3.5k->300Hz; 10 tik deselerasi + jitter; lonceng 220/311/466Hz terbalik; sine 60Hz AM 5Hz; thump. | lead: BattleScene: distortion_wave (seluruh barisan; fase 2); juga seal_pulse bila perlu |
+| `SFX_BOSS_PHASE_SHIFT` | Pergeseran fase: sapuan naik, gong rendah 98Hz, retak pendek, satu tik terakhir lalu hening. | Noise BP 400->2500Hz swell 450ms; lonceng 98Hz tau x3; klik; thump 75->36Hz; satu tik di 1.35s; reverb 1.4. | lead: BattleScene: phase_shift (jeda transisi fase 1->2 dan 2->3, tanpa damage) |
+| `SFX_FRACTURE_MARK` | Penanda retakan: sapuan sine naik, retak kaca kering, denting tinggi, dua tik; dua variasi. | Sine 500->1900Hz; crackle BP; parsial 1568/1608Hz; dua tik 1.8kHz; thump 200Hz; reverb kecil. | lead: BattleScene: fracture_mark menandai target (fase 2); sekali per penandaan |
+| `SFX_METEOR_CHARGE` | Gemuruh jauh: staf diangkat (derit kayu), gemuruh coklat membesar pelan, sub 40->62Hz dengan harmonik, desir angin tipis. "Distant rumble" tanpa melodi. | Noise coklat LP 110->200Hz swell 1.6s; sine 40->62Hz + 80->124Hz; noise BP 500->900Hz; saw BP derit; reverb 1.8 teredam. | lead: BattleScene: meteor_call / meteor_hold (telegraf, langit ditahan); sekali per panggilan dan sekali per hold |
+| `SFX_METEOR_DESCENT` | Meteor jatuh: raungan pink noise yang LP-nya membuka 250->2500Hz, sub menanjak, serpihan terbalik, desing sempit tipis; berakhir keras lalu dipotong (fade 80ms) untuk disambung tabrakan. | Noise pink LP 250->2500Hz amplop kuadrat 1.75s; sine 45->90Hz; crackle terbalik; noise BP 700->2200Hz Q6 tipis. | lead: BattleScene: meteor_fall fase jatuh (kamera mengikuti); langsung disambung SFX_METEOR_IMPACT |
+| `SFX_METEOR_IMPACT` | Tabrakan besar: klik penuh-pita, boom sub 85->24Hz, gemuruh coklat, batu bergema, serpihan; ekor sengaja meluruh ke senyap pada 0.9 s terakhir. | Klik 0.4-7k; sine 85->24Hz tau 450ms; noise coklat LP 160Hz tau 700ms; parsial batu 70Hz x6; crackle; noise BP; saturasi 2.0 + reverb 1.8; amplop meluruh ke 0 mulai 2.4s. | lead: BattleScene: meteor_fall dampak. JANGAN memutar SFX apa pun ~0.6 s sesudahnya ("keheningan" aftermath); mulai SFX_AEGIS_STRESS di dampak bila perisai menahan |
+| `SFX_AEGIS_CAST` | Perlindungan dirapal: lima lapis sine harmonik (D3-A3-D4-A4-D5) masuk bertahap dan mengembang, kilau udara, lalu satu denting D5/A5 saat muatan penuh. Bukan sapuan sirene. | Lima sine harmonik (detune 0.4%) masuk berjarak 300ms, swell 0.8s; noise BP 6k tipis; lonceng 587/880Hz di 1.65s + thump 90Hz; reverb 1.3. | lead: BattleScene: velthia_aegis (antisipasi -> muatan); sekali per cast |
+| `SFX_AEGIS_FORM` | Perisai terbentuk: dengung D3/A3 lebar, empat denting D5-F#5-A5-D6, kilau bertremolo 3Hz, hantaman lembut penutup. Beda dari SFX_MAGIC_VELTHIA_SHIELD (ward). | hum sine 146.8+220Hz; lonceng 587/740/880/1175Hz berjarak 40ms; sine 880/1318Hz tremolo 3Hz; thump 110->62Hz; reverb 1.5. | lead: BattleScene: pembentukan perisai (sesudah SFX_AEGIS_CAST); sekali |
+| `SFX_AEGIS_STRESS` | Perisai menahan: tegangan resonan (dua pasang sine berdetune, tremolo 7Hz), tekanan sub, tiga retakan kaca makin besar (klik + denting + gedebuk). Terasa berat namun tidak melengking. | Sine 220/222.6/330/334Hz AM 7Hz LP 900Hz; sine 55->48Hz + noise coklat LP 180Hz; tiga retakan di 0.2/0.75/1.3s (1568/1480/1397Hz) amp 0.4/0.6/0.85; reverb 1. | lead: BattleScene: perisai menahan dampak meteor (retak bertingkat); mulai di dampak, sekali; dua variasi |
+| `SFX_AEGIS_FADE` | Perisai memudar: empat denting turun (D6-A5-D5-A4), kilau meluruh, dengung jatuh 294->147Hz, reverb panjang. Lega, hangat. | Lonceng 1175/880/587/440Hz berjarak 200ms; noise HP 7k meluruh; sine 294->147Hz; reverb 1.6 wet 0.38. | lead: BattleScene: perisai memudar sesudah aftermath meteor; sekali |
+| `SFX_RIFTBORN_ATTACK` | Cambuk retakan: robekan saw-FM menanjak, desis noise 1.2->6kHz, serpihan retak, hantaman ringan, turunan disonan. Lebih tipis dan cepat dari SFX_ENEMY_ATTACK. | Saw FM 380->1100Hz BP menyapu; noise BP 1.2->6kHz; crackle; thump 170->90Hz; sine 700->300Hz; tiga variasi (nada awal +40Hz). | lead: BattleScene: Riftborn rift_lash / rift_surge (kontak, sekali); tiga variasi karena sering muncul |
+| `SFX_GRAVORN_ATTACK` | Hantaman raksasa batu: dengus rendah, gedebuk 95->36Hz, dering batu, gemuruh coklat, serpihan. Lebih kecil dan gelap dari SFX_GROUND_SLAM. | Noise coklat LP 300Hz swell; thump 95->36Hz; parsial batu 140Hz x1.6; noise coklat LP 200Hz; klik; crackle; saturasi 1.4; reverb 0.7. | lead: BattleScene: Gravorn gravorn_heave / gravorn_crush (kontak, sekali); tiga variasi |
+| `SFX_BATTLE_TRANSITION_FINAL` | Transisi final: gong rendah terbalik, dua denyut lambat 58Hz, tumpukan sine rendah D2-A2-D3-A3 mengembang, lalu staf kayu ditanam (hantaman dalam + resonansi kayu). | Lonceng 98Hz tau x2.2 dibalik; dua thump 58->40Hz; hum 73/110/147/220Hz; parsial kayu 140Hz + thump 90->32Hz + klik di 1.0s; reverb 1.3. | lead: TransitionScene kategori `final` (masuk battle Varlgrim): menutup layar |
+<!-- SFX_P8_RECIPES_END -->
+
+## Urutan pemicu yang disarankan (lead)
+
+| Momen | Urutan |
+|---|---|
+| Masuk battle Varlgrim | `SFX_BATTLE_TRANSITION_FINAL` (kategori `final`). |
+| Ayunan staf (`keeper_strike`/`fracture_strike`) | `SFX_VARLGRIM_STAFF_SWING` di akhir antisipasi -> `SFX_VARLGRIM_STAFF_IMPACT` di kontak (satu kali per target). |
+| `time_bind` / `seal_pulse` / `distortion_wave` / `fracture_mark` | `SFX_TEMPORAL_BIND` / (`SFX_TEMPORAL_BIND` atau `SFX_TIME_DISTORTION`) / `SFX_TIME_DISTORTION` / `SFX_FRACTURE_MARK`. |
+| `phase_shift` | `SFX_BOSS_PHASE_SHIFT` (jeda tanpa damage). |
+| `meteor_call` -> `meteor_hold` | `SFX_METEOR_CHARGE` saat call; saat hold cukup sekali lagi pada pengulangan pertama (interval minimum 1,5 s mencegah tumpukan). |
+| `velthia_aegis` | `SFX_AEGIS_CAST` (antisipasi -> muatan, ~2,6 s) -> `SFX_AEGIS_FORM` (perisai terbentuk). |
+| `meteor_fall` | `SFX_METEOR_DESCENT` (~2,0 s) -> `SFX_METEOR_IMPACT` (saat dampak) + `SFX_AEGIS_STRESS` bersamaan bila perisai menahan -> keheningan ~0,6 s -> `SFX_AEGIS_FADE` pada pemulihan. |
+| Musuh Bab IV | `SFX_RIFTBORN_ATTACK` / `SFX_GRAVORN_ATTACK` di kontak (bukan di telegraf). |
+| Dunia | `SFX_FORTRESS_DOOR_ANCIENT` (gerbang/pintasan), `SFX_SEAL_ACTIVATE` / `SFX_SEAL_ERROR` (satu kali per percobaan), `SFX_ECHO_MEMORY` (objek Ruang Gema), `SFX_HEART_LOCK` x2 -> `SFX_HEART_UNSEAL`, `SFX_TOWER_COLLAPSE_DISTANT` (C4-04). |

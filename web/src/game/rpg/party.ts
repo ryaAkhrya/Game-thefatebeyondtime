@@ -2,6 +2,7 @@ import type { GameStateData } from '../systems/GameState';
 import { CITY_FLAG } from '../story/aveloriaFlags';
 import { C2 } from '../story/chapter2Flags';
 import { C3 } from '../story/chapter3Flags';
+import { C4 } from '../story/chapter4Flags';
 import { TORVAN_PROFILE, VELTHIA_PROFILE } from './definitions';
 import { createCharacter, effectiveStats } from './progression';
 
@@ -72,5 +73,43 @@ export function restChapter3Party(data: GameStateData): GameStateData {
     next.partyVitals![id] = { hp: stats.HP, mp: stats.MP };
   }
   if (next.flags[C3.gateOpen]) next.flags[C3.checkpoint] = true;
+  return next;
+}
+
+/**
+ * Awal Chapter IV (Phase 8): hanya sesudah Bab III selesai. Party tetap Yaric+Velthia (Torvan cadangan, progresnya utuh).
+ * Posisi/area diatur pemanggil (WorldScene/SliceEnd). Atomik dan idempoten.
+ */
+export function enterChapter4(data: GameStateData): GameStateData {
+  if (data.flags[C4.start] && data.chapter === 'IV') return data;
+  if (!data.flags[C3.complete] || data.chapter !== 'III' || data.party.join() !== 'C01,C02') throw new Error('Chapter IV out of sequence');
+  const next = structuredClone(data);
+  next.chapter = 'IV';
+  next.area = 'fortress';
+  next.flags[C4.start] = true;
+  return next;
+}
+
+/** Istirahat aman Chapter IV: pulihkan HP/MP semua anggota (termasuk cadangan). Tanpa item/EXP/emas baru; flag checkpoint diset oleh cerita. */
+export function restChapter4Party(data: GameStateData): GameStateData {
+  if (data.chapter !== 'IV' || !data.flags[C3.velthiaJoined]) throw new Error('Chapter IV rest out of sequence');
+  const next = structuredClone(data);
+  const yaric = effectiveStats(next, 'C01');
+  next.vitals = { hp: yaric.HP, mp: yaric.MP };
+  for (const id of ['C03', 'C02'] as const) {
+    const stats = effectiveStats(next, id);
+    next.partyVitals![id] = { hp: stats.HP, mp: stats.MP };
+  }
+  return next;
+}
+
+/** Kembali dari Benteng ke Aveloria (C4-07): area+flag `returned` sekaligus; hanya setelah pengakuan Torvan. */
+export function returnToAveloria(data: GameStateData, position: GameStateData['position']): GameStateData {
+  if (data.chapter !== 'IV' || !data.flags[C4.creatorReveal]) throw new Error('Return to Aveloria out of sequence');
+  if (data.flags[C4.returned] && data.area === 'aveloria') return data;
+  const next = structuredClone(data);
+  next.area = 'aveloria';
+  next.position = { ...position };
+  next.flags[C4.returned] = true;
   return next;
 }

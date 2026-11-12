@@ -1,0 +1,183 @@
+{
+  "entity_id": "M04",
+  "status": "NEEDS_REVIEW",
+  "facing": "front_toward_right",
+  "source": "assets/monsters/M04_Gravorn/M04_NEW_CONCEPT_DRAFT.png",
+  "foot_pivot": [
+    88,
+    131
+  ],
+  "special_frames": {
+    "guard": "gravorn_brace: kedua lengan batu disilangkan di depan dada"
+  },
+  "notes": "DRAFT / NEEDS_REVIEW. Official concept pixelized and re-posed as a paper-doll (left arm, right arm, head, torso+shoulders, legs). Arms are lifted overhead for the heave tell; guard draws the arms over the chest; death = upper body sinks between the legs. Every frame is a re-pose of the same drawing; needs an artist redraw. Script: web/scripts/battle-art/build_m04.py.",
+  "frame_size": [
+    176,
+    136
+  ],
+  "atlas_size": [
+    1936,
+    136
+  ],
+  "frames": {
+    "idle_a": {
+      "index_0_based": 0,
+      "rect": [
+        0,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 800
+    },
+    "idle_b": {
+      "index_0_based": 1,
+      "rect": [
+        176,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 800
+    },
+    "anticipation": {
+      "index_0_based": 2,
+      "rect": [
+        352,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 520
+    },
+    "attack": {
+      "index_0_based": 3,
+      "rect": [
+        528,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 280
+    },
+    "followthrough": {
+      "index_0_based": 4,
+      "rect": [
+        704,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 220
+    },
+    "recovery": {
+      "index_0_based": 5,
+      "rect": [
+        880,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 420
+    },
+    "hit_recoil": {
+      "index_0_based": 6,
+      "rect": [
+        1056,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 240
+    },
+    "hit_recover": {
+      "index_0_based": 7,
+      "rect": [
+        1232,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 200
+    },
+    "guard": {
+      "index_0_based": 8,
+      "rect": [
+        1408,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 400
+    },
+    "death_start": {
+      "index_0_based": 9,
+      "rect": [
+        1584,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 360
+    },
+    "defeated": {
+      "index_0_based": 10,
+      "rect": [
+        1760,
+        0,
+        176,
+        136
+      ],
+      "pivot": [
+        88,
+        131
+      ],
+      "duration_ms": 900
+    }
+  },
+  "event": {
+    "frame_key": "attack",
+    "index_0_based": 3
+  },
+  "palette_size": 25
+}

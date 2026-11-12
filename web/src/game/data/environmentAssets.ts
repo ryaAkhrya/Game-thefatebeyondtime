@@ -3,6 +3,8 @@
  * bagian miliknya agar tidak bentrok. Atlas = PNG + JSON berformat Phaser atlas (frames) dengan `pivot` per frame
  * (sama seperti forest1 props). Path relatif terhadap web/public.
  */
+import { AVELORIA_C4_ATLASES, AVELORIA_C4_IMAGES } from './aveloriaC4Assets';
+import { FORTRESS_ATLASES, FORTRESS_IMAGES } from './fortressAssets';
 export interface EnvAtlas { key: string; image: string; json: string }
 export interface EnvImage { key: string; url: string }
 
@@ -35,5 +37,5 @@ const TEMPLE_IMAGES: EnvImage[] = [
   { key: 'temple_ground', url: 'assets/environment/temple/ground.png' },
 ];
 
-export const ENV_ATLASES: readonly EnvAtlas[] = [...FOREST_ATLASES, ...TOWN_ATLASES, ...TEMPLE_ATLASES];
-export const ENV_IMAGES: readonly EnvImage[] = [...FOREST_IMAGES, ...TOWN_IMAGES, ...TEMPLE_IMAGES];
+export const ENV_ATLASES: readonly EnvAtlas[] = [...FOREST_ATLASES, ...TOWN_ATLASES, ...TEMPLE_ATLASES, ...AVELORIA_C4_ATLASES, ...FORTRESS_ATLASES];
+export const ENV_IMAGES: readonly EnvImage[] = [...FOREST_IMAGES, ...TOWN_IMAGES, ...TEMPLE_IMAGES, ...AVELORIA_C4_IMAGES, ...FORTRESS_IMAGES];

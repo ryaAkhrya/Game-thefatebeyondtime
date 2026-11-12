@@ -1,0 +1,4 @@
+1. particles: rshard_a, rshard_b, rshard_c, gchip_a, gchip_b
+2. riftborn_lash: rlash_1, rlash_2, rlash_3, rlash_4, rlash_5
+3. riftborn_surge: rsurge_1, rsurge_2, rsurge_3, rsurge_3_c, rsurge_4, rsurge_4_c, rsurge_5, rsurge_5_c, rsurge_6, rsurge_7
+4. gravorn_slam: gslam_1, gslam_2, gslam_3, gslam_4, gslam_5, gslam_6, gslam_7

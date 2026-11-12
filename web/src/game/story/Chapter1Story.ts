@@ -19,6 +19,7 @@ import { BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, SLICE_COM
 import { AveloriaStory } from './AveloriaStory';
 import { Chapter2Story } from './Chapter2Story';
 import { Chapter3Story } from './Chapter3Story';
+import { Chapter4Story } from './Chapter4Story';
 import type { AreaId } from '../data/ids';
 
 /** Flag cerita kanonik (docs/narrative/STORY_AND_SCENES.md). Dinaikkan hanya setelah event benar-benar selesai. */
@@ -50,7 +51,8 @@ export type StoryAction =
   | { type: 'setFlag'; flag: string }
   | { type: 'objective' }
   | { type: 'toast'; text: string }
-  | { type: 'giveItem'; item: string; count: number }
+  /** `flag` = gerbang idempotensi (hadiah sekali); tanpa `flag` memakai flag peti Bab I. */
+  | { type: 'giveItem'; item: string; count: number; flag?: string }
   | { type: 'npc'; id: 'nambo'; op: 'face_player' | 'step_aside' }
   | { type: 'openThicket' }
   | { type: 'openChest' }
@@ -63,7 +65,7 @@ export type StoryAction =
   | { type: 'cityBell'; number: 1 | 2 }
   | { type: 'chapterEnd' }
   | { type: 'shop' }
-  | { type: 'changeArea'; area: Extract<AreaId, 'aveloria' | 'liora' | 'forest_2' | 'temple'> }
+  | { type: 'changeArea'; area: Extract<AreaId, 'aveloria' | 'liora' | 'forest_2' | 'temple' | 'fortress'> }
   | { type: 'joinTorvan' }
   | { type: 'restParty' }
   | { type: 'chapter2End' }
@@ -72,7 +74,14 @@ export type StoryAction =
   | { type: 'c3'; op: string; arg?: string | number }
   /** Party aktif jadi Yaric + Velthia; Torvan jadi cadangan (progres tersimpan). */
   | { type: 'joinVelthia' }
-  | { type: 'chapter3End' };
+  | { type: 'chapter3End' }
+  // ---- Chapter IV (Phase 8) ----
+  /** Aksi view area generik Benteng/Aveloria sesudah runtuh (lihat world/AreaView3.ts); op khusus `to_aveloria` ditangani WorldScene. */
+  | { type: 'c4'; op: string; arg?: string | number }
+  /** Pulihkan HP/MP seluruh party (titik simpan aman Bab IV); flag checkpoint diset oleh story. */
+  | { type: 'restParty4' }
+  /** Layar bab selesai: kartu "Bab IV selesai" (SliceEnd). Tanpa epilog/modern. */
+  | { type: 'chapter4End' };
 
 export interface StoryContext {
   /** Salinan periodik (0 = pertama) untuk papan/semak/peti. */
@@ -118,6 +127,7 @@ export class Chapter1Story {
 
   /** Teks tujuan di HUD, diturunkan dari flag (selalu konsisten dengan state). */
   objective(): string | null {
+    if (this.state.snapshot()?.chapter === 'IV') return new Chapter4Story(this.state).objective();
     if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).objective();
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).objective();
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).objective();
@@ -133,6 +143,7 @@ export class Chapter1Story {
 
   /** Aksi saat game dimulai: intro C1-01 sekali. */
   onStart(): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'IV') return new Chapter4Story(this.state).onStart();
     if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).onStart();
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).onStart();
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).onStart();
@@ -154,6 +165,7 @@ export class Chapter1Story {
   }
 
   interact(id: string, ctx: StoryContext): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'IV') return new Chapter4Story(this.state).interact(id);
     if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).interact(id);
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).interact(id);
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).interact(id);
@@ -194,6 +206,7 @@ export class Chapter1Story {
   }
 
   trigger(id: string, _ctx: StoryContext): StoryAction[] {
+    if (this.state.snapshot()?.chapter === 'IV') return new Chapter4Story(this.state).trigger(id);
     if (this.state.snapshot()?.chapter === 'III') return new Chapter3Story(this.state).trigger(id);
     if (this.state.snapshot()?.chapter === 'II') return new Chapter2Story(this.state).trigger(id);
     if (this.state.snapshot()?.area === 'aveloria') return new AveloriaStory(this.state).trigger(id);

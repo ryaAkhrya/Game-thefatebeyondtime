@@ -15,8 +15,10 @@ const PORTRAIT_H = 352;
 const FIGURE_H = 760;
 const ROSTER = [
   { id: 'C01', dir: 'C01_Yaric', names: ['ANGRY', 'CONFUSED', 'DETERMINED', 'EMBARRASSED', 'HAPPY', 'NEUTRAL', 'SAD', 'SURPRISED'] },
-  { id: 'C02', dir: 'C02_Velthia', names: ['NEUTRAL', 'STERN', 'AMUSED', 'WORRIED', 'SURPRISED', 'VULNERABLE'] },
+  { id: 'C02', dir: 'C02_Velthia', names: ['NEUTRAL', 'STERN', 'AMUSED', 'WORRIED', 'SURPRISED', 'VULNERABLE', 'ANGRY'] },
   { id: 'C03', dir: 'C03_Torvan', names: ['NEUTRAL', 'DETERMINED', 'MISCHIEVOUS', 'CURIOUS', 'SAD', 'SURPRISED', 'SOLEMN', 'UPSET'] },
+  // Phase 8 (agen BA): Varlgrim untuk dialog Bab IV.
+  { id: 'C04', dir: 'C04_Varlgrim', names: ['NEUTRAL', 'ANGRY', 'STERN', 'REMORSE', 'DETERMINED', 'SAD', 'SURPRISED', 'SUSPICIOUS'] },
   { id: 'C05', dir: 'C05_Azie', names: ['NEUTRAL', 'WORRIED', 'SKEPTICAL'] },
   { id: 'C06', dir: 'C06_Talric', names: ['NEUTRAL', 'SUSPICIOUS', 'ALARMED'] },
   { id: 'C07', dir: 'C07_Zira', names: ['NEUTRAL', 'CAUTIOUS', 'HAPPY', 'SAD'] },
@@ -32,6 +34,8 @@ const FIGURES = [
 mkdirSync(resolve(pub, 'portraits_hd'), { recursive: true });
 mkdirSync(resolve(pub, 'title'), { recursive: true });
 const items = [];
+// Phase 8: UI_ONLY_NEW=1 -> hanya menurunkan portrait yang BELUM ada (aset lama tidak ditimpa), tanpa figur Title; ui.generated.json digabung.
+const ONLY_NEW = process.env.UI_ONLY_NEW === '1';
 
 const resizeInPage = async (page, b64, h) =>
   page.evaluate(async ({ b64, h }) => {
@@ -71,13 +75,14 @@ try {
     for (const name of def.names) {
       const src = `assets/characters/${def.dir}/${def.id}_EXPRESSION_${name}.png`;
       if (!existsSync(resolve(repo, src))) { console.warn('tidak ada:', src); continue; }
-      const res = await resizeInPage(page, readFileSync(resolve(repo, src)).toString('base64'), PORTRAIT_H);
       const out = `assets/portraits_hd/${def.id}_${name}.png`;
+      if (ONLY_NEW && existsSync(resolve('public', out))) continue;
+      const res = await resizeInPage(page, readFileSync(resolve(repo, src)).toString('base64'), PORTRAIT_H);
       writeFileSync(resolve('public', out), Buffer.from(res.png.split(',')[1], 'base64'));
       items.push({ id: `${def.id}_${name}`, kind: 'portrait_hd', source: src, out, status: 'DRAFT', size: res.size, sourceSize: res.sourceSize });
     }
   }
-  for (const fig of FIGURES) {
+  for (const fig of ONLY_NEW ? [] : FIGURES) {
     const res = await resizeInPage(page, readFileSync(resolve(repo, fig.src)).toString('base64'), FIGURE_H);
     const out = `assets/title/${fig.out}`;
     writeFileSync(resolve('public', out), Buffer.from(res.png.split(',')[1], 'base64'));
@@ -85,5 +90,11 @@ try {
       note: 'Crop turnaround/weapon REFERENCE diperkecil; hanya dipakai sebagai siluet bernada gelap di Title Screen, bukan art final.' });
   }
 } finally { await browser.close(); }
-writeFileSync(resolve(pub, 'ui.generated.json'), JSON.stringify({ generatedBy: 'web/scripts/prepare-ui-assets.mjs', status: 'DRAFT', items }, null, 2) + '\n');
+let outItems = items;
+if (ONLY_NEW && existsSync(resolve(pub, 'ui.generated.json'))) {
+  const prev = JSON.parse(readFileSync(resolve(pub, 'ui.generated.json'), 'utf8')).items ?? [];
+  const ids = new Set(items.map((i) => i.id));
+  outItems = [...prev.filter((i) => !ids.has(i.id)), ...items];
+}
+writeFileSync(resolve(pub, 'ui.generated.json'), JSON.stringify({ generatedBy: 'web/scripts/prepare-ui-assets.mjs', status: 'DRAFT', items: outItems }, null, 2) + '\n');
 console.log(`UI assets: ${items.length} item.`);

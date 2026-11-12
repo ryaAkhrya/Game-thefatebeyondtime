@@ -54,7 +54,7 @@ function registryTs(cues) {
  * Semua bunyi disintesis dari kode (web/scripts/sfx/*), bukan rekaman/sampel pihak ketiga. Kualitas: FUNCTIONAL / AUDIO-REVIEW PENDING.
  * BootScene memuat entri READY dari assets/audio/sfx/: key = id (satu file) atau \`id#i\` (variasi).
  */
-export type SfxCategory = 'ui' | 'step' | 'interact' | 'transition' | 'battle' | 'magic' | 'stinger';
+export type SfxCategory = 'ui' | 'step' | 'interact' | 'transition' | 'battle' | 'magic' | 'stinger' | 'world' | 'boss' | 'meteor' | 'aegis';
 
 export interface SfxCue {
   id: string;
@@ -90,9 +90,9 @@ function tableMd(cues) {
   return lines.join('\n');
 }
 
-function recipeMd() {
+function recipeMd(phase) {
   const lines = ['| id | deskripsi bunyi | resep sintesis | lokasi pemicu |', '|---|---|---|---|'];
-  for (const e of CATALOG) lines.push(`| \`${e.id}\` | ${e.desc} | ${e.recipe} | ${e.trigger} |`);
+  for (const e of CATALOG.filter((c) => c.phase === phase)) lines.push(`| \`${e.id}\` | ${e.desc} | ${e.recipe} | ${e.trigger} |`);
   return lines.join('\n');
 }
 
@@ -103,8 +103,10 @@ function patchDoc(cues) {
     const re = new RegExp(`(<!-- ${tag}_START -->)[\\s\\S]*?(<!-- ${tag}_END -->)`);
     if (re.test(md)) md = md.replace(re, `$1\n${body}\n$2`);
   };
-  sub('SFX_TABLE', tableMd(cues));
-  sub('SFX_RECIPES', recipeMd());
+  sub('SFX_TABLE', tableMd(cues.filter((c) => c.entry.phase === 7)));
+  sub('SFX_RECIPES', recipeMd(7));
+  sub('SFX_P8_TABLE', tableMd(cues.filter((c) => c.entry.phase === 8)));
+  sub('SFX_P8_RECIPES', recipeMd(8));
   writeFileSync(DOC, md);
   return true;
 }

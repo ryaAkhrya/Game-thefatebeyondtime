@@ -416,9 +416,310 @@ R.SFX_CHRONOLITH_TEMPORAL = (rng) => {
   return finish(out, { fadeOut: 0.18 });
 };
 
+// ---------- Phase 8 (Bab IV): helper + resep ----------
+/** Resonansi kayu tua berat (staf): rasio tak harmonik, peluruhan cepat. */
+const WOOD = [
+  { ratio: 1, amp: 1, tau: 0.16 },
+  { ratio: 1.58, amp: 0.6, tau: 0.12 },
+  { ratio: 2.43, amp: 0.4, tau: 0.08 },
+  { ratio: 3.71, amp: 0.22, tau: 0.05 },
+];
+/** Dengung bertumpuk: sine-sine dengan swell bersama (tremolo opsional). Bukan melodi: satu sapuan akor. */
+const hum = (sec, freqs, up, amps = null, tremHz = 0, tremDepth = 0) => {
+  const out = mono(sec);
+  freqs.forEach((f, i) => {
+    const s = applyEnv(osc(sec, f), env.swell(up, sec));
+    if (tremHz) for (let k = 0; k < s.length; k++) s[k] *= 1 - tremDepth * (0.5 + 0.5 * Math.sin((2 * Math.PI * tremHz * k) / SR));
+    mixInto(out, s, 0, amps ? amps[i] : 1 / (1 + i * 0.5));
+  });
+  return out;
+};
+/** Rekam ulang buffer dengan amplop fungsi-waktu (untuk meluruh ke senyap pada ujung). */
+const shape = (b, fn) => applyEnv(b, fn);
+
+/** Normalisasi ke puncak 1 lalu saturasi tanh: merapatkan faktor puncak (loudness efektif naik tanpa menaikkan puncak). */
+const soft = (b, drive) => {
+  let p = 0;
+  for (let i = 0; i < b.length; i++) p = Math.max(p, Math.abs(b[i]));
+  if (p > 0) for (let i = 0; i < b.length; i++) b[i] /= p;
+  return saturate(b, drive);
+};
+
+const P8 = {};
+
+// --- dunia: Benteng Penjaga ---
+P8.SFX_FORTRESS_DOOR_ANCIENT = (rng) => {
+  const n = 3.0;
+  const out = mono(n);
+  mixInto(out, applyEnv(grind(2.1, rng, 240, 3.2, 0.5), env.swell(0.7, 2.1)), 0.05, 1.0);
+  mixInto(out, applyEnv(biquad(noise(1.9, rng, 'pink'), 'bp', sweep(150, 430, 1.8), 3), env.swell(0.8, 1.9)), 0.1, 0.55);
+  mixInto(out, partials(0.9, 62, scaled(STONE, 3)), 0.05, 0.22);
+  mixInto(out, thump(0.6, 95, 38, 0.1, 0.17), 1.9, 1.0);
+  mixInto(out, partials(1.0, 110, scaled(STONE, 3)), 1.9, 0.4);
+  mixInto(out, biquad(crackle(1.0, rng, 420, 0.4), 'lp', 2400, 0.7), 1.95, 0.2);
+  return finish(reverb(soft(out, 1.8), { room: 1.6, wet: 0.25, damp: 0.5 }), { fadeIn: 0.04, fadeOut: 0.5 });
+};
+P8.SFX_SEAL_ACTIVATE = (rng) => {
+  const n = 2.0;
+  const out = mono(n);
+  mixInto(out, reversed(reverb(bell(0.7, 440, 1.2), { room: 1, wet: 0.25 })), 0, 0.5);
+  mixInto(out, hum(1.5, [220, 330], 0.55, [0.5, 0.35], 4.5, 0.25), 0.1, 0.5);
+  mixInto(out, click(0.04, rng, { hp: 900, lp: 5000, tau: 0.006 }), 0.58, 0.5);
+  mixInto(out, thump(0.2, 140, 80, 0.05, 0.06), 0.58, 0.55);
+  mixInto(out, bell(1.2, 659.25, 1.2), 0.6, 0.55);
+  mixInto(out, bell(1.1, 880, 1.0), 0.72, 0.35);
+  mixInto(out, bell(0.9, 1318.5, 0.8), 0.84, 0.2);
+  return finish(reverb(out, { room: 1.2, wet: 0.28 }), { fadeOut: 0.35 });
+};
+P8.SFX_SEAL_ERROR = (rng, v) => {
+  const n = 0.75;
+  const f = 190 * Math.pow(2, (v * 1.5) / 12);
+  const two = sum([osc(0.45, sweep(f, f * 0.88, 0.3), 'tri'), 1], [osc(0.45, sweep(f * 1.059, f * 0.93, 0.3), 'tri'), 0.8]);
+  const out = mono(n);
+  mixInto(out, applyEnv(biquad(two, 'lp', 700, 0.8), env.perc(0.004, 0.1)), 0, 0.8);
+  mixInto(out, click(0.04, rng, { hp: 900, lp: 4500, tau: 0.006 }), 0, 0.6);
+  mixInto(out, thump(0.2, 160, 90, 0.04, 0.05), 0, 0.6);
+  mixInto(out, partials(0.4, 330, scaled(STONE, 0.8)), 0, 0.25);
+  return finish(reverb(soft(out, 1.7), { room: 0.6, wet: 0.12 }), { fadeOut: 0.2 });
+};
+P8.SFX_ECHO_MEMORY = (rng) => {
+  const n = 3.4;
+  const out = mono(n);
+  const chord = mono(2.6);
+  [[293.66, 0.5], [440, 0.4], [587.33, 0.3], [739.99, 0.16]].forEach(([f, a]) => {
+    mixInto(chord, applyEnv(sum([osc(2.6, f), 1], [osc(2.6, f * 1.003), 0.7]), env.swell(1.0, 2.6)), 0, a);
+  });
+  mixInto(out, biquad(chord, 'lp', 2400, 0.7), 0.2, 1);
+  mixInto(out, reversed(reverb(bell(0.9, 587.33, 1.1), { room: 1.2, wet: 0.25 })), 0, 0.4);
+  mixInto(out, bell(1.5, 880, 1.2), 1.0, 0.35);
+  mixInto(out, air(1.8, rng, 1800, 1.5, 0.9, 1.8), 0.3, 0.1);
+  return finish(reverb(out, { room: 1.6, wet: 0.35, damp: 0.55 }), { fadeIn: 0.03, fadeOut: 0.7 });
+};
+P8.SFX_HEART_LOCK = (rng) => {
+  const n = 1.9;
+  const out = mono(n);
+  mixInto(out, click(0.06, rng, { hp: 600, lp: 5000, tau: 0.012 }), 0, 0.9);
+  mixInto(out, thump(0.35, 150, 70, 0.07, 0.09), 0, 0.9);
+  mixInto(out, partials(1.2, 110, scaled(STONE, 4)), 0.01, 0.5);
+  mixInto(out, bell(1.4, 164.81, 1.8), 0.05, 0.55);
+  mixInto(out, bell(1.0, 329.63, 1.2), 0.12, 0.3);
+  mixInto(out, hum(1.2, [82.4], 0.3), 0.1, 0.25);
+  return finish(reverb(soft(out, 1.7), { room: 1.4, wet: 0.28 }), { fadeOut: 0.45 });
+};
+P8.SFX_HEART_UNSEAL = (rng) => {
+  const n = 3.4;
+  const out = mono(n);
+  mixInto(out, applyEnv(grind(1.6, rng, 260, 6, 0.5), env.swell(0.5, 1.6)), 0, 0.8);
+  [293.66, 440, 587.33, 739.99, 880, 1174.7].forEach((f, k) => mixInto(out, bell(1.6, f, 1.2), 0.5 + k * 0.18, 0.5 - k * 0.04));
+  mixInto(out, hum(2.4, [146.83, 220, 293.66, 369.99], 1.0, [0.2, 0.18, 0.15, 0.1]), 0.4, 1);
+  mixInto(out, thump(0.8, 70, 34, 0.2, 0.25), 1.55, 0.9);
+  mixInto(out, click(0.08, rng, { hp: 500, lp: 5000, tau: 0.015 }), 1.55, 0.5);
+  mixInto(out, partials(1.2, 100, scaled(STONE, 4)), 1.55, 0.35);
+  mixInto(out, bell(1.6, 587.33, 1.4), 1.6, 0.45);
+  return finish(reverb(out, { room: 1.6, wet: 0.32 }), { fadeOut: 0.8 });
+};
+P8.SFX_TOWER_COLLAPSE_DISTANT = (rng) => {
+  const n = 4.4;
+  const out = mono(n);
+  mixInto(out, applyEnv(biquad(noise(3.8, rng, 'brown'), 'lp', (t) => 140 - 50 * Math.min(1, t / 3), 0.7), env.swell(1.2, 3.8)), 0, 1.8);
+  [[0.45, 1], [1.15, 0.8], [1.85, 0.55], [2.5, 0.35]].forEach(([t, g]) => mixInto(out, biquad(thump(0.7, 62, 30, 0.15, 0.2), 'lp', 140, 0.7), t, g));
+  mixInto(out, biquad(crackle(3, rng, 700, 1.2), 'lp', 900, 0.7), 0.3, 0.12);
+  mixInto(out, applyEnv(osc(3.2, sweep(70, 45, 3)), env.swell(1.2, 3.2)), 0, 0.25);
+  const far = biquad(reverb(soft(out, 1.8), { room: 2.0, wet: 0.35, damp: 0.7 }), 'lp', 480, 0.7);
+  return finish(far, { fadeIn: 0.2, fadeOut: 0.9 });
+};
+
+// --- Varlgrim: staf kayu berat + temporal "dry ticking" ---
+P8.SFX_VARLGRIM_STAFF_SWING = (rng, v) => {
+  const n = 0.7;
+  const peak = 0.3;
+  const whoosh = applyEnv(biquad(noise(n, rng), 'bp', (t) => (t < peak ? 260 * Math.pow(5, t / peak) : 1300 * Math.pow(0.4, (t - peak) / 0.3)), 1.3), env.swell(peak, n));
+  const body = applyEnv(osc(n, sweep(150 + v * 12, 80, 0.5)), env.swell(0.28, n));
+  const creak = applyEnv(biquad(osc(0.35, (t) => 180 + 120 * t + 8 * Math.sin(60 * t), 'saw'), 'bp', (t) => 500 + 700 * t, 5), env.swell(0.12, 0.35));
+  return finish(sum([whoosh, 1], [body, 0.22], [creak, 0.25]), { fadeIn: 0.01, fadeOut: 0.18 });
+};
+P8.SFX_VARLGRIM_STAFF_IMPACT = (rng, v) => {
+  const n = 1.2;
+  const th = thump(n, 130 + v * 10, 42, 0.12, 0.12);
+  const wood = partials(n, 170 + v * 12, scaled(WOOD, 1.0));
+  const crack = applyEnv(biquad(noise(n, rng), 'bp', 900, 1.0), env.perc(0.001, 0.025));
+  const knock = click(n, rng, { hp: 700, lp: 4500, tau: 0.008 });
+  const floor = partials(n, 95, scaled(STONE, 1.5));
+  return finish(reverb(soft(sum([th, 1], [wood, 0.5], [crack, 0.8], [knock, 0.6], [floor, 0.25]), 2.2), { room: 0.6, wet: 0.18, damp: 0.6 }), { fadeOut: 0.3 });
+};
+P8.SFX_TEMPORAL_BIND = (rng, v) => {
+  const n = 1.4;
+  const out = mono(n);
+  mixInto(out, thump(0.3, 110, 60, 0.06, 0.08), 0, 0.7);
+  mixInto(out, partials(0.4, 140, scaled(WOOD, 0.6)), 0, 0.3);
+  mixInto(out, ticksAt(n, decelTimes(9, 0.95, 0.12 + v * 0.01), rng, { f: 1500, amp: 0.35, tau: 0.005, hp: 1800 }), 0, 1);
+  const veil = mono(1.0);
+  [330, 495].forEach((f) => mixInto(veil, bell(1.0, f, 1.3), 0, 0.6));
+  mixInto(out, reversed(biquad(reverb(veil, { room: 1.1, wet: 0.3 }), 'lp', 2200, 0.7)), 0.1, 0.3);
+  mixInto(out, applyEnv(osc(1.2, sweep(82.4, 70, 1.1)), env.swell(0.3, 1.2)), 0, 0.25);
+  return finish(out, { fadeOut: 0.3 });
+};
+P8.SFX_TIME_DISTORTION = (rng) => {
+  const n = 2.2;
+  const out = mono(n);
+  const saws = sum([osc(1.5, sweep(330, 55, 1.4), 'saw'), 1], [osc(1.5, sweep(349, 58, 1.4), 'saw'), 0.8]);
+  mixInto(out, applyEnv(biquad(saws, 'lp', (t) => 1800 * Math.pow(0.25, t / 1.4), 0.9), env.swell(0.2, 1.5)), 0, 0.45);
+  mixInto(out, applyEnv(biquad(noise(1.5, rng), 'bp', sweep(3500, 300, 1.3), 2), env.swell(0.25, 1.5)), 0, 0.3);
+  mixInto(out, ticksAt(n, decelTimes(10, 1.4, 0.05).map((t, i) => t + (i % 3) * 0.015), rng, { f: 2100, amp: 0.4 }), 0, 1);
+  const cl = mono(1.0);
+  [220, 311.1, 466.2].forEach((f) => mixInto(cl, bell(1.0, f, 1.2), 0, 0.5));
+  mixInto(out, reversed(reverb(cl, { room: 1.2, wet: 0.3 })), 0.1, 0.4);
+  const throb = applyEnv(osc(1.6, 60), env.swell(0.4, 1.6));
+  for (let k = 0; k < throb.length; k++) throb[k] *= 0.5 + 0.5 * Math.sin((2 * Math.PI * 5 * k) / SR);
+  mixInto(out, throb, 0, 0.3);
+  mixInto(out, thump(0.3, 70, 40, 0.1, 0.1), 1.55, 0.6);
+  return finish(reverb(out, { room: 1.2, wet: 0.2 }), { fadeOut: 0.35 });
+};
+P8.SFX_BOSS_PHASE_SHIFT = (rng) => {
+  const n = 2.2;
+  const out = mono(n);
+  mixInto(out, bell(1.8, 98, 3), 0.45, 0.8);
+  mixInto(out, applyEnv(biquad(noise(0.5, rng), 'bp', sweep(400, 2500, 0.45), 1.5), env.swell(0.44, 0.5)), 0, 0.5);
+  mixInto(out, click(0.06, rng, { hp: 500, lp: 6000, tau: 0.02 }), 0.45, 0.8);
+  mixInto(out, thump(0.5, 75, 36, 0.15, 0.18), 0.45, 0.9);
+  mixInto(out, ticksAt(n, [1.35], rng, { f: 1700, amp: 0.5, tau: 0.005, hp: 1800 }), 0, 1);
+  return finish(reverb(out, { room: 1.4, wet: 0.25 }), { fadeOut: 0.45 });
+};
+P8.SFX_FRACTURE_MARK = (rng, v) => {
+  const n = 1.0;
+  const out = mono(n);
+  mixInto(out, applyEnv(osc(0.4, sweep(500 + v * 40, 1900, 0.3)), env.swell(0.3, 0.4)), 0, 0.5);
+  mixInto(out, crackle(0.4, rng, 2600, 0.06), 0.28, 0.5);
+  mixInto(out, partials(0.7, 1568 + v * 40, scaled(PING, 1.6)), 0.3, 0.5);
+  mixInto(out, ticksAt(n, [0.32, 0.58], rng, { f: 1800, amp: 0.4, tau: 0.005, hp: 2000 }), 0, 1);
+  mixInto(out, thump(0.2, 200, 110, 0.04, 0.04), 0.3, 0.4);
+  return finish(reverb(soft(out, 1.8), { room: 0.7, wet: 0.15 }), { fadeOut: 0.3 });
+};
+
+// --- Meteor: gemuruh jauh -> jatuh -> tabrakan besar -> keheningan ---
+P8.SFX_METEOR_CHARGE = (rng) => {
+  const n = 2.6;
+  const out = mono(n);
+  mixInto(out, applyEnv(biquad(noise(2.2, rng, 'brown'), 'lp', (t) => 110 + 90 * t, 0.8), env.swell(1.6, 2.2)), 0, 1.6);
+  mixInto(out, applyEnv(osc(2.2, sweep(40, 62, 2.0)), env.swell(1.7, 2.2)), 0, 0.5);
+  mixInto(out, applyEnv(osc(2.2, sweep(80, 124, 2.0)), env.swell(1.7, 2.2)), 0, 0.25);
+  mixInto(out, applyEnv(biquad(noise(2.0, rng), 'bp', (t) => 500 + 400 * t, 1.2), env.swell(1.5, 2.0)), 0.1, 0.12);
+  mixInto(out, applyEnv(biquad(osc(0.9, (t) => 110 + 60 * t + 6 * Math.sin(45 * t), 'saw'), 'bp', (t) => 400 + 500 * t, 4), env.swell(0.4, 0.9)), 0, 0.22);
+  return finish(reverb(out, { room: 1.8, wet: 0.3, damp: 0.6 }), { fadeIn: 0.05, fadeOut: 0.55 });
+};
+P8.SFX_METEOR_DESCENT = (rng) => {
+  const n = 2.0;
+  const rise = (t) => (t < 1.75 ? Math.pow(t / 1.75, 2.0) : Math.max(0, 1 - (t - 1.75) / 0.1));
+  const out = mono(n);
+  mixInto(out, shape(biquad(noise(n, rng, 'pink'), 'lp', (t) => 250 * Math.pow(10, Math.min(t, 1.8) / 1.8), 0.9), rise), 0, 1.0);
+  mixInto(out, shape(osc(n, sweep(45, 90, 1.7)), rise), 0, 0.5);
+  mixInto(out, shape(reversed(crackle(n, rng, 3000, 0.9)), rise), 0, 0.2);
+  mixInto(out, shape(biquad(noise(n, rng), 'bp', sweep(700, 2200, 1.8), 6), rise), 0, 0.1);
+  return finish(out, { fadeIn: 0.1, fadeOut: 0.08 });
+};
+P8.SFX_METEOR_IMPACT = (rng) => {
+  const n = 3.6;
+  const out = mono(n);
+  mixInto(out, click(0.15, rng, { hp: 400, lp: 7000, tau: 0.03 }), 0, 1.0);
+  mixInto(out, applyEnv(osc(2, sweep(85, 24, 0.5)), env.perc(0.002, 0.45)), 0, 1.2);
+  mixInto(out, applyEnv(biquad(noise(3, rng, 'brown'), 'lp', 160, 0.8), env.perc(0.01, 0.7)), 0, 1.5);
+  mixInto(out, partials(2.5, 70, scaled(STONE, 6)), 0, 0.35);
+  mixInto(out, crackle(2.4, rng, 1800, 0.7), 0.15, 0.35);
+  mixInto(out, applyEnv(biquad(noise(0.8, rng), 'bp', sweep(2500, 500, 0.5), 0.8), env.perc(0.002, 0.12)), 0, 0.5);
+  const big = reverb(soft(out, 2.6), { room: 1.8, wet: 0.22 });
+  // keheningan sesudah tabrakan: ekor meluruh ke senyap pada 0.9 s terakhir
+  return finish(shape(big, (t) => (t < 2.4 ? 1 : Math.max(0, 1 - (t - 2.4) / 0.9))), { fadeOut: 0.3 });
+};
+
+// --- Perlindungan (Ultimate Shield Velthia): harmonik, anggun, bukan alarm ---
+P8.SFX_AEGIS_CAST = (rng) => {
+  const n = 2.8;
+  const out = mono(n);
+  [[146.83, 0], [220, 0.3], [293.66, 0.6], [440, 0.9], [587.33, 1.2]].forEach(([f, t0], i) => {
+    const len = 2.2 - t0;
+    mixInto(out, applyEnv(sum([osc(len, f), 1], [osc(len, f * 1.004), 0.6]), env.swell(0.8, len)), t0, 0.5 - i * 0.05);
+  });
+  mixInto(out, air(1.4, rng, 6000, 2, 0.9, 1.4), 0.6, 0.07);
+  mixInto(out, bell(1.2, 587.33, 1.1), 1.65, 0.6);
+  mixInto(out, bell(1.0, 880, 1.0), 1.73, 0.35);
+  mixInto(out, thump(0.3, 90, 60, 0.08, 0.1), 1.65, 0.35);
+  return finish(reverb(out, { room: 1.3, wet: 0.3 }), { fadeIn: 0.05, fadeOut: 0.45 });
+};
+P8.SFX_AEGIS_FORM = (rng) => {
+  const n = 2.2;
+  const out = mono(n);
+  mixInto(out, hum(1.7, [146.83, 220], 0.3, [0.45, 0.35]), 0, 1);
+  [587.33, 739.99, 880, 1174.7].forEach((f, i) => mixInto(out, bell(1.4, f, 1.1), i * 0.04, 0.5 - i * 0.07));
+  mixInto(out, hum(1.4, [880, 1318.5], 0.3, [0.1, 0.07], 3, 0.4), 0.1, 1);
+  mixInto(out, thump(0.3, 110, 62, 0.06, 0.1), 0, 0.6);
+  return finish(reverb(out, { room: 1.5, wet: 0.35 }), { fadeOut: 0.5 });
+};
+P8.SFX_AEGIS_STRESS = (rng, v) => {
+  const n = 2.4;
+  const out = mono(n);
+  const strain = mono(2.0);
+  [220, 222.6, 330, 334].forEach((f, i) => mixInto(strain, applyEnv(osc(2.0, f), env.swell(0.3, 2.0)), 0, i < 2 ? 0.5 : 0.3));
+  for (let k = 0; k < strain.length; k++) strain[k] *= 1 - 0.35 * (0.5 + 0.5 * Math.sin((2 * Math.PI * 7 * k) / SR));
+  mixInto(out, biquad(strain, 'lp', 900, 0.8), 0, 0.35);
+  mixInto(out, applyEnv(osc(2.0, sweep(55, 48, 1.8)), env.swell(0.2, 2.0)), 0, 0.45);
+  mixInto(out, applyEnv(biquad(noise(2.0, rng, 'brown'), 'lp', 180, 0.8), env.swell(0.3, 2.0)), 0, 0.4);
+  [[0.2, 0.4, 1568], [0.75 + v * 0.05, 0.6, 1480], [1.3, 0.85, 1397]].forEach(([t, a, f]) => {
+    mixInto(out, click(0.05, rng, { hp: 2500, lp: 9000, tau: 0.01 }), t, a);
+    mixInto(out, partials(0.5, f, scaled(PING, 0.8)), t, a);
+    mixInto(out, applyEnv(biquad(noise(0.2, rng), 'bp', 3000, 1), env.perc(0.001, 0.04)), t, a * 0.6);
+    mixInto(out, thump(0.15, 160, 90, 0.04, 0.05), t, a * 0.4);
+  });
+  return finish(reverb(soft(out, 1.7), { room: 1, wet: 0.22 }), { fadeIn: 0.02, fadeOut: 0.4 });
+};
+P8.SFX_AEGIS_FADE = (rng) => {
+  const n = 2.6;
+  const out = mono(n);
+  [1174.7, 880, 587.33, 440].forEach((f, k) => mixInto(out, bell(1.3, f, 1.2), k * 0.2, 0.5 - k * 0.07));
+  mixInto(out, applyEnv(biquad(noise(1.4, rng), 'hp', 7000, 0.7), env.perc(0.1, 0.45)), 0, 0.05);
+  mixInto(out, applyEnv(osc(1.8, sweep(293.66, 146.83, 1.6)), env.swell(0.12, 1.8)), 0, 0.3);
+  return finish(reverb(out, { room: 1.6, wet: 0.38 }), { fadeOut: 0.8 });
+};
+
+// --- musuh Bab IV ---
+P8.SFX_RIFTBORN_ATTACK = (rng, v) => {
+  const n = 0.6;
+  const out = mono(n);
+  mixInto(out, applyEnv(biquad(osc(0.3, sweep(380 + v * 40, 1100, 0.18), 'saw', { ratio: 1.41, index: 3 }), 'bp', (t) => 900 + 3000 * t, 2), env.swell(0.12, 0.3)), 0, 0.5);
+  mixInto(out, applyEnv(biquad(noise(0.3, rng), 'bp', sweep(1200, 6000, 0.14), 1.4), env.perc(0.006, 0.05)), 0.09, 0.8);
+  mixInto(out, crackle(0.25, rng, 2500, 0.05), 0.12, 0.35);
+  mixInto(out, thump(0.2, 170, 90, 0.04, 0.05), 0.13, 0.55);
+  mixInto(out, applyEnv(osc(0.3, sweep(700, 300, 0.25)), env.perc(0.004, 0.06)), 0.12, 0.15);
+  return finish(soft(out, 2.2), { fadeOut: 0.14 });
+};
+P8.SFX_GRAVORN_ATTACK = (rng, v) => {
+  const n = 0.95;
+  const out = mono(n);
+  mixInto(out, applyEnv(biquad(noise(0.3, rng, 'brown'), 'lp', 300, 0.8), env.swell(0.12, 0.3)), 0, 0.8);
+  mixInto(out, thump(0.7, 95 - v * 6, 36, 0.14, 0.14), 0.22, 1.0);
+  mixInto(out, partials(0.6, 140 + v * 18, scaled(STONE, 1.6)), 0.22, 0.45);
+  mixInto(out, applyEnv(biquad(noise(0.5, rng, 'brown'), 'lp', 200, 0.8), env.perc(0.004, 0.16)), 0.22, 1.0);
+  mixInto(out, click(0.05, rng, { hp: 700, lp: 5000, tau: 0.012 }), 0.22, 0.6);
+  mixInto(out, crackle(0.4, rng, 700, 0.1), 0.24, 0.2);
+  return finish(reverb(saturate(out, 1.4), { room: 0.7, wet: 0.14 }), { fadeOut: 0.22 });
+};
+P8.SFX_BATTLE_TRANSITION_FINAL = (rng) => {
+  const n = 1.6;
+  const out = mono(n);
+  mixInto(out, reversed(reverb(bell(0.9, 98, 2.2), { room: 1.2, wet: 0.2 })), 0, 0.55);
+  mixInto(out, thump(0.4, 58, 40, 0.06, 0.12), 0.1, 0.8);
+  mixInto(out, thump(0.4, 58, 40, 0.06, 0.12), 0.62, 0.9);
+  mixInto(out, hum(1.2, [73.4, 110, 146.8, 220], 1.0, [0.25, 0.2, 0.18, 0.12]), 0, 1);
+  mixInto(out, partials(0.6, 140, scaled(WOOD, 1.0)), 1.0, 0.6);
+  mixInto(out, thump(0.6, 90, 32, 0.12, 0.2), 1.0, 1.1);
+  mixInto(out, click(0.04, rng, { hp: 600, lp: 4500, tau: 0.01 }), 1.0, 0.7);
+  return finish(reverb(out, { room: 1.3, wet: 0.22 }), { fadeOut: 0.25 });
+};
+Object.assign(R, P8);
+
 // ---------- katalog ----------
-/** Tiap entri: id, category, variants, minIntervalMs, gain (volume relatif runtime), trigger (teks dokumen), desc + recipe (dokumentasi). */
-const E = (id, category, o) => ({ id, category, variants: 1, ...o });
+/** Tiap entri: id, category, variants, minIntervalMs, gain (volume relatif runtime), trigger (teks dokumen), desc + recipe (dokumentasi). `phase` = fase asal (7 = Phase 7, 8 = Bab IV). */
+const E = (id, category, o) => ({ id, category, variants: 1, phase: 7, ...o });
+const E8 = (id, category, o) => ({ id, category, variants: 1, phase: 8, ...o });
 
 export const CATALOG = [
   E('SFX_UI_MOVE', 'ui', { minIntervalMs: 45, gain: 0.5, trigger: 'MenuList atas/bawah (semua menu), Settings, RpgMenu ganti anggota', desc: 'Tik lembut tinggi untuk pindah fokus.', recipe: 'Sine 1900Hz turun cepat (exp tau 12ms) + parsial 3800Hz + klik HP 3k; fade 20ms.' }),
@@ -428,10 +729,10 @@ export const CATALOG = [
   E('SFX_UI_ITEM_USE', 'ui', { minIntervalMs: 120, gain: 0.6, trigger: 'RpgMenu: item dipakai / skill dibuka', desc: 'Sapuan naik berkilau lalu denting.', recipe: 'Sine 520->1560Hz exp 110ms swell + noise BP 6.5k + denting 1568Hz +100ms.' }),
   E('SFX_UI_SAVE_OK', 'ui', { minIntervalMs: 200, gain: 0.6, trigger: 'SaveLoadScene: simpan/muat berhasil', desc: 'Arpeggio denting C6-E6-G6 cepat.', recipe: 'Tiga parsial-denting 1046.5/1318.5/1568Hz berjarak 45ms.' }),
   E('SFX_UI_SAVE_FAIL', 'ui', { minIntervalMs: 200, gain: 0.55, trigger: 'SaveLoadScene: simpan/muat gagal', desc: 'Dua dengung rendah disonan (sekunde kecil) turun.', recipe: 'Saw 220+233.1Hz lalu 196+207.7Hz +95ms, LP 900Hz, glide -10%.' }),
-  E('SFX_UI_DIALOGUE_ADVANCE', 'ui', { minIntervalMs: 60, gain: 0.35, trigger: 'DialogueBox: lanjut halaman/baris', desc: 'Tok kayu rendah sangat pendek dan pelan (sering terdengar).', recipe: 'Sine 520Hz turun cepat tau 11ms + klik LP 4k.' }),
+  E('SFX_UI_DIALOGUE_ADVANCE', 'ui', { minIntervalMs: 60, gain: 0.4, trigger: 'DialogueBox: lanjut halaman/baris', desc: 'Tok kayu rendah sangat pendek dan pelan (sering terdengar).', recipe: 'Sine 520Hz turun cepat tau 11ms + klik LP 4k.' }),
   E('SFX_UI_DIALOGUE_CHOICE', 'ui', { minIntervalMs: 60, gain: 0.45, trigger: 'DialogueBox: opsi pilihan digeser', desc: 'Dua denting kecil naik (G5 -> B5) saat opsi pilihan dialog bergeser.', recipe: 'Parsial-denting 784Hz lalu 988Hz +35ms.' }),
-  E('SFX_UI_SHOP_BUY', 'ui', { minIntervalMs: 100, gain: 0.6, trigger: 'ShopScene: beli berhasil', desc: 'Dua koin logam naik.', recipe: 'FM sine 2349Hz & 3136Hz rasio 3.5 indeks 2.2 meluruh 40ms, +50ms.' }),
-  E('SFX_UI_SHOP_SELL', 'ui', { minIntervalMs: 100, gain: 0.6, trigger: 'ShopScene: jual berhasil', desc: 'Dua koin turun + gesekan kain halus.', recipe: 'FM 3136 -> 2093Hz +50ms + noise BP 1.6k lembut.' }),
+  E('SFX_UI_SHOP_BUY', 'ui', { minIntervalMs: 100, gain: 0.42, trigger: 'ShopScene: beli berhasil', desc: 'Dua koin logam naik.', recipe: 'FM sine 2349Hz & 3136Hz rasio 3.5 indeks 2.2 meluruh 40ms, +50ms.' }),
+  E('SFX_UI_SHOP_SELL', 'ui', { minIntervalMs: 100, gain: 0.42, trigger: 'ShopScene: jual berhasil', desc: 'Dua koin turun + gesekan kain halus.', recipe: 'FM 3136 -> 2093Hz +50ms + noise BP 1.6k lembut.' }),
 
   E('SFX_STEP_GRASS', 'step', { variants: 4, minIntervalMs: 90, gain: 0.5, trigger: 'wired by lead: WorldScene', desc: 'Gesekan rumput, empat variasi (pita tengah 2.8-4kHz acak).', recipe: 'Noise BP 2.8-4kHz tau ~28ms + desis HP 5.2k tertunda + gedebuk sine 90->58Hz.' }),
   E('SFX_STEP_DIRT', 'step', { variants: 4, minIntervalMs: 90, gain: 0.55, trigger: 'wired by lead: WorldScene', desc: 'Pijakan tanah: gedebuk rendah + kerikil halus, empat variasi.', recipe: 'Noise LP 1-1.6kHz + gedebuk 65-85Hz + klik acak (crackle).' }),
@@ -469,6 +770,35 @@ export const CATALOG = [
   E('SFX_CHRONOLITH_CHARGE', 'magic', { minIntervalMs: 300, gain: 0.85, trigger: 'wired by lead: BattleScene', desc: 'Chronolith mengisi: gerus batu, kilau terbalik, tik makin rapat.', recipe: 'Noise coklat LP 220Hz AM 5Hz; BP 200->650Hz; lonceng 330/495Hz dibalik; 14 tik akselerasi; sine 55->110Hz.' }),
   E('SFX_CHRONOLITH_STRIKE', 'magic', { minIntervalMs: 300, gain: 1.0, trigger: 'wired by lead: BattleScene', desc: 'Hantaman batu waktu: thump dalam, retak, resonansi, tik pudar.', recipe: 'Sine 80->35Hz; klik 0.6-6kHz; parsial batu 180Hz; noise coklat LP 140Hz; 5 tik deselerasi; saturasi + reverb.' }),
   E('SFX_CHRONOLITH_TEMPORAL', 'magic', { minIntervalMs: 300, gain: 0.85, trigger: 'wired by lead: BattleScene', desc: 'Distorsi waktu: tik-tok melambat, kilau terbalik, saw jatuh seperti pita berhenti.', recipe: '11 tik deselerasi 2400/1800Hz bergantian; lonceng 220/330Hz dibalik; saw 160->40Hz LP 600; gerus; thump.' }),
+
+  // ===== Phase 8 (Bab IV: The Fate) =====
+  E8('SFX_FORTRESS_DOOR_ANCIENT', 'world', { minIntervalMs: 1500, gain: 0.7, trigger: 'lead: Benteng Penjaga: gerbang batu kuno terbuka (Gerbang Luar, pintu ke Ruang Heart, pintasan Koridor Retakan)', desc: 'Pintu batu tua: gerus batu panjang yang berat, berhenti dengan satu hantaman dalam dan debu halus. Beda dari SFX_DOOR_OPEN (kayu).', recipe: 'Noise coklat LP 240Hz AM 3Hz swell 0.7s + noise pink BP 150->430Hz Q3; parsial batu 62Hz; thump 95->38Hz + parsial batu 110Hz di 1.9s; crackle LP; reverb 1.6.' }),
+  E8('SFX_SEAL_ACTIVATE', 'world', { minIntervalMs: 400, gain: 0.7, trigger: 'lead: Ruang Uji Segel / Benteng: segel rune diaktifkan (pilar/alas/penyelarasan)', desc: 'Segel menyala: denting terbalik, dengung kuinta dua nada bertremolo pelan, klik batu, tiga denting harmonik (E5 A5 E6). Anggun, bukan alarm.', recipe: 'Lonceng 440Hz dibalik; hum sine 220+330Hz tremolo 4.5Hz; klik + thump 140Hz; lonceng 659/880/1318Hz berurutan; reverb 1.2.' }),
+  E8('SFX_SEAL_ERROR', 'world', { variants: 2, minIntervalMs: 300, gain: 0.7, trigger: 'lead: Benteng: urutan segel/teka-teki salah (satu kali per percobaan, bukan per langkah)', desc: 'Penolakan tumpul: dua nada segitiga disonan (sekunde kecil) turun, redam LP 700Hz, ketukan batu. Tidak tajam; dua variasi.', recipe: 'Triangle f & f*1.059 glide -12%, LP 700Hz tau 100ms; klik + thump 160Hz; parsial batu 330Hz; f=190Hz (+1.5 semiton variasi 2); reverb kecil.' }),
+  E8('SFX_ECHO_MEMORY', 'world', { minIntervalMs: 1500, gain: 0.7, trigger: 'lead: Ruang Gema: menyentuh objek kuno (dua objek, C4-05); pusaka Velthia bergema di Arsip', desc: 'Gema ingatan hangat: akor D-A-D-F# berdetune halus yang mengembang, denting terbalik lalu satu denting lembut, napas udara. Satu sapuan, bukan melodi.', recipe: 'Sine 293.66/440/587.33/740Hz (+detune 0.3%) swell 1s LP 2.4k; lonceng 587Hz terbalik; lonceng 880Hz; noise BP 1.8k; reverb 1.6 wet 0.35.' }),
+  E8('SFX_HEART_LOCK', 'world', { minIntervalMs: 800, gain: 0.75, trigger: 'lead: Ruang Heart: setiap pengunci Heart ditahan (Yaric, Velthia; dua kali per adegan)', desc: 'Pengunci Heart terpasang: klik palang berat, hantaman batu, lonceng rendah E3 dan dengung 82Hz.', recipe: 'Klik BP + thump 150->70Hz + parsial batu 110Hz tau x4; lonceng 164.8/329.6Hz; sine 82.4Hz; reverb 1.4.' }),
+  E8('SFX_HEART_UNSEAL', 'world', { minIntervalMs: 2000, gain: 0.7, trigger: 'lead: Ruang Heart: kedua pengunci dibuka bersama (C4 heartOpen)', desc: 'Heart terbuka: mekanisme batu menggerus, enam denting harmonik menaik, akor lembut, hantaman dalam dan denting hangat penutup.', recipe: 'Noise coklat LP 260Hz AM 6Hz; lonceng D4-A4-D5-F#5-A5-D6 berjarak 180ms; hum 4 sine; thump 70->34Hz + klik + parsial batu di 1.55s; lonceng 587Hz; reverb 1.6.' }),
+  E8('SFX_TOWER_COLLAPSE_DISTANT', 'world', { minIntervalMs: 3000, gain: 0.62, trigger: 'lead: jendela busur Ruang Heart ke Aveloria (C4-04): menara runtuh dari kejauhan; sekali', desc: 'Runtuhnya menara dari jauh: gemuruh coklat sangat teredam, empat dentum jauh yang makin kecil, serpihan samar. Disengaja redam dan "jauh" (gain rendah).', recipe: 'Noise coklat LP 140->90Hz swell 1.2s; empat thump 62->30Hz LP 140Hz (1/0.8/0.55/0.35); crackle LP 900Hz; sine 70->45Hz; reverb 2.0 lalu LP 480Hz.' }),
+
+  E8('SFX_VARLGRIM_STAFF_SWING', 'boss', { variants: 2, minIntervalMs: 250, gain: 0.85, trigger: 'lead: BattleScene: keeper_strike / fracture_strike (anticipation -> swing), satu kali per ayunan; dua variasi', desc: 'Ayunan staf kayu besar: whoosh rendah menanjak 260->1300Hz lalu meredup, derit kayu, badan sine rendah. Lebih berat dan lambat dari SFX_GREATSWORD_SWING.', recipe: 'Noise BP 260->1300->520Hz Q1.3 swell 300ms + sine 150->80Hz + saw BP derit; dua variasi (badan 150/162Hz).' }),
+  E8('SFX_VARLGRIM_STAFF_IMPACT', 'boss', { variants: 2, minIntervalMs: 200, gain: 1.0, trigger: 'lead: BattleScene: kontak staf (keeper_strike / fracture_strike), sekali di kontak, bukan di telegraf', desc: 'Hantaman kayu tua: gedebuk, resonansi kayu (parsial 170Hz), retak kayu, ketukan lantai batu. "Wood impact" dari SKILLS_AND_BOSSES.', recipe: 'Thump 130->42Hz + parsial kayu 170Hz (1/1.58/2.43/3.71x) + noise BP 900Hz + klik + parsial batu 95Hz; saturasi 1.4; reverb kering 0.6.' }),
+  E8('SFX_TEMPORAL_BIND', 'boss', { variants: 2, minIntervalMs: 500, gain: 0.8, trigger: 'lead: BattleScene: time_bind / saat status ikatan temporal menempel pada target (sekali)', desc: '"Dry ticking" halus: tongkat ditanam (gedebuk + kayu), sembilan tik kering makin renggang, kilau lonceng terbalik teredam, dengung rendah. Bukan jam dinding.', recipe: 'Thump 110->60Hz + parsial kayu; 9 tik deselerasi 1.5kHz HP 1.8k amp 0.35; lonceng 330/495Hz terbalik LP 2.2k; sine 82->70Hz.' }),
+  E8('SFX_TIME_DISTORTION', 'boss', { minIntervalMs: 1000, gain: 0.8, trigger: 'lead: BattleScene: distortion_wave (seluruh barisan; fase 2); juga seal_pulse bila perlu', desc: 'Distorsi waktu: saw jatuh seperti pita berhenti, sapuan noise turun, tik tidak beraturan melambat, kilau terbalik, denyut sub 5Hz, hantaman penutup.', recipe: 'Saw 330->55Hz LP 1.8k turun; noise BP 3.5k->300Hz; 10 tik deselerasi + jitter; lonceng 220/311/466Hz terbalik; sine 60Hz AM 5Hz; thump.' }),
+  E8('SFX_BOSS_PHASE_SHIFT', 'boss', { minIntervalMs: 1500, gain: 0.8, trigger: 'lead: BattleScene: phase_shift (jeda transisi fase 1->2 dan 2->3, tanpa damage)', desc: 'Pergeseran fase: sapuan naik, gong rendah 98Hz, retak pendek, satu tik terakhir lalu hening.', recipe: 'Noise BP 400->2500Hz swell 450ms; lonceng 98Hz tau x3; klik; thump 75->36Hz; satu tik di 1.35s; reverb 1.4.' }),
+  E8('SFX_FRACTURE_MARK', 'boss', { variants: 2, minIntervalMs: 400, gain: 0.75, trigger: 'lead: BattleScene: fracture_mark menandai target (fase 2); sekali per penandaan', desc: 'Penanda retakan: sapuan sine naik, retak kaca kering, denting tinggi, dua tik; dua variasi.', recipe: 'Sine 500->1900Hz; crackle BP; parsial 1568/1608Hz; dua tik 1.8kHz; thump 200Hz; reverb kecil.' }),
+
+  E8('SFX_METEOR_CHARGE', 'meteor', { minIntervalMs: 1500, gain: 0.65, trigger: 'lead: BattleScene: meteor_call / meteor_hold (telegraf, langit ditahan); sekali per panggilan dan sekali per hold', desc: 'Gemuruh jauh: staf diangkat (derit kayu), gemuruh coklat membesar pelan, sub 40->62Hz dengan harmonik, desir angin tipis. "Distant rumble" tanpa melodi.', recipe: 'Noise coklat LP 110->200Hz swell 1.6s; sine 40->62Hz + 80->124Hz; noise BP 500->900Hz; saw BP derit; reverb 1.8 teredam.' }),
+  E8('SFX_METEOR_DESCENT', 'meteor', { minIntervalMs: 1500, gain: 0.7, trigger: 'lead: BattleScene: meteor_fall fase jatuh (kamera mengikuti); langsung disambung SFX_METEOR_IMPACT', desc: 'Meteor jatuh: raungan pink noise yang LP-nya membuka 250->2500Hz, sub menanjak, serpihan terbalik, desing sempit tipis; berakhir keras lalu dipotong (fade 80ms) untuk disambung tabrakan.', recipe: 'Noise pink LP 250->2500Hz amplop kuadrat 1.75s; sine 45->90Hz; crackle terbalik; noise BP 700->2200Hz Q6 tipis.' }),
+  E8('SFX_METEOR_IMPACT', 'meteor', { minIntervalMs: 3000, gain: 1.0, trigger: 'lead: BattleScene: meteor_fall dampak. JANGAN memutar SFX apa pun ~0.6 s sesudahnya ("keheningan" aftermath); mulai SFX_AEGIS_STRESS di dampak bila perisai menahan', desc: 'Tabrakan besar: klik penuh-pita, boom sub 85->24Hz, gemuruh coklat, batu bergema, serpihan; ekor sengaja meluruh ke senyap pada 0.9 s terakhir.', recipe: 'Klik 0.4-7k; sine 85->24Hz tau 450ms; noise coklat LP 160Hz tau 700ms; parsial batu 70Hz x6; crackle; noise BP; saturasi 2.0 + reverb 1.8; amplop meluruh ke 0 mulai 2.4s.' }),
+
+  E8('SFX_AEGIS_CAST', 'aegis', { minIntervalMs: 2000, gain: 0.8, trigger: 'lead: BattleScene: velthia_aegis (antisipasi -> muatan); sekali per cast', desc: 'Perlindungan dirapal: lima lapis sine harmonik (D3-A3-D4-A4-D5) masuk bertahap dan mengembang, kilau udara, lalu satu denting D5/A5 saat muatan penuh. Bukan sapuan sirene.', recipe: 'Lima sine harmonik (detune 0.4%) masuk berjarak 300ms, swell 0.8s; noise BP 6k tipis; lonceng 587/880Hz di 1.65s + thump 90Hz; reverb 1.3.' }),
+  E8('SFX_AEGIS_FORM', 'aegis', { minIntervalMs: 1000, gain: 0.8, trigger: 'lead: BattleScene: pembentukan perisai (sesudah SFX_AEGIS_CAST); sekali', desc: 'Perisai terbentuk: dengung D3/A3 lebar, empat denting D5-F#5-A5-D6, kilau bertremolo 3Hz, hantaman lembut penutup. Beda dari SFX_MAGIC_VELTHIA_SHIELD (ward).', recipe: 'hum sine 146.8+220Hz; lonceng 587/740/880/1175Hz berjarak 40ms; sine 880/1318Hz tremolo 3Hz; thump 110->62Hz; reverb 1.5.' }),
+  E8('SFX_AEGIS_STRESS', 'aegis', { variants: 2, minIntervalMs: 800, gain: 0.75, trigger: 'lead: BattleScene: perisai menahan dampak meteor (retak bertingkat); mulai di dampak, sekali; dua variasi', desc: 'Perisai menahan: tegangan resonan (dua pasang sine berdetune, tremolo 7Hz), tekanan sub, tiga retakan kaca makin besar (klik + denting + gedebuk). Terasa berat namun tidak melengking.', recipe: 'Sine 220/222.6/330/334Hz AM 7Hz LP 900Hz; sine 55->48Hz + noise coklat LP 180Hz; tiga retakan di 0.2/0.75/1.3s (1568/1480/1397Hz) amp 0.4/0.6/0.85; reverb 1.' }),
+  E8('SFX_AEGIS_FADE', 'aegis', { minIntervalMs: 1500, gain: 0.75, trigger: 'lead: BattleScene: perisai memudar sesudah aftermath meteor; sekali', desc: 'Perisai memudar: empat denting turun (D6-A5-D5-A4), kilau meluruh, dengung jatuh 294->147Hz, reverb panjang. Lega, hangat.', recipe: 'Lonceng 1175/880/587/440Hz berjarak 200ms; noise HP 7k meluruh; sine 294->147Hz; reverb 1.6 wet 0.38.' }),
+
+  E8('SFX_RIFTBORN_ATTACK', 'boss', { variants: 3, minIntervalMs: 150, gain: 0.85, trigger: 'lead: BattleScene: Riftborn rift_lash / rift_surge (kontak, sekali); tiga variasi karena sering muncul', desc: 'Cambuk retakan: robekan saw-FM menanjak, desis noise 1.2->6kHz, serpihan retak, hantaman ringan, turunan disonan. Lebih tipis dan cepat dari SFX_ENEMY_ATTACK.', recipe: 'Saw FM 380->1100Hz BP menyapu; noise BP 1.2->6kHz; crackle; thump 170->90Hz; sine 700->300Hz; tiga variasi (nada awal +40Hz).' }),
+  E8('SFX_GRAVORN_ATTACK', 'boss', { variants: 3, minIntervalMs: 200, gain: 0.9, trigger: 'lead: BattleScene: Gravorn gravorn_heave / gravorn_crush (kontak, sekali); tiga variasi', desc: 'Hantaman raksasa batu: dengus rendah, gedebuk 95->36Hz, dering batu, gemuruh coklat, serpihan. Lebih kecil dan gelap dari SFX_GROUND_SLAM.', recipe: 'Noise coklat LP 300Hz swell; thump 95->36Hz; parsial batu 140Hz x1.6; noise coklat LP 200Hz; klik; crackle; saturasi 1.4; reverb 0.7.' }),
+  E8('SFX_BATTLE_TRANSITION_FINAL', 'transition', { minIntervalMs: 1500, gain: 0.85, trigger: 'lead: TransitionScene kategori `final` (masuk battle Varlgrim): menutup layar', desc: 'Transisi final: gong rendah terbalik, dua denyut lambat 58Hz, tumpukan sine rendah D2-A2-D3-A3 mengembang, lalu staf kayu ditanam (hantaman dalam + resonansi kayu).', recipe: 'Lonceng 98Hz tau x2.2 dibalik; dua thump 58->40Hz; hum 73/110/147/220Hz; parsial kayu 140Hz + thump 90->32Hz + klik di 1.0s; reverb 1.3.' }),
 ];
 
 /** Batas durasi (ms) dan jendela RMS (dBFS pada berkas, setelah normalisasi puncak -3 dBFS) per kategori; dipakai tes. */
@@ -480,6 +810,11 @@ export const CATEGORY_LIMITS = {
   battle: { minMs: 150, maxMs: 600, rmsMin: -26, rmsMax: -8 },
   magic: { minMs: 300, maxMs: 1200, rmsMin: -28, rmsMax: -8 },
   stinger: { minMs: 1000, maxMs: 2500, rmsMin: -30, rmsMax: -10 },
+  // Phase 8 (Bab IV)
+  world: { minMs: 400, maxMs: 4500, rmsMin: -30, rmsMax: -8 },
+  boss: { minMs: 400, maxMs: 2300, rmsMin: -30, rmsMax: -8 },
+  meteor: { minMs: 1500, maxMs: 3700, rmsMin: -32, rmsMax: -8 },
+  aegis: { minMs: 1500, maxMs: 3000, rmsMin: -30, rmsMax: -8 },
 };
 
 /** Render satu entri -> array Float32Array (satu per variasi). Resep id yang sama selalu menghasilkan bunyi yang sama. */

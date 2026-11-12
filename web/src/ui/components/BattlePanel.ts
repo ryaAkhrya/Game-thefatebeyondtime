@@ -1,7 +1,8 @@
 import type Phaser from 'phaser';
 import type { IntentEvent } from '../../game/core/InputManager';
 import { COLORS } from '../../game/config/palette';
-import type { BattleActor, BattleEngine, Command } from '../../game/combat/BattleEngine';
+import { aegisStatus, type BattleActor, type BattleEngine, type Command } from '../../game/combat/BattleEngine';
+import { AEGIS_SKILL_INFO } from '../../game/combat/aegis';
 import { MenuList, type MenuItem } from './MenuList';
 import { bar } from './frame';
 import { TYPE, Ui } from '../kit/ui';
@@ -10,7 +11,9 @@ import { UNKNOWN_LABEL } from '../../game/story/identity';
 import { VELTHIA_SKILLS } from '../../game/rpg/velthia';
 
 export const BATTLE_BAND = { y: 388, h: 152 } as const;
-const STATUS_LABEL: Record<string, string> = { poison: 'Racun', stun: 'Pingsan', atk_up: 'Serang+', def_up: 'Tahan+', shield: 'Selubung', regen: 'Pulih', concord: 'Selaras', chrono_guard: 'Tertutup' };
+const STATUS_LABEL: Record<string, string> = { poison: 'Racun', stun: 'Pingsan', atk_up: 'Serang+', def_up: 'Tahan+', shield: 'Selubung', regen: 'Pulih', concord: 'Selaras', chrono_guard: 'Tertutup', aegis: 'Perlindungan' };
+/** Label status; Perlindungan tidak berkurang per giliran sehingga tanpa hitungan. */
+const chip = (st: { id: string; turns: number }): string => st.id === 'aegis' ? (STATUS_LABEL.aegis ?? 'Perlindungan') : `${STATUS_LABEL[st.id] ?? st.id} ${st.turns}`;
 type SkillTarget = 'enemy' | 'ally' | 'allies' | 'yaric';
 /** Tabel jurus untuk menu: label, MP, deskripsi, jenis target. Jurus Velthia diambil dari rpg/velthia.ts (satu sumber). */
 const SKILL_UI: Record<string, { label: string; mp: number; desc: string; target: SkillTarget }> = {
@@ -19,6 +22,8 @@ const SKILL_UI: Record<string, { label: string; mp: number; desc: string; target
   bukan_aku: { label: 'Bukan Aku!', mp: 2, desc: '2 MP. Lindungi satu anggota party.', target: 'ally' },
   tunas_bandel: { label: 'Tunas Bandel', mp: 4, desc: '4 MP. Pulihkan 24 HP satu anggota.', target: 'ally' },
   ...Object.fromEntries(VELTHIA_SKILLS.map(v => [v.id, { label: v.name, mp: v.mp, desc: v.description, target: v.target }])),
+  // Phase 8: Ultimate Velthia. Tanpa MP (sumber daya aegis), menaungi seluruh sekutu: tanpa pilih target.
+  velthia_aegis: { label: AEGIS_SKILL_INFO.name, mp: 0, desc: AEGIS_SKILL_INFO.description, target: 'allies' },
 };
 /** Perintah yang menargetkan sekutu (Potion + jurus bertarget ally). */
 const targetKind = (command: string): SkillTarget => command === 'potion' ? 'ally' : SKILL_UI[command]?.target ?? 'enemy';
@@ -27,8 +32,15 @@ const DANGER: Record<string, { text: string; danger: boolean }> = {
   chrono_sweep: { text: 'SAPUAN!', danger: true }, chrono_charge: { text: 'MENGUMPULKAN', danger: false }, chrono_guard: { text: 'BERTAHAN', danger: false },
   chrono_rewind: { text: 'MEMUTAR WAKTU', danger: false }, oath_brace: { text: 'MENAHAN', danger: false },
   recover: { text: 'GOYAH', danger: false }, knight_recover: { text: 'TERBUKA', danger: false },
+  // Phase 8 (Varlgrim, Riftborn, Gravorn)
+  keeper_strike: { text: 'HANTAMAN!', danger: true }, fracture_strike: { text: 'RETAKAN!', danger: true }, rift_surge: { text: 'LONJAKAN!', danger: true },
+  gravorn_crush: { text: 'REMUK!', danger: true }, meteor_call: { text: 'METEOR!', danger: true }, meteor_hold: { text: 'METEOR!', danger: true }, meteor_fall: { text: 'METEOR!', danger: true },
+  keeper_stance: { text: 'KUDA-KUDA', danger: false }, fracture_mark: { text: 'MENANDAI', danger: false }, rift_gather: { text: 'MENGUMPULKAN', danger: false },
+  gravorn_brace: { text: 'MENAHAN', danger: false }, phase_shift: { text: 'BERGESER', danger: false },
 };
+const METEOR_INTENTS = new Set(['meteor_call', 'meteor_hold', 'meteor_fall']);
 const DEPTH = 20;
+export type PanelAction = Command | 'continue' | 'retry' | 'retry_phase' | 'title';
 type PanelMode = 'main' | 'skill' | 'item' | 'target' | 'result' | 'busy';
 
 /**
@@ -46,13 +58,13 @@ export class BattlePanel {
   private hintObj?: Phaser.GameObjects.Text;
   private sourceMode: 'main' | 'skill' | 'item' = 'main';
   private engineRef?: BattleEngine;
-  private resultState: { outcome: 'victory' | 'defeat' | 'escaped'; reward?: RewardReceipt | null } | null = null;
+  private resultState: { outcome: 'victory' | 'defeat' | 'escaped'; reward?: RewardReceipt | null; extra?: { phaseRetry?: boolean; hint?: string } } | null = null;
   private duo = false;
   mode: PanelMode = 'main';
 
   constructor(
     private readonly scene: Phaser.Scene,
-    private readonly onAction: (action: Command | 'continue' | 'retry' | 'title', targetId?: string) => void,
+    private readonly onAction: (action: PanelAction, targetId?: string) => void,
     private readonly enemyName = 'Hollowling',
     private readonly onTarget: (id: string | null) => void = () => undefined,
     private readonly hintOnFirstBattle = true,
@@ -70,7 +82,7 @@ export class BattlePanel {
     this.build();
     const engine = this.engineRef;
     if (!engine) return;
-    if (this.mode === 'result' && this.resultState) { this.result(this.resultState.outcome, this.resultState.reward); return; }
+    if (this.mode === 'result' && this.resultState) { this.result(this.resultState.outcome, this.resultState.reward, this.resultState.extra); return; }
     if (this.mode === 'busy') { this.refresh(engine); this.busy(); return; }
     this.show(engine, this.sourceMode === 'main' || this.mode === 'main' ? 'main' : this.sourceMode);
   }
@@ -123,7 +135,7 @@ export class BattlePanel {
       const y = 28 + i * 54;
       const dead = e.hp <= 0;
       put(ui.text(40, y, e.name, { family: 'display', weight: '700', size: TYPE.heading - 1, depth: DEPTH + 2, color: dead ? COLORS.disabled : COLORS.paper }));
-      const chips = [...e.statuses.map(st => `${STATUS_LABEL[st.id] ?? st.id} ${st.turns}`), ...(e.defending ? ['Bertahan'] : [])].join('  ');
+      const chips = [...e.statuses.map(st => chip(st)), ...(e.defending ? ['Bertahan'] : [])].join('  ');
       if (chips) put(ui.text(300, y + 3, chips, { size: TYPE.tiny, originX: 1, color: COLORS.warn, depth: DEPTH + 2 }));
       bar(ui, 40, y + 26, 260, 6, e.hp / e.stats.HP, e.hp / e.stats.HP < 0.3 ? COLORS.danger : COLORS.bitterLime, DEPTH + 2).forEach(o => put(o));
       put(ui.text(300, y + 33, `${e.hp} / ${e.stats.HP}`, { size: TYPE.tiny, originX: 1, color: COLORS.paperDim, depth: DEPTH + 2 }));
@@ -131,7 +143,8 @@ export class BattlePanel {
 
     // lencana giliran + bahaya
     const e0 = enemies.find(e => e.hp > 0) ?? enemies[0]!;
-    const badge = e0.intent ? DANGER[e0.intent] : undefined;
+    const covered = aegisStatus(s).covered;
+    const badge = e0.intent && METEOR_INTENTS.has(e0.intent) && covered && e0.intent !== 'meteor_call' ? { text: 'TERLINDUNGI', danger: false } : e0.intent ? DANGER[e0.intent] : undefined;
     const danger = badge?.danger ? badge.text : '';
     const calm = badge && !badge.danger ? badge.text : '';
     if (!s.outcome) {
@@ -155,7 +168,7 @@ export class BattlePanel {
       const active = a.id === activeId;
       if (active) put(ui.rect(x0 - 10, y - 2, 3, 62, COLORS.bitterLime, 1, DEPTH + 2));
       put(ui.text(x0, y, this.name(a), { weight: '600', size: TYPE.body + 1, color: active ? COLORS.bitterLime : COLORS.paper, depth: DEPTH + 2 }));
-      const chips = [...a.statuses.map(st => `${STATUS_LABEL[st.id] ?? st.id} ${st.turns}`), ...(a.defending ? ['Bertahan'] : [])].join('  ');
+      const chips = [...a.statuses.map(st => chip(st)), ...(a.defending ? ['Bertahan'] : [])].join('  ');
       if (chips) put(ui.text(x0 + cardW, y + 3, chips, { size: TYPE.tiny, originX: 1, color: COLORS.warn, depth: DEPTH + 2 }));
       const row = (label: string, v: number, max: number, color: number, ry: number): void => {
         put(ui.text(x0, ry, label, { size: TYPE.tiny, color: COLORS.paperDim, depth: DEPTH + 2 }));
@@ -174,15 +187,19 @@ export class BattlePanel {
     this.refresh(engine);
     const state = engine.snapshot(), count = state.items.potion ?? 0;
     const skills = engine.current.skills ?? [];
+    // Perlindungan tidak boleh tersembunyi: saat ancaman besar tergantung dan giliran Velthia, ia naik ke menu utama (juga ada di Jurus).
+    const ag = aegisStatus(state);
+    const aegisUp = mode === 'main' && ag.threat && engine.current.id === 'C02' && skills.includes('velthia_aegis') && !ag.covered && engine.unavailable('velthia_aegis') === null;
     const choices: { id: string; label: string; command?: Command; right?: string }[] = mode === 'skill'
-      ? [...skills.filter(id => id in SKILL_UI).map(id => ({ id, label: SKILL_UI[id]!.label, command: id as Command, right: `${SKILL_UI[id]!.mp} MP` })), { id: 'back', label: 'Kembali' }]
+      ? [...skills.filter(id => id in SKILL_UI).map(id => ({ id, label: SKILL_UI[id]!.label, command: id as Command, right: id === 'velthia_aegis' ? 'Siap' : `${SKILL_UI[id]!.mp} MP` })), { id: 'back', label: 'Kembali' }]
       : mode === 'item'
         ? [{ id: 'potion', label: 'Potion', command: 'potion', right: `×${count}` }, { id: 'back', label: 'Kembali' }]
-        : [{ id: 'attack', label: 'Serang', command: 'attack' }, { id: 'skill', label: 'Jurus' }, { id: 'item', label: 'Barang' }, { id: 'defend', label: 'Bertahan', command: 'defend' }, { id: 'run', label: 'Kabur', command: 'run' }];
+        : [...(aegisUp ? [{ id: 'velthia_aegis', label: 'Perlindungan', command: 'velthia_aegis' as Command, right: 'Siap' }] : []),
+          { id: 'attack', label: 'Serang', command: 'attack' }, { id: 'skill', label: 'Jurus' }, { id: 'item', label: 'Barang' }, { id: 'defend', label: 'Bertahan', command: 'defend' }, ...(aegisUp ? [] : [{ id: 'run', label: 'Kabur', command: 'run' as Command }])]; // saat Perlindungan naik ke menu utama, Kabur (selalu nonaktif pada boss) dilepas agar enam baris tidak terpotong
     const reason = (command: Command): string | null => {
       const kind = targetKind(command);
       if (this.duo && kind === 'ally') {
-        const allies = state.actors.filter(a => a.side === 'player' && a.hp > 0);
+        const allies = state.actors.filter(a => a.side === 'player' && (a.hp > 0 || (command === 'potion' && state.revivePotion)));
         if (allies.some(a => engine.unavailable(command, a.id) === null)) return null;
       }
       return engine.unavailable(command);
@@ -201,7 +218,7 @@ export class BattlePanel {
       if (item.id === 'skill' || item.id === 'item') { this.show(engine, item.id); return; }
       if (item.id === 'back') { this.show(engine); return; }
       this.chooseTarget(engine, item.id as Command, mode);
-    }, describe);
+    }, describe, aegisUp ? 'velthia_aegis' : undefined);
     if (mode !== 'main') describe(this.menu!.focusedItem);
   }
 
@@ -216,9 +233,9 @@ export class BattlePanel {
     this.hint('');
   }
 
-  result(outcome: 'victory' | 'defeat' | 'escaped', reward?: RewardReceipt | null): void {
+  result(outcome: 'victory' | 'defeat' | 'escaped', reward?: RewardReceipt | null, extra: { phaseRetry?: boolean; hint?: string } = {}): void {
     this.mode = 'result';
-    this.resultState = { outcome, reward };
+    this.resultState = { outcome, reward, extra };
     this.onTarget(null);
     this.menu?.destroy();
     const ui = this.ui;
@@ -233,7 +250,8 @@ export class BattlePanel {
       if (reward.afterLevel > reward.beforeLevel) lines.push(`Naik ke Lv ${reward.afterLevel}`);
       if (reward.skillPoints) lines.push(`+${reward.skillPoints} poin jurus`);
     }
-    const h = 118 + lines.length * 24 + 92;
+    const menuRows = outcome === 'defeat' && extra.phaseRetry ? 3 : 2;
+    const h = 118 + lines.length * 24 + 38 * menuRows + 16;
     this.result_ = [
       ...ui.panel(x, y, w, h, { fill: COLORS.deepPlum, alpha: 0.97, line: outcome === 'defeat' ? COLORS.danger : COLORS.plumLine, depth: DEPTH + 3 }),
       ui.text(ui.dw / 2, y + 26, title, { family: 'display', weight: '700', size: TYPE.display - 2, originX: 0.5, color: outcome === 'defeat' ? COLORS.danger : COLORS.bitterLime, depth: DEPTH + 4 }),
@@ -243,10 +261,10 @@ export class BattlePanel {
     ];
     this.message = '';
     this.messageText?.setText('');
-    this.hint(outcome !== 'defeat' ? '' : 'Item dan MP kembali ke checkpoint.');
+    this.hint(outcome !== 'defeat' ? '' : extra.hint ?? 'Item dan MP kembali ke checkpoint.');
     this.menu = new MenuList(this.scene, { ui, x: ui.dw / 2, y: y + h - 86, width: 240, rowHeight: 38, align: 'center', depth: DEPTH + 5, size: TYPE.body + 1,
-      items: [{ id: outcome === 'defeat' ? 'retry' : 'continue', label: outcome === 'defeat' ? 'Coba Lagi' : 'Lanjutkan' }, { id: 'title', label: 'Ke Judul' }],
-      onConfirm: item => this.onAction(item.id as 'continue' | 'retry' | 'title') });
+      items: [...(outcome === 'defeat' && extra.phaseRetry ? [{ id: 'retry_phase', label: 'Ulang dari fase meteor' }] : []), { id: outcome === 'defeat' ? 'retry' : 'continue', label: outcome === 'defeat' ? 'Coba Lagi' : 'Lanjutkan' }, { id: 'title', label: 'Ke Judul' }],
+      onConfirm: item => this.onAction(item.id as 'continue' | 'retry' | 'retry_phase' | 'title') });
   }
   private result_: Phaser.GameObjects.GameObject[] = [];
   private clearResult(): void { this.result_.forEach(o => o.destroy()); this.result_ = []; }
@@ -258,7 +276,8 @@ export class BattlePanel {
     const kind = targetKind(command);
     if (kind === 'allies') { this.onAction(command); return; } // seluruh sekutu: tanpa pilih target
     const ally = kind !== 'enemy';
-    const candidates = engine.snapshot().actors.filter(a => a.side === (ally ? 'player' : 'enemy') && a.hp > 0 && (kind !== 'yaric' || a.id === 'C01'));
+    const snap = engine.snapshot();
+    const candidates = snap.actors.filter(a => a.side === (ally ? 'player' : 'enemy') && (a.hp > 0 || (command === 'potion' && !!snap.revivePotion)) && (kind !== 'yaric' || a.id === 'C01'));
     if (candidates.length === 1) { this.onAction(command, candidates[0]!.id); return; }
     this.mode = 'target'; this.sourceMode = sourceMode;
     const items: MenuItem[] = candidates.map(a => ({ id: a.id, label: this.name(a), right: `${a.hp}/${a.stats.HP}`, disabled: !!engine.unavailable(command, a.id), disabledHint: engine.unavailable(command, a.id) ?? undefined }));
@@ -272,9 +291,9 @@ export class BattlePanel {
     this.hint('Enter pilih  ·  Esc kembali');
   }
 
-  private makeMenu(items: MenuItem[], confirm: (item: MenuItem) => void, focus?: (item: MenuItem) => void): void {
+  private makeMenu(items: MenuItem[], confirm: (item: MenuItem) => void, focus?: (item: MenuItem) => void, initialId?: string): void {
     this.menu?.destroy();
-    this.menu = new MenuList(this.scene, { ui: this.ui, x: 40, y: BATTLE_BAND.y + 10, width: 204, rowHeight: 27, depth: DEPTH + 2, size: TYPE.body, items, onConfirm: confirm, onFocusChange: focus,
+    this.menu = new MenuList(this.scene, { ui: this.ui, ...(initialId ? { initialId } : {}), x: 40, y: BATTLE_BAND.y + 10, width: 204, rowHeight: 27, depth: DEPTH + 2, size: TYPE.body, items, onConfirm: confirm, onFocusChange: focus,
       onDisabledConfirm: item => this.say(item.disabledHint ?? '') });
   }
 

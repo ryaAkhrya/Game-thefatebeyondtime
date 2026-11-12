@@ -8,6 +8,7 @@ import { BOSS_CHECKPOINT_FLAG, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFAN
 import { CITY_FLAG } from '../story/aveloriaFlags';
 import { C2 } from '../story/chapter2Flags';
 import { C3, C3_BEATS, type C3Beat } from '../story/chapter3Flags';
+import { C4, C4_BEATS, isChapter4Flag, type C4Beat } from '../story/chapter4Flags';
 import { ITEMS, MAX_ITEMS } from '../rpg/definitions';
 
 export const GAME_STATE_VERSION = 2;
@@ -37,7 +38,7 @@ export interface GameStateData {
   partyVitals?: { C03: { hp: number; mp: number }; C02?: { hp: number; mp: number } };
   rpg: RpgState;
   storyBeat: 'C1-01' | 'C1-02' | 'C1-03' | 'C1-04' | 'C1-04-DONE' | 'C1-05' | 'C1-05-DONE' | 'SLICE-DONE' | 'C1-06' | 'C1-07' | 'C1-08' | 'C1-09' | 'C1-DONE'
-    | 'C2-01' | 'C2-02' | 'C2-03' | 'C2-04' | 'C2-05' | 'C2-06' | 'C2-07' | 'C2-08' | 'C2-09' | 'C2-DONE' | C3Beat;
+    | 'C2-01' | 'C2-02' | 'C2-03' | 'C2-04' | 'C2-05' | 'C2-06' | 'C2-07' | 'C2-08' | 'C2-09' | 'C2-DONE' | C3Beat | C4Beat;
   /** Optional extension of v2: old saves have never opened a persistent shop. */
   world: { forestWrapCount: number; shops?: Record<string, Record<string, number>>; lastChapter2EncounterSec?: number };
   playtimeSec: number;
@@ -63,6 +64,15 @@ export function createNewGameData(): GameStateData {
 const FACINGS: readonly Facing[] = ['up', 'down', 'left', 'right'];
 
 export function storyBeatFor(flags: Record<string, boolean>): GameStateData['storyBeat'] {
+  // Chapter IV: flag akhir beat N -> beat N+1 (urutan dari yang paling akhir).
+  if (flags[C4.complete]) return 'C4-DONE';
+  if (flags[C4.returned] || flags[C4.creatorReveal]) return 'C4-07';
+  if (flags[C4.oldMemory]) return 'C4-06';
+  if (flags[C4.heartOpen]) return 'C4-05';
+  if (flags[C4.varlgrim]) return 'C4-04';
+  if (flags[C4.confront]) return 'C4-03';
+  if (flags[C4.checkpoint] || flags[C4.aegisTrial]) return 'C4-02';
+  if (flags[C4.start]) return 'C4-01';
   // Chapter III (diturunkan dari flag; urutan dari yang paling akhir).
   if (flags[C3.complete]) return 'C3-DONE';
   if (flags[C3.chronolithOutroSeen] || flags[C3.hiddenName] || flags[C3.promise]) return 'C3-07';
@@ -150,7 +160,7 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
   if (!record(r.world) || !integer(r.world.forestWrapCount, 0, 1000000)) return null;
   const lastChapter2EncounterSec = r.world.lastChapter2EncounterSec;
   if (lastChapter2EncounterSec !== undefined && ((r.chapter !== 'II' && r.chapter !== 'III') || typeof lastChapter2EncounterSec !== 'number' || !Number.isFinite(lastChapter2EncounterSec) || lastChapter2EncounterSec < 0 || lastChapter2EncounterSec > (r.playtimeSec as number))) return null;
-  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE', 'C1-05', 'C1-05-DONE', 'SLICE-DONE', 'C1-06', 'C1-07', 'C1-08', 'C1-09', 'C1-DONE', 'C2-01', 'C2-02', 'C2-03', 'C2-04', 'C2-05', 'C2-06', 'C2-07', 'C2-08', 'C2-09', 'C2-DONE', ...C3_BEATS].includes(String(r.storyBeat))) return null;
+  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE', 'C1-05', 'C1-05-DONE', 'SLICE-DONE', 'C1-06', 'C1-07', 'C1-08', 'C1-09', 'C1-DONE', 'C2-01', 'C2-02', 'C2-03', 'C2-04', 'C2-05', 'C2-06', 'C2-07', 'C2-08', 'C2-09', 'C2-DONE', ...C3_BEATS, ...C4_BEATS].includes(String(r.storyBeat))) return null;
   if ((r.area === 'forest_edge' || flags[FOREST_EDGE_FLAG] || flags[BOSS_CHECKPOINT_FLAG] || flags[MOURNFANG_FLAG]) && !flags[FIRST_HOLLOWLING_FLAG]) return null;
   if (flags['reward.mournfang.rpg'] && !flags[MOURNFANG_FLAG]) return null;
   if ((flags[MOURNFANG_VICTORY_SEEN] || flags[SLICE_COMPLETE]) && !flags[MOURNFANG_FLAG]) return null;
@@ -176,6 +186,20 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
   if (r.area === 'temple' && !flags[C3.velthiaJoined]) return null;
   for (const [next, previous] of [[C3.velthiaJoined, C2.torvan], [C3.templeEntered, C3.velthiaJoined], [C3.templeFight1, C3.velthiaJoined], [C3.templeFight2, C3.velthiaJoined],
     [C3.gateOpen, C3.templeEntered], [C3.chronolith, C3.velthiaJoined], [C3.chronolithOutroSeen, C3.chronolith], [C3.complete, C3.chronolith], ['reward.c3_chronolith.rpg', C3.chronolith]]) {
+    if (flags[next!] && !flags[previous!]) return null;
+  }
+  // Chapter IV: butuh Bab III selesai; hanya bab IV (atau sesudahnya) yang boleh membawa flag Bab IV; area benteng/Aveloria.
+  const anyC4 = Object.keys(flags).some(isChapter4Flag);
+  if ((r.chapter === 'IV' || r.area === 'fortress' || anyC4) && !flags[C3.complete]) return null;
+  if ((r.chapter === 'IV' || r.area === 'fortress' || anyC4) && !flags[C4.start]) return null;
+  if ((r.chapter === 'I' || r.chapter === 'II' || r.chapter === 'III') && (anyC4 || r.area === 'fortress')) return null;
+  if (r.chapter === 'IV' && r.area !== 'fortress' && !(r.area === 'aveloria' && flags[C4.returned])) return null;
+  for (const [next, previous] of [[C4.entered, C4.start], [C4.aegisLearned, C4.entered], [C4.aegisTrial, C4.aegisLearned], [C4.fightCourt, C4.entered], [C4.fightHall, C4.entered],
+    [C4.fightGuard, C4.entered], [C4.fightRift, C4.entered], [C4.reportA, C4.entered], [C4.reportB, C4.entered], [C4.checkpoint, C4.aegisTrial], [C4.confront, C4.checkpoint],
+    [C4.varlgrim, C4.confront], ['reward.c4_varlgrim.rpg', C4.varlgrim], [C4.leanSeen, C4.varlgrim], [C4.unlockYaric, C4.leanSeen], [C4.unlockVelthia, C4.leanSeen],
+    [C4.heartOpen, C4.unlockYaric], [C4.heartOpen, C4.unlockVelthia], [C4.towerFallen, C4.heartOpen], [C4.memoryA, C4.heartOpen], [C4.memoryB, C4.heartOpen],
+    [C4.oldMemory, C4.heartOpen], [C4.varlgrimTruth, C4.oldMemory], [C4.creatorReveal, C4.oldMemory], [C4.varlgrimStays, C4.varlgrimTruth], [C4.returned, C4.creatorReveal],
+    [C4.returnSeen, C4.returned], [C4.complete, C4.returnSeen]]) {
     if (flags[next!] && !flags[previous!]) return null;
   }
   const expectedParty = flags[C3.velthiaJoined] ? 'C01,C02' : flags[C2.torvan] ? 'C01,C03' : 'C01';

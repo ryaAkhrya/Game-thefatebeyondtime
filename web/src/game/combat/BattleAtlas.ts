@@ -3,7 +3,9 @@ export interface BattleAtlas { frame_size: [number, number]; frames: Record<stri
 export const BATTLE_TEXTURE = { C01: 'C01_YARIC_BATTLE', C03: 'C03_CH2_BATTLE', M01: 'M01_HOLLOWLING_BATTLE',
   M02: 'M02_CH2_BATTLE', M03: 'M03_CH2_BATTLE', B01: 'B01_MOURNFANG_BATTLE', B02: 'B02_CH2_BATTLE',
   /** Phase 7 (Agent BA): atlas penuh 13-an frame (DRAFT/NEEDS_REVIEW), tiap atlas membawa duration_ms, pivot dan event sendiri. */
-  C02: 'C02_BATTLE_V1', B03: 'B03_BATTLE_V1', M05: 'M05_BATTLE_V1', slam: 'VFX_C01_GROUND_SLAM' } as const;
+  C02: 'C02_BATTLE_V1', B03: 'B03_BATTLE_V1', M05: 'M05_BATTLE_V1',
+  /** Phase 8 (Agent BA): Varlgrim (id aktor `C04`; `B04` = alias kanon), Gravorn, Riftborn (juga "Penguji"). Semua atlas penuh. */
+  C04: 'B04_BATTLE_V1', B04: 'B04_BATTLE_V1', M04: 'M04_BATTLE_V1', M06: 'M06_BATTLE_V1', slam: 'VFX_C01_GROUND_SLAM' } as const;
 
 export interface PoseAtlas { authored_grid: [number, number]; frames: Record<string, { rect: [number, number, number, number]; pivot: [number, number] }> }
 /** Playback aliases HOLD the four existing poses. They do not claim extra authored animation frames. */
@@ -55,4 +57,23 @@ export function fullAtlas(meta: unknown): BattleAtlas {
 /** Frame untuk kunci khusus (cast/heal/shield/summon/guard/special/charge): jatuh ke fallback bila atlas tidak punya. */
 export function frameKeyFor(atlas: BattleAtlas, key: string, fallback = 'attack'): string {
   return key in atlas.frames ? key : fallback in atlas.frames ? fallback : 'idle_a';
+}
+
+/**
+ * Phase 8: kunci frame khusus Varlgrim (B04) dan Gravorn (M04). Atlas lama tidak memilikinya -> jatuh ke fallback (perilaku lama tidak berubah).
+ *  plant = tongkat ditanam (time_bind/phase_shift); raise = tongkat diangkat menahan langit (meteor_call/meteor_hold);
+ *  cast = tangan terulur (distortion_wave/seal_pulse); guard = lengan disilang (Gravorn brace, juga B03).
+ */
+export const SPECIAL_FRAME_FALLBACK = { plant: 'anticipation', raise: 'anticipation', cast: 'attack', guard: 'idle_a' } as const;
+export type SpecialFrameKey = keyof typeof SPECIAL_FRAME_FALLBACK;
+export function specialFrameKey(atlas: BattleAtlas, key: SpecialFrameKey): string {
+  return frameKeyFor(atlas, key, SPECIAL_FRAME_FALLBACK[key]);
+}
+export function hasSpecialFrame(atlas: BattleAtlas, key: SpecialFrameKey): boolean {
+  return key in atlas.frames;
+}
+/** Atlas yang melayang (Riftborn) membawa `hover_px` di JSON: celah udara antara dasar sprite dan garis pivot (bayangan jatuh di garis pivot). */
+export function atlasHoverPx(meta: unknown): number {
+  const h = (meta as { hover_px?: unknown } | null)?.hover_px;
+  return typeof h === 'number' && h >= 0 ? h : 0;
 }

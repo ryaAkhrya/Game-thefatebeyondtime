@@ -382,7 +382,7 @@ def build_c02():
     return rows, meta
 
 
-FALLBACK_NAMES = {'C05': 'Azie', 'C06': 'Talric', 'C07': 'Zira', 'C09': 'Derrria'}
+FALLBACK_NAMES = {'C04': 'Varlgrim', 'C05': 'Azie', 'C06': 'Talric', 'C07': 'Zira', 'C09': 'Derrria'}  # C04 ditambah Phase 8 (agen BA)
 
 
 def build_fallback(cid):
@@ -420,9 +420,19 @@ def build_fallback(cid):
 
 def fallback_write(cid):
     rows, meta = build_fallback(cid)
+    if cid == 'C04':  # Phase 8 (agen BA): label jujur; sumber = C04_EXPLORATION_ATLAS_DRAFT
+        meta['notes'] = [n.replace('Polish Sprint 2: ', 'Phase 8: ') for n in meta['notes']]
     names = ['stand', 'old_idle_1', 'old_walk_0', 'old_walk_1', 'old_walk_2', 'old_walk_3', 'idle_1', 'idle_2', 'idle_3']
     names = ['old_0', 'old_1', 'old_2', 'old_3', 'old_4', 'old_5', 'idle_1', 'idle_2', 'idle_3']
-    return write_atlas(cid, rows, meta, cols=9, walk=[2, 3, 4, 5], idle=[0, 6, 7, 8], col_order=names), rows
+    res = write_atlas(cid, rows, meta, cols=9, walk=[2, 3, 4, 5], idle=[0, 6, 7, 8], col_order=names)
+    if cid == 'C04':
+        jp = os.path.join(OUT_DIR, f'{cid}_explore.json')
+        js = json.load(open(jp, encoding='utf-8'))
+        js['sprint'] = 'Phase 8'
+        with open(jp, 'w', encoding='utf-8', newline=chr(10)) as fh:
+            json.dump(js, fh, indent=2, ensure_ascii=False)
+            fh.write(chr(10))
+    return res, rows
 
 
 BUILDERS = {'C08': build_c08, 'C03': build_c03, 'C02': build_c02}

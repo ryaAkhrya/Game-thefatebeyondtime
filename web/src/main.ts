@@ -23,14 +23,41 @@ import { probeStorage } from './game/systems/StorageAdapter';
 import { SaveCoordinator } from './game/systems/SaveCoordinator';
 import { effectiveStats, applyReward } from './game/rpg/progression';
 import { HOLLOWLING_REWARD } from './game/rpg/definitions';
-import { BOSS_CHECKPOINT, BOSS_CHECKPOINT_FLAG, DUO_REWARD, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFANG_FLAG, MOURNFANG_REWARD, MOURNFANG_VICTORY_SEEN, VEYRATH_REWARD, type EncounterId } from './game/combat/encounters';
+import { CHRONOLITH_REWARD, OATHGUARD_REWARD, TEMPLE_MIXED_REWARD, BOSS_CHECKPOINT, BOSS_CHECKPOINT_FLAG, DUO_REWARD, FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, MOURNFANG_FLAG, MOURNFANG_REWARD, MOURNFANG_VICTORY_SEEN, VEYRATH_REWARD, type EncounterId } from './game/combat/encounters';
 import { CITY_FLAG } from './game/story/aveloriaFlags';
 import { C2, FOREST2_SPAWN, LIORA_SPAWN } from './game/story/chapter2Flags';
 import { IDENTITY_FLAG } from './game/story/identity';
-import { enterChapter3, joinTorvan, joinVelthia } from './game/rpg/party';
+import { enterChapter3, enterChapter4, joinTorvan, joinVelthia, restChapter4Party, returnToAveloria } from './game/rpg/party';
+import { C4 } from './game/story/chapter4Flags';
+import { FORT } from './game/story/c4/fortressFlags';
+import { AEGIS_TRIAL_REWARD, FORTRESS_COURT_REWARD, FORTRESS_GUARD_REWARD, FORTRESS_HALL_REWARD, FORTRESS_RIFT_REWARD, VARLGRIM_REWARD } from './game/rpg/chapter4Rewards';
+import { FORTRESS_BATTLE_RETURN, FORTRESS_SPAWN } from './game/world/fortressMaps';
+import { AVELORIA_C4_SPAWN } from './game/world/aveloriaC4';
 import { C3 } from './game/story/chapter3Flags';
 import { TEMPLE_BATTLE_RETURN, TEMPLE_FROM_FOREST } from './game/world/templeMaps';
 import type { GameStateData } from './game/systems/GameState';
+import { equip, skillUnlockReason, unlockSkill } from './game/rpg/actions';
+import { SKILLS } from './game/rpg/definitions';
+
+/**
+ * QA saja: bentuk "pemain yang wajar" memakai aksi RPG asli game (sama dengan menu Perlengkapan/Pohon Jurus): pakai zirah Benteng yang dimiliki
+ * dan belanjakan semua poin jurus pada pasif yang dapat dibuka. Tidak mengubah angka apa pun di luar aturan permainan.
+ */
+function qaBuildData(data: GameStateData): GameStateData {
+  let d = data;
+  for (const [id, item] of [['C01', 'warden_plate'], ['C02', 'keeper_robe']] as const) {
+    if ((d.items[item] ?? 0) > 0 && d.rpg.characters[id]) { const r = equip(d, 'armor', item, id); if (r.ok) d = r.data; }
+  }
+  for (const id of ['C01', 'C02']) {
+    for (let progress = true; progress;) {
+      progress = false;
+      for (const sk of SKILLS) {
+        if (sk.cost > 0 && d.rpg.characters[id] && skillUnlockReason(d, sk.id, id) === null) { const r = unlockSkill(d, sk.id, id); if (r.ok) { d = r.data; progress = true; } }
+      }
+    }
+  }
+  return d;
+}
 
 function boot(): void {
   document.title = GAME_TITLE;
@@ -217,8 +244,62 @@ function boot(): void {
           if (battle) { game.scene.getScene('TitleScene').scene.start('BattleScene', { encounter: battle }); }
           else game.scene.getScene('TitleScene').scene.start('WorldScene');
         },
+        /**
+         * Bab IV (hanya QA, build produksi publik tidak memuat hook ini): menyusun save Bab III selesai dengan hadiah nyata lalu maju ke tahap.
+         * start | trial | checkpoint | boss | heart | echo | return. `battle` langsung membuka battle; `opts.hp/mp` mengubah vitals.
+         */
+        chapter4: (stage: 'c3end' | 'start' | 'trial' | 'checkpoint' | 'boss' | 'heart' | 'echo' | 'return', battle?: EncounterId, opts?: { hp?: Partial<Record<'C01' | 'C02', number>>; mp?: Partial<Record<'C01' | 'C02', number>> }) => {
+          services.checkpoints.reset();
+          let d: GameStateData = applyReward(applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data, MOURNFANG_REWARD).data;
+          d.chapter = 'II'; d.area = 'forest_2';
+          for (const f of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed', 'c1.hollowling_victory_seen', FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, ...Object.values(CITY_FLAG), C2.start, C2.depart, C2.farewell, C2.zira, C2.forest, IDENTITY_FLAG]) d.flags[f] = true;
+          d = joinTorvan(d);
+          for (const f of [C2.secondMarker, C2.tutorial, C2.veyrath, C2.fragmentA, C2.fragments, C2.complete]) d.flags[f] = true;
+          d = applyReward(applyReward(d, DUO_REWARD).data, VEYRATH_REWARD).data;
+          d = enterChapter3(d); d = joinVelthia(d);
+          for (const f of [C3.crisisSeen, C3.azieDemand, C3.velthiaRefuses, C3.evacOrdered, C3.evacDone, C3.decision, C3.torvanStays, C3.departed, C3.templeEntered, C3.puzzleA, C3.puzzleB, C3.puzzleC, C3.gateOpen, C3.checkpoint, C3.chronolithIntroSeen]) d.flags[f] = true;
+          d = applyReward(applyReward(d, OATHGUARD_REWARD).data, TEMPLE_MIXED_REWARD).data;
+          for (const f of [C3.templeFight1, C3.templeFight2, C3.chronolith, C3.chronolithOutroSeen, C3.hiddenName, C3.promise, C3.complete]) d.flags[f] = true;
+          d = applyReward(d, CHRONOLITH_REWARD).data;
+          d.items.potion = 3;
+          d.area = 'temple'; d.position = { ...TEMPLE_BATTLE_RETURN.chronolith };
+          if (stage === 'c3end') { services.gameState.load(d); game.scene.getScene('TitleScene').scene.start('WorldScene'); return; }
+          d = enterChapter4(d); d.position = { ...FORTRESS_SPAWN };
+          const order = ['c3end', 'start', 'trial', 'checkpoint', 'boss', 'heart', 'echo', 'return'] as const;
+          const at = (name: (typeof order)[number]): boolean => order.indexOf(stage) >= order.indexOf(name);
+          if (at('trial')) { d.flags[C4.entered] = true; d.flags[C4.aegisLearned] = true; d.position = { ...FORTRESS_BATTLE_RETURN.fortress_aegis_trial }; }
+          if (at('checkpoint')) {
+            for (const f of [C4.fightCourt, C4.fightHall, C4.fightGuard, C4.fightRift, C4.aegisTrial, FORT.sealsSolved, FORT.logRead, FORT.riftAligned, FORT.shortcutOpen, FORT.trialIntroSeen, FORT.trialDoneSeen, FORT.riftbornSeen, FORT.sealHintSeen, FORT.riftHintSeen, C4.reportA, C4.reportB]) d.flags[f] = true;
+            for (const r of [FORTRESS_COURT_REWARD, FORTRESS_HALL_REWARD, FORTRESS_GUARD_REWARD, FORTRESS_RIFT_REWARD, AEGIS_TRIAL_REWARD]) d = applyReward(d, r).data;
+            for (const f of [FORT.chestPotion, FORT.chestPlate, FORT.chestRobe]) d.flags[f] = true;
+            d.items.warden_plate = 1; d.items.keeper_robe = 1;
+            d = qaBuildData(d); // equivalen pemain yang membuka peti Benteng, memakai zirahnya, dan membelanjakan poin jurus
+            d = restChapter4Party(d); d.flags[C4.checkpoint] = true; d.items.potion = 3; d.position = { ...FORTRESS_BATTLE_RETURN.varlgrim };
+          }
+          if (at('boss')) { d.flags[C4.confront] = true; d.flags[FORT.bossIntroSeen] = true; d.flags[FORT.heartApproachSeen] = true; }
+          if (at('heart')) { d.flags[C4.varlgrim] = true; d.flags[C4.leanSeen] = true; d = applyReward(d, VARLGRIM_REWARD).data; }
+          if (at('echo')) { for (const f of [C4.unlockYaric, C4.unlockVelthia, C4.heartOpen, C4.towerFallen, FORT.echoEntered]) d.flags[f] = true; }
+          if (stage === 'return') {
+            for (const f of [C4.memoryA, C4.memoryB, C4.oldMemory, C4.varlgrimTruth, C4.creatorReveal, C4.varlgrimStays, FORT.torvanLeft]) d.flags[f] = true;
+            d = returnToAveloria(d, { ...AVELORIA_C4_SPAWN });
+          }
+          if (opts?.hp?.C01 !== undefined) d.vitals = { ...d.vitals, hp: opts.hp.C01 };
+          if (opts?.mp?.C01 !== undefined) d.vitals = { ...d.vitals, mp: opts.mp.C01 };
+          if (d.partyVitals?.C02) d.partyVitals = { ...d.partyVitals, C02: { hp: opts?.hp?.C02 ?? d.partyVitals.C02.hp, mp: opts?.mp?.C02 ?? d.partyVitals.C02.mp } };
+          services.gameState.load(d);
+          if (battle) game.scene.getScene('TitleScene').scene.start('BattleScene', { encounter: battle });
+          else game.scene.getScene('TitleScene').scene.start('WorldScene');
+        },
+        /** QA: pakai zirah Benteng yang dimiliki dan belanjakan poin jurus (aksi RPG asli); kembalikan ringkasan. */
+        build: () => {
+          const d = qaBuildData(services.gameState.snapshot()!); services.gameState.load(d);
+          const c = (id: string): unknown => ({ equipment: d.rpg.characters[id]?.equipment, skills: d.rpg.characters[id]?.unlockedSkills, points: d.rpg.characters[id]?.skillPoints });
+          return { C01: c('C01'), C02: c('C02') };
+        },
+        /** QA: ubah HP satu aktor battle (mis. Varlgrim ke 30% untuk menguji fase meteor tanpa memainkan seluruh pertarungan). */
+        battleHp: (id: string, hp: number) => (game.scene.getScene('BattleScene') as import('./game/scenes/BattleScene').BattleScene).qaPatchHp(id, hp),
         /** Uji transisi besar tanpa battle: tutup layar dengan kategori tertentu, lalu `revealTransition`. */
-        coverTransition: (kind: 'normal' | 'scripted' | 'boss' | 'temporal' | 'return', label?: string) => (game.scene.getScene('TransitionScene') as import('./game/scenes/TransitionScene').TransitionScene).cover(kind, label).then(() => true),
+        coverTransition: (kind: 'normal' | 'scripted' | 'boss' | 'temporal' | 'final' | 'return', label?: string) => (game.scene.getScene('TransitionScene') as import('./game/scenes/TransitionScene').TransitionScene).cover(kind, label).then(() => true),
         openSliceEnd: () => services.router.openOverlay(game.scene.getScene('WorldScene'), 'SliceEndScene'),
         revealTransition: () => (game.scene.getScene('TransitionScene') as import('./game/scenes/TransitionScene').TransitionScene).reveal().then(() => true),
         shop: () => {

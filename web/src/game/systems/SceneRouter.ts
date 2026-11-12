@@ -3,8 +3,8 @@ import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import type { CoverKind } from '../scenes/TransitionScene';
 
 /** Pemutar transisi besar (TransitionScene); diakses lewat duck-typing agar router tidak bergantung pada kelas scene. */
-interface TransitionPlayer { isReady(): boolean; isCovered(): boolean; cover(kind: CoverKind, label?: string): Promise<void>; reveal(): Promise<void>; whenRevealed(): Promise<void> }
-export interface GotoOptions { transition?: CoverKind; label?: string }
+interface TransitionPlayer { isReady(): boolean; isCovered(): boolean; cover(kind: CoverKind, label?: string, subtitle?: string): Promise<void>; reveal(): Promise<void>; whenRevealed(): Promise<void> }
+export interface GotoOptions { transition?: CoverKind; label?: string; subtitle?: string }
 
 export interface OverlayData {
   returnTo: SceneKey;
@@ -47,7 +47,7 @@ export class SceneRouter {
     this.busy = true;
     const big = options?.transition ? this.player(from) : null;
     if (big) {
-      void big.cover(options!.transition!, options!.label).then(() => from.scene.start(to, data));
+      void big.cover(options!.transition!, options!.label, options!.subtitle).then(() => from.scene.start(to, data));
       return true;
     }
     const cam = from.cameras.main;

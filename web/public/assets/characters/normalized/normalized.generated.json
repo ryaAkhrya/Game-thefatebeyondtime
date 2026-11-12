@@ -397,6 +397,144 @@
       }
     },
     {
+      "id": "C04",
+      "status": "DRAFT",
+      "out": "assets/characters/normalized/C04_explore.png",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPLORATION_ATLAS_DRAFT.png",
+      "source_sha256": "1fec06b8752e533c82533b561ab7110d1add9d8ed69775b4e6a6b1ed0ddf9333",
+      "output_sha256": "737303a19af1f0b715bf28600c30a6fe8d09c8b65dccb0d55627df17ba92da22",
+      "per_direction": {
+        "down": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "left": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "right": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        },
+        "up": {
+          "dx": -1,
+          "dyAll": [
+            -1
+          ],
+          "heightsAfter": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "heightsBefore": [
+            44,
+            43,
+            44,
+            43,
+            44,
+            43
+          ],
+          "bottomBefore": [
+            47,
+            47,
+            47,
+            47,
+            47,
+            47
+          ],
+          "bottomAfter": 46,
+          "footCenterMean": 15.82
+        }
+      }
+    },
+    {
       "id": "C05",
       "status": "DRAFT",
       "out": "assets/characters/normalized/C05_explore.png",

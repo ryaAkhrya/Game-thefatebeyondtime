@@ -1,6 +1,10 @@
 # PHASE ROADMAP — DESKTOP WEB (CLAUDE CODE)
 
-## Phase 7 otonom — Chapter III + combat sinematik + SFX asli (instruksi terbaru)
+## Phase 8 otonom — Chapter IV: The Fate (instruksi terbaru)
+
+Instruksi Phase 8 mengotorisasikan Chapter IV (C4-01..07) dari akhir Bab III sampai Heart of Time selesai dan kembali ke Aveloria: Warden Fortress (teka-teki pengamatan, encounter, checkpoint), boss akhir Varlgrim (tiga fase), meteor + Ultimate Perlindungan Velthia, level cap 10 dengan kompatibilitas save lama, SFX asli (bukan BGM) dan pixel art DRAFT. Status **FUNCTIONAL PASS — VISUAL/AUDIO/BALANCE REVIEW PENDING**; bukti dan sisa masalah: `docs/production/PHASE8_REPORT.md`. **Modern Interlude, Epilog, kredit akhir, pesan anniversary dan data personal modern TIDAK termasuk dan tidak boleh dimulai tanpa instruksi baru.** Tidak ada commit/push/deploy otomatis.
+
+## Riwayat Phase 7 — Chapter III + combat sinematik + SFX asli
 
 Instruksi Phase 7 mengotorisasikan Chapter III (C3-01..07) sampai akhir bab, Velthia sebagai anggota party, Kuil Jejak, boss Chronolith, transisi battle 4 kategori, linimasa aksi/hitstop, pustaka VFX piksel dan SFX asli (bukan BGM). Status **FUNCTIONAL PASS — VISUAL/AUDIO REVIEW PENDING**; bukti dan sisa masalah: `docs/production/PHASE7_REPORT.md`. Bab IV, Varlgrim sebagai boss, meteor, dan Ultimate Perlindungan TIDAK termasuk.
 

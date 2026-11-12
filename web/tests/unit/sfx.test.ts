@@ -20,6 +20,14 @@ const REQUIRED = [
   'SFX_CHRONOLITH_CHARGE', 'SFX_CHRONOLITH_STRIKE', 'SFX_CHRONOLITH_TEMPORAL',
 ];
 
+/** Id wajib Phase 8 (Bab IV) dari docs/production/sprint4/CONTRACT.md. */
+const REQUIRED_P8 = [
+  'SFX_FORTRESS_DOOR_ANCIENT', 'SFX_SEAL_ACTIVATE', 'SFX_SEAL_ERROR', 'SFX_ECHO_MEMORY', 'SFX_VARLGRIM_STAFF_SWING', 'SFX_VARLGRIM_STAFF_IMPACT',
+  'SFX_TEMPORAL_BIND', 'SFX_TIME_DISTORTION', 'SFX_BOSS_PHASE_SHIFT', 'SFX_FRACTURE_MARK', 'SFX_METEOR_CHARGE', 'SFX_METEOR_DESCENT',
+  'SFX_METEOR_IMPACT', 'SFX_AEGIS_CAST', 'SFX_AEGIS_FORM', 'SFX_AEGIS_STRESS', 'SFX_AEGIS_FADE', 'SFX_HEART_LOCK', 'SFX_HEART_UNSEAL',
+  'SFX_TOWER_COLLAPSE_DISTANT', 'SFX_RIFTBORN_ATTACK', 'SFX_GRAVORN_ATTACK', 'SFX_BATTLE_TRANSITION_FINAL',
+];
+
 interface Decoded { sampleRate: number; channels: number; bits: number; samples: Float32Array }
 function decodeWav(b: Buffer): Decoded {
   expect(b.toString('ascii', 0, 4)).toBe('RIFF');
@@ -54,7 +62,8 @@ describe('SFX_REGISTRY', () => {
     const ids = SFX_REGISTRY.map(c => c.id);
     expect(new Set(ids).size).toBe(ids.length);
     for (const id of REQUIRED) expect(ids, id).toContain(id);
-    expect(ids.length).toBe(REQUIRED.length);
+    for (const id of REQUIRED_P8) expect(ids, id).toContain(id);
+    expect(ids.length).toBe(REQUIRED.length + REQUIRED_P8.length);
     for (const c of SFX_REGISTRY) {
       expect(c.status, c.id).toBe('READY');
       expect(c.id).toMatch(/^SFX_[A-Z0-9_]+$/);
@@ -63,6 +72,31 @@ describe('SFX_REGISTRY', () => {
       expect(c.gain).toBeGreaterThan(0);
       expect(c.gain).toBeLessThanOrEqual(1);
     }
+  });
+
+  it('Phase 8: semua id READY, kategori baru, interval/gain wajar, variasi untuk bunyi yang sering berulang', () => {
+    const p8 = SFX_REGISTRY.filter(c => REQUIRED_P8.includes(c.id));
+    expect(p8.length).toBe(REQUIRED_P8.length);
+    for (const c of p8) {
+      expect(c.status, c.id).toBe('READY');
+      expect(['world', 'boss', 'meteor', 'aegis', 'transition']).toContain(c.category);
+      expect(c.minIntervalMs, c.id).toBeGreaterThanOrEqual(150);
+      expect(c.gain, c.id).toBeGreaterThanOrEqual(0.5);
+      expect(c.durationMs, c.id).toBeGreaterThan(0);
+    }
+    const files = (id: string): number => SFX_REGISTRY.find(c => c.id === id)!.files.length;
+    for (const id of ['SFX_RIFTBORN_ATTACK', 'SFX_GRAVORN_ATTACK']) expect(files(id), id).toBe(3);
+    for (const id of ['SFX_VARLGRIM_STAFF_SWING', 'SFX_VARLGRIM_STAFF_IMPACT', 'SFX_TEMPORAL_BIND', 'SFX_FRACTURE_MARK', 'SFX_SEAL_ERROR', 'SFX_AEGIS_STRESS']) expect(files(id), id).toBe(2);
+    // momen tunggal yang tidak boleh melelahkan: interval panjang
+    for (const id of ['SFX_METEOR_IMPACT', 'SFX_TOWER_COLLAPSE_DISTANT']) expect(SFX_REGISTRY.find(c => c.id === id)!.minIntervalMs, id).toBeGreaterThanOrEqual(3000);
+  });
+
+  it('durasi meteor/Perlindungan sesuai kontrak: dampak besar + ekor, cast 2.2-2.8 s, telegraf >= 1.6 s', () => {
+    const d = (id: string): number => SFX_REGISTRY.find(c => c.id === id)!.durationMs!;
+    expect(d('SFX_AEGIS_CAST')).toBeGreaterThanOrEqual(2200); expect(d('SFX_AEGIS_CAST')).toBeLessThanOrEqual(2800);
+    expect(d('SFX_METEOR_CHARGE')).toBeGreaterThanOrEqual(1600);
+    expect(d('SFX_METEOR_DESCENT') + d('SFX_METEOR_IMPACT')).toBeGreaterThanOrEqual(3200);
+    expect(d('SFX_BATTLE_TRANSITION_FINAL')).toBeLessThanOrEqual(1600);
   });
 
   it('langkah punya >= 3 variasi; id lain satu berkas kecuali bila disengaja', () => {
@@ -146,11 +180,26 @@ describe('berkas WAV SFX', () => {
   });
 
   it('variasi langkah berbeda satu sama lain (bukan salinan)', () => {
-    for (const id of ['SFX_STEP_GRASS', 'SFX_STEP_DIRT', 'SFX_STEP_STONE']) {
+    for (const id of ['SFX_STEP_GRASS', 'SFX_STEP_DIRT', 'SFX_STEP_STONE', 'SFX_RIFTBORN_ATTACK', 'SFX_GRAVORN_ATTACK', 'SFX_VARLGRIM_STAFF_SWING', 'SFX_VARLGRIM_STAFF_IMPACT', 'SFX_TEMPORAL_BIND', 'SFX_FRACTURE_MARK', 'SFX_SEAL_ERROR', 'SFX_AEGIS_STRESS']) {
       const files = SFX_REGISTRY.find(c => c.id === id)!.files;
       const hashes = files.map(f => createHash('sha256').update(readFileSync(resolve(OUT_DIR, f))).digest('hex'));
       expect(new Set(hashes).size, id).toBe(files.length);
     }
+  });
+});
+
+describe('Phase 7 tetap utuh (hash beku)', () => {
+  it('53 berkas WAV Phase 7 byte-identik dengan hash yang dibekukan (fixture)', () => {
+    const frozen = JSON.parse(readFileSync(resolve(__dirname, 'fixtures', 'sfx-phase7-hashes.json'), 'utf8')) as Record<string, string>;
+    expect(Object.keys(frozen).length).toBe(53);
+    for (const [file, hash] of Object.entries(frozen)) {
+      expect(createHash('sha256').update(readFileSync(resolve(OUT_DIR, file))).digest('hex'), file).toBe(hash);
+    }
+  });
+
+  it('tidak ada berkas BGM di folder SFX maupun registry; tidak ada musik berkelanjutan (durasi <= 4.5 s)', () => {
+    for (const f of readdirSync(OUT_DIR)) expect(/^BGM/i.test(f), f).toBe(false);
+    for (const c of SFX_REGISTRY) { expect(c.id.startsWith('BGM')).toBe(false); expect(c.durationMs!, c.id).toBeLessThanOrEqual(4500); }
   });
 });
 

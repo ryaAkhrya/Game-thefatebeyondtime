@@ -1,5 +1,6 @@
 import { SAVE_STORAGE_PREFIX } from '../config/constants';
 import type { AreaId, ChapterId } from '../data/ids';
+import { normalizeLedger } from '../rpg/rewardLedger';
 import { migrateLegacyGameState, validateGameStateData, type GameStateData } from './GameState';
 import type { StorageLike } from './StorageAdapter';
 
@@ -92,7 +93,9 @@ export class SaveRepository {
     if (env.slot !== slot) return { status: 'corrupt', reason: 'slot tidak cocok' };
     if (!env.data || env.checksum !== checksumOf(env.data)) return { status: 'corrupt', reason: 'checksum tidak cocok' };
     const legacy = String(env.schema) === 'save_v1';
-    const data = legacy ? migrateLegacyGameState(env.data) : validateGameStateData(env.data);
+    // Phase 8: save v2 lama yang EXP-nya terpotong cap level 5 dipulihkan dari ledger hadiah (hanya naik, idempoten; tidak ditulis ulang sampai pemain menyimpan).
+    const validated = legacy ? migrateLegacyGameState(env.data) : validateGameStateData(env.data);
+    const data = validated && !legacy ? normalizeLedger(validated) : validated;
     if (!data || (!legacy && env.data.schemaVersion !== 2)) return { status: 'corrupt', reason: 'data game tidak valid' };
     if (typeof env.savedAt !== 'string' || Number.isNaN(Date.parse(env.savedAt))) {
       return { status: 'corrupt', reason: 'savedAt tidak valid' };

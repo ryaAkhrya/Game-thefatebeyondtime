@@ -1,59 +1,111 @@
 import { ITEMS } from '../rpg/definitions';
-import { itemUseReason, useConsumable } from '../rpg/inventory';
+import { changeItem, itemUseReason, useConsumable } from '../rpg/inventory';
 import { VELTHIA_SKILL_INFO, VELTHIA_TUNING, bloomAmount, isVelthiaCommand, mendAmount, pulseDamage, velthiaSkillsAtLevel, wardAmount, type VelthiaCommand } from '../rpg/velthia';
+import { AEGIS_COMMAND, GRAVORN_COMMANDS, RIFTBORN_COMMANDS, VARLGRIM_COMMANDS, type VarlgrimCommand } from '../story/chapter4Flags';
+import { AEGIS, aegisStress, stressLevel } from './aegis';
+import { C4_POWER, gravornNext, riftbornNext, type GravornCommand, type RiftbornCommand } from './c4Enemies';
+import { LEAD_IN, VARLGRIM, isPlainCommand, varlgrimNext, varlgrimPhaseFor, varlgrimPlainFallback, type VarlgrimPhase } from './varlgrim';
 /** Pure combat model. All balance values are DRAFT, independent of Phaser and wall-clock time. */
 export interface Stats { HP: number; MP: number; ATK: number; DEF: number; MAG: number; MDEF: number; SPD: number }
 /**
- * shield: menyerap `amount` kerusakan sebelum HP (dipakai ulang oleh Ultimate Perlindungan Chapter IV nanti; durasi = giliran pemilik).
- * regen: pulihkan `amount` HP di akhir giliran pemilik. concord: serangan berikutnya Yaric x1.5. chrono_guard: kerusakan masuk x0.5.
+ * shield: menyerap `amount` kerusakan sebelum HP (Ward). regen: pulihkan `amount` HP di akhir giliran pemilik.
+ * concord: serangan berikutnya Yaric x1.5. chrono_guard: kerusakan masuk x0.5.
+ * aegis (Chapter IV): perisai Perlindungan; tidak berkurang per giliran, tidak dapat di-dispel/diganti, hanya dihabiskan oleh ancaman besar.
  */
-export type StatusId = 'poison' | 'stun' | 'atk_up' | 'def_up' | 'shield' | 'regen' | 'concord' | 'chrono_guard';
+export type StatusId = 'poison' | 'stun' | 'atk_up' | 'def_up' | 'shield' | 'regen' | 'concord' | 'chrono_guard' | 'aegis';
 export interface StatusEffect { id: StatusId; turns: number; /** hanya shield (sisa serap) dan regen (HP per giliran) */ amount?: number }
 export type ChronolithIntent = 'chrono_sweep' | 'chrono_charge' | 'chrono_slam' | 'chrono_guard' | 'chrono_rewind';
-export type Intent = 'strike' | 'windup' | 'sweep' | 'recover' | 'knight_strike' | 'knight_guard' | 'knight_thrust' | 'knight_recover' | 'oath_strike' | 'oath_brace' | ChronolithIntent;
+export type Intent = 'strike' | 'windup' | 'sweep' | 'recover' | 'knight_strike' | 'knight_guard' | 'knight_thrust' | 'knight_recover' | 'oath_strike' | 'oath_brace' | ChronolithIntent | VarlgrimCommand | RiftbornCommand | GravornCommand;
 export interface BattleActor {
   id: string; name: string; side: 'player' | 'enemy'; stats: Stats;
   hp: number; mp: number; defending: boolean; statuses: StatusEffect[];
   skills?: string[];
   /** Boss intention survives the full player response turn; presentation only reads it. */
   intent?: Intent;
-  /** Chronolith/Oathguard: penghitung pola deterministik (tanpa RNG). */
+  /** Chronolith/Oathguard/Varlgrim/Riftborn/Gravorn: penghitung pola deterministik (tanpa RNG). */
   aiStep?: number;
-  /** Chronolith: fase 1/2 (fase 2 di HP <= 50%). */
-  phase?: 1 | 2;
+  /** Chronolith: fase 1/2 (fase 2 di HP <= 50%). Varlgrim: fase 1 Keeper, 2 Distortion, 3 Meteor. */
+  phase?: VarlgrimPhase;
   /** Chronolith: jumlah hantaman yang sudah ditelegraf (rotasi target). */
   slams?: number;
-  /** Chronolith: target hantaman yang sudah ditelegraf (ada selama intent chrono_slam). */
+  /** Chronolith/Varlgrim/Gravorn/Riftborn: target serangan yang sudah ditelegraf (ada sampai serangannya jatuh). */
   intentTargetId?: string; intentTargetName?: string;
+  /** Varlgrim: aksi biasa sejak meteor terakhir. Riftborn Penguji: lash sejak surge. */
+  calm?: number;
+  /** Rotasi target/aksi deterministik (Varlgrim, Riftborn, Gravorn). */
+  rot?: number;
+  /** Velthia: muatan Perlindungan, 0 atau 1. undefined = tidak ada ancaman besar dalam pertarungan ini. */
+  aegis?: number;
+  /** Riftborn Penguji (fortress_aegis_trial): rift_surge mematikan tanpa Perlindungan. */
+  lethalSurge?: boolean;
 }
-export type EnemyCommand = 'boss_windup' | 'boss_sweep' | 'boss_recover' | 'knight_guard' | 'knight_thrust' | 'knight_recover' | 'oath_brace' | ChronolithIntent;
-export type Command = 'attack' | 'ground_slam' | 'ranting_nakal' | 'bukan_aku' | 'tunas_bandel' | 'potion' | 'defend' | 'run' | 'stunned' | VelthiaCommand | EnemyCommand;
+export type EnemyCommand = 'boss_windup' | 'boss_sweep' | 'boss_recover' | 'knight_guard' | 'knight_thrust' | 'knight_recover' | 'oath_brace' | ChronolithIntent | VarlgrimCommand | RiftbornCommand | GravornCommand;
+export type Command = 'attack' | 'ground_slam' | 'ranting_nakal' | 'bukan_aku' | 'tunas_bandel' | 'potion' | 'defend' | 'run' | 'stunned' | VelthiaCommand | typeof AEGIS_COMMAND | EnemyCommand;
 export type Outcome = 'victory' | 'defeat' | 'escaped' | null;
 export interface PendingAction { token: number; actorId: string; command: Command; targetId?: string; impacted: boolean }
 export interface BattleTick { actorId: string; kind: 'poison' | 'regen'; amount: number }
+/** Jendela ancaman mematikan (meteor Varlgrim atau surge Riftborn Penguji). Hanya ada bila roster memuatnya. */
+export interface MeteorWindow {
+  /** true dari meteor_call/rift_gather sampai dampak jatuh */
+  open: boolean;
+  /** Velthia sudah menyelesaikan aksi (bukan terhenti) sejak telegraf */
+  velthiaActed: boolean;
+  calls: number; holds: number; falls: number;
+}
 export interface BattleState {
   actors: BattleActor[]; order: string[]; cursor: number; turn: number;
   items: Record<string, number>; allowRun: boolean; outcome: Outcome;
   pending: PendingAction | null; log: string[];
   /** Efek akhir giliran dari finish() terakhir (racun/regen) untuk presenter. */
   ticks: BattleTick[];
+  meteor?: MeteorWindow;
+  /** Chapter IV: Potion boleh membangkitkan sekutu tumbang (jalur pemulihan Velthia; lihat ULTIMATE_SHIELD_MECHANIC.md). */
+  revivePotion?: true;
 }
 /** Satu efek pada satu target; presenter memutar sesuai `kind`. */
 export interface EffectResult {
   targetId: string;
-  kind: 'damage' | 'heal' | 'shield' | 'regen' | 'buff' | 'mp' | 'guard' | 'shift' | 'telegraph' | 'none';
+  kind: 'damage' | 'heal' | 'shield' | 'regen' | 'buff' | 'mp' | 'guard' | 'shift' | 'telegraph' | 'none' | 'meteor' | 'aegis' | 'revive';
   amount: number; absorbed?: number; status?: StatusId;
+  /** kind 'meteor': tingkat tekanan pada perisai (0 = tidak ada perisai/tewas, 1..3 makin berat) */
+  stress?: 0 | 1 | 2 | 3;
+  /** kind 'meteor': anggota tewas karena tidak berperlindungan */
+  lethal?: boolean;
+  /** kind 'heal' dari Potion yang membangkitkan */
+  revived?: boolean;
 }
-/** Petunjuk frame BattleAtlas: kunci standar atau khusus (cast/heal/shield/summon/guard/special). */
-export type FrameKeyHint = 'attack' | 'anticipation' | 'cast' | 'heal' | 'shield' | 'summon' | 'guard' | 'special' | 'idle_a';
+/** Petunjuk frame BattleAtlas: kunci standar atau khusus (cast/heal/shield/summon/guard/special; plant/raise khusus Varlgrim). */
+export type FrameKeyHint = 'attack' | 'anticipation' | 'cast' | 'heal' | 'shield' | 'summon' | 'guard' | 'special' | 'idle_a' | 'plant' | 'raise';
+/** Laporan jendela ancaman besar untuk presenter (kamera, VFX, SFX, banner). */
+export interface MeteorReport {
+  event: 'call' | 'hold' | 'fall' | 'aegis_cast';
+  /** 'meteor' (Varlgrim) atau 'surge' (Riftborn Penguji) */
+  source: 'meteor' | 'surge';
+  /** id anggota yang bernaung di bawah perisai pada saat peristiwa */
+  protectedIds: string[];
+  /** event 'fall': true bila ada anggota yang tewas karena tidak berperlindungan */
+  lethal: boolean;
+  /** event 'fall': total HP yang diselamatkan perisai */
+  savedHp: number;
+  /** event 'fall': tekanan terbesar 0..3 */
+  stressMax: 0 | 1 | 2 | 3;
+  /** muatan Perlindungan Velthia sesudah peristiwa (0/1) */
+  charge: 0 | 1;
+}
 export interface ImpactResult {
   /** HP nyata yang berubah pada `targetId` (kerusakan setelah serapan, atau pemulihan). */
   amount: number; targetId: string; text: string;
   actorId: string; command: Command; skillId?: string; frameKey: FrameKeyHint;
   targetIds: string[]; effects: EffectResult[]; absorbed: number;
-  /** chrono_charge: target & hantaman berikutnya. chrono_rewind: urutan giliran baru. */
-  telegraph?: { targetId: string; next: ChronolithIntent };
+  /** chrono_charge / keeper_stance / fracture_mark / gravorn_brace: target & serangan berikutnya. chrono_rewind: urutan giliran baru. */
+  telegraph?: { targetId: string; next: Intent };
   order?: string[];
+  /** phase_shift Varlgrim: fase baru. */
+  phase?: VarlgrimPhase;
+  /** meteor_call / meteor_hold / meteor_fall / velthia_aegis (dan rift_gather/rift_surge pada uji). */
+  meteor?: MeteorReport;
+  /** anggota yang bangkit pada aksi ini (phase_shift ke fase 3, atau Potion). */
+  revived?: string[];
 }
 export const GROUND_SLAM = { cost: 4, power: 1.65 } as const;
 export const POTION_HEAL = ITEMS.potion!.healHP!;
@@ -69,13 +121,21 @@ export const CHRONOLITH = {
   guardReduction: 0.5, guardTurns: 2,
 } as const;
 const OATHGUARD_PATTERN: readonly Intent[] = ['oath_strike', 'oath_brace', 'oath_strike'];
-const NAMES: Record<string, string> = { C01: 'Yaric', C02: 'Velthia', C03: 'Torvan', M01: 'Hollowling', M02: 'Briaroot', M03: 'Wisplet', M05: 'Oathguard', B01: 'Mournfang', B02: 'Veyrath', B03: 'Chronolith' };
+const NAMES: Record<string, string> = { C01: 'Yaric', C02: 'Velthia', C03: 'Torvan', C04: 'Varlgrim', M01: 'Hollowling', M02: 'Briaroot', M03: 'Wisplet', M04: 'Gravorn', M05: 'Oathguard', M06: 'Riftborn', B01: 'Mournfang', B02: 'Veyrath', B03: 'Chronolith' };
+/** Semua perintah musuh Bab IV (nama sama dengan niat). */
+const C4_ENEMY_COMMANDS: ReadonlySet<string> = new Set<string>([...VARLGRIM_COMMANDS, ...RIFTBORN_COMMANDS, ...GRAVORN_COMMANDS]);
+export const isC4EnemyCommand = (c: string): boolean => C4_ENEMY_COMMANDS.has(c);
+/** Perintah yang HANYA boleh dijalankan musuh. */
+const isEnemyOnlyCommand = (c: string): boolean => c.startsWith('boss_') || c.startsWith('knight_') || c.startsWith('chrono_') || c.startsWith('oath_') || C4_ENEMY_COMMANDS.has(c);
 
 export function actor(id: string, side: BattleActor['side'], stats: Stats): BattleActor {
   return { id, name: NAMES[id] ?? id, side, stats: { ...stats }, hp: stats.HP, mp: stats.MP, defending: false, statuses: [],
     skills: id === 'C01' ? ['ground_slam'] : id === 'C03' ? ['ranting_nakal', 'bukan_aku'] : id === 'C02' ? velthiaSkillsAtLevel(5) : [],
     ...(id === 'B01' ? { intent: 'strike' as const } : id === 'B02' ? { intent: 'knight_strike' as const } : id === 'M05' ? { intent: 'oath_strike' as const, aiStep: 0 }
-      : id === 'B03' ? { intent: 'chrono_sweep' as const, aiStep: 0, phase: 1 as const, slams: 0 } : {}) };
+      : id === 'B03' ? { intent: 'chrono_sweep' as const, aiStep: 0, phase: 1 as const, slams: 0 }
+      : id === 'C04' ? { intent: 'keeper_stance' as const, aiStep: 1, phase: 1 as const, calm: 0, rot: 0 }
+      : id === 'M06' ? { intent: 'rift_lash' as const, aiStep: 1, calm: 0, rot: 0 }
+      : id === 'M04' ? { intent: 'gravorn_heave' as const, aiStep: 1, rot: 0 } : {}) };
 }
 
 /** SPD descending; equal speeds use stable lexical actor ID (no locale-dependent sorting). */
@@ -88,6 +148,10 @@ export function damage(attacker: BattleActor, target: BattleActor, power = 1): n
   const atk = attacker.stats.ATK * (attacker.statuses.some(s => s.id === 'concord') ? VELTHIA_TUNING.concordMult : attacker.statuses.some(s => s.id === 'atk_up') ? 1.25 : 1);
   const def = target.stats.DEF * (target.statuses.some(s => s.id === 'def_up') ? 1.25 : 1);
   return Math.max(1, Math.floor(Math.max(1, atk * power - def * 0.5) * (target.defending ? 0.5 : 1) * guardMult(target)));
+}
+/** Serangan sihir musuh Bab IV (MAG vs MDEF). Defend tetap memotong separuh; Ward menyerap lewat applyDamage. */
+export function magicDamage(attacker: BattleActor, target: BattleActor, power = 1): number {
+  return Math.max(1, Math.floor(Math.max(1, attacker.stats.MAG * power - target.stats.MDEF * 0.55) * (target.defending ? 0.5 : 1) * guardMult(target)));
 }
 
 /** Terapkan kerusakan: selubung (shield) menyerap dulu, sisanya mengurangi HP. Satu pintu untuk semua serangan. */
@@ -103,7 +167,7 @@ export function applyDamage(target: BattleActor, raw: number): { hp: number; abs
   target.hp -= hp;
   return { hp, absorbed };
 }
-/** Selubung yang dapat dipakai ulang (Ward sekarang, Ultimate Perlindungan nanti): muat ulang, tidak menumpuk. */
+/** Selubung yang dapat dipakai ulang (Ward): muat ulang, tidak menumpuk. Bukan Perlindungan (status `aegis`). */
 export function addShield(target: BattleActor, amount: number, turns: number): void {
   if (!Number.isInteger(turns) || turns < 1 || !Number.isFinite(amount) || amount < 1) throw new Error('Invalid shield');
   const existing = target.statuses.find(s => s.id === 'shield');
@@ -116,10 +180,12 @@ export function enemyAI(enemy?: Pick<BattleActor, 'intent'>): Command {
   const i = enemy?.intent;
   return i === 'windup' ? 'boss_windup' : i === 'sweep' ? 'boss_sweep' : i === 'recover' ? 'boss_recover'
     : i === 'knight_guard' ? 'knight_guard' : i === 'knight_thrust' ? 'knight_thrust' : i === 'knight_recover' ? 'knight_recover'
-    : i === 'oath_brace' ? 'oath_brace' : i?.startsWith('chrono_') ? i as ChronolithIntent : 'attack';
+    : i === 'oath_brace' ? 'oath_brace' : i && C4_ENEMY_COMMANDS.has(i) ? i as EnemyCommand : i?.startsWith('chrono_') ? i as ChronolithIntent : 'attack';
 }
 
-export function intentHint(enemy: Pick<BattleActor, 'intent'> & { intentTargetName?: string }): string {
+export function intentHint(enemy: Pick<BattleActor, 'intent'> & { intentTargetName?: string }, ctx?: { aegisCovered?: boolean }): string {
+  const who = enemy.intentTargetName ?? 'salah satu dari kalian';
+  const covered = ctx?.aegisCovered ? ' Perisai Perlindungan sudah menaungi kalian; bertahanlah sampai dampak.' : '';
   if (enemy.intent === 'sweep') return 'Sapuan berat berikutnya. Bertahan atau Ground Slam!';
   if (enemy.intent === 'recover') return 'Mournfang goyah. Ada waktu untuk menyerang atau memulihkan HP.';
   if (enemy.intent === 'knight_thrust') return 'Veyrath mengarah ke Torvan. Lindungi dia atau pecahkan kuda-kudanya dengan sihir!';
@@ -130,14 +196,41 @@ export function intentHint(enemy: Pick<BattleActor, 'intent'> & { intentTargetNa
   if (enemy.intent === 'chrono_slam') return `Hantaman berat mengarah ke ${enemy.intentTargetName ?? 'salah satu dari kalian'}! Pasang selubung, bertahan, atau pulihkan.`;
   if (enemy.intent === 'chrono_guard') return 'Chronolith akan menutup diri. Serangan pada saat itu melemah; gunakan waktunya untuk bersiap.';
   if (enemy.intent === 'chrono_rewind') return 'Chronolith akan memutar waktu: giliran satu sekutu bergeser dan penguat Yaric terhapus.';
+  // ---- Varlgrim ----
+  if (enemy.intent === 'keeper_stance') return 'Varlgrim menegakkan tongkatnya dan membidik salah satu dari kalian. Hantaman berat menyusul. Bertahan atau pasang Selubung pada sasarannya.';
+  if (enemy.intent === 'keeper_strike') return `Hantaman tongkat mengarah ke ${who}! Bertahan, pasang Selubung Kecil, atau pulihkan.`;
+  if (enemy.intent === 'seal_pulse') return 'Denyut segel akan menyapu seluruh barisan. Ringan, tetapi mengenai semua.';
+  if (enemy.intent === 'time_bind') return 'Varlgrim akan mengikat waktu satu sekutu: gilirannya bergeser dan penguatnya terhapus. Kalian tetap bisa bertindak.';
+  if (enemy.intent === 'fracture_mark') return 'Varlgrim akan menandai satu sekutu dengan retakan waktu. Hantaman retak menyusul pada ronde berikutnya.';
+  if (enemy.intent === 'fracture_strike') return `Retakan waktu menghantam ${who}! Lindungi sasarannya: Bertahan atau Selubung Kecil.`;
+  if (enemy.intent === 'distortion_wave') return 'Gelombang distorsi akan menghantam seluruh barisan. Bertahan atau pasang Selubung untuk meredamnya.';
+  if (enemy.intent === 'phase_shift') return 'Varlgrim berhenti dan menanam tongkatnya. Waktu bergeser; tidak ada serangan. Manfaatkan jeda ini.';
+  if (enemy.intent === 'meteor_call') return 'Varlgrim akan mengangkat tongkat dan memanggil Meteor. Bersiaplah: Perlindungan Velthia tanpa MP adalah satu-satunya jawaban.';
+  if (enemy.intent === 'meteor_fall') return `Meteor jatuh di akhir ronde ini! Bertahan, Selubung, atau Potion tidak menghalanginya. Velthia: pilih Perlindungan (tanpa MP).${covered}`;
+  if (enemy.intent === 'meteor_hold') return 'Meteor masih tergantung di langit. Varlgrim menunggu Velthia bertindak. Pilih Perlindungan (tanpa MP).';
+  // ---- Riftborn / Gravorn ----
+  if (enemy.intent === 'rift_lash') return 'Riftborn menyentak dengan cincin retak. Serangan ringan pada satu sasaran.';
+  if (enemy.intent === 'rift_gather') return 'Cincin Riftborn berhenti dan berkumpul. Sentakan berat menyusul. Bersiaplah.';
+  if (enemy.intent === 'rift_surge') return `Sentakan berat Riftborn akan menimpa ${who}! Bertahan atau pasang Selubung. Pada uji Perlindungan: Velthia, pilih Perlindungan.${covered}`;
+  if (enemy.intent === 'gravorn_heave') return 'Gravorn mengayunkan lengan batunya. Pertahanannya tinggi; sihir menembusnya.';
+  if (enemy.intent === 'gravorn_brace') return 'Gravorn mengangkat lengan batunya dan mengeras. Crush berat menyusul. Gunakan sihir atau bersiaplah bertahan.';
+  if (enemy.intent === 'gravorn_crush') return `Crush Gravorn mengarah ke ${who}! Bertahan atau pasang Selubung.`;
   return '';
 }
 
-/** Durations count completed OWNER turns. Poison ticks before decrement; Stun replaces one action. */
+/** Ringkasan Perlindungan untuk menu/banner: tersedia, sudah menaungi, atau ancaman besar sedang tergantung. */
+export function aegisStatus(state: Pick<BattleState, 'actors' | 'meteor'>): { threat: boolean; windowOpen: boolean; charge: 0 | 1 | null; covered: boolean; velthiaAlive: boolean } {
+  const v = state.actors.find(a => a.id === 'C02' && a.side === 'player');
+  const alive = state.actors.filter(a => a.side === 'player' && a.hp > 0);
+  return { threat: !!state.meteor, windowOpen: !!state.meteor?.open, charge: v?.aegis === undefined ? null : v.aegis >= 1 ? 1 : 0,
+    covered: alive.length > 0 && alive.every(a => a.statuses.some(s => s.id === 'aegis')), velthiaAlive: !!v && v.hp > 0 };
+}
+
+/** Durations count completed OWNER turns. Poison ticks before decrement; Stun replaces one action. `aegis` tidak berkurang per giliran. */
 export function finishStatuses(a: BattleActor): number {
   const loss = a.statuses.some(s => s.id === 'poison') ? Math.min(a.hp, Math.max(1, Math.floor(a.stats.HP * 0.08))) : 0;
   a.hp -= loss;
-  a.statuses = a.statuses.map(s => ({ ...s, turns: s.turns - 1 })).filter(s => s.turns > 0);
+  a.statuses = a.statuses.map(s => s.id === 'aegis' ? s : ({ ...s, turns: s.turns - 1 })).filter(s => s.turns > 0);
   return loss;
 }
 /** Regen sebelum penurunan durasi; hanya aktor hidup. */
@@ -155,9 +248,14 @@ function chronolithIntent(a: BattleActor): ChronolithIntent {
   return CHRONOLITH.phase1[step % CHRONOLITH.phase1.length]!;
 }
 
+export interface EngineOptions { revivePotion?: boolean }
+
 export class BattleEngine {
-  private readonly data: BattleState;
-  constructor(actors: BattleActor[], items: Record<string, number> = {}, allowRun = false, private readonly random: () => number = () => 0.5) {
+  private data: BattleState;
+  /** Snapshot dalam memori di awal fase meteor (tidak pernah ke disk). */
+  private phaseSnap: BattleState | null = null;
+  private phaseEntered = false;
+  constructor(actors: BattleActor[], items: Record<string, number> = {}, allowRun = false, private readonly random: () => number = () => 0.5, options: EngineOptions = {}) {
     if (new Set(actors.map(a => a.id)).size !== actors.length || !actors.some(a => a.side === 'player') || !actors.some(a => a.side === 'enemy')) throw new Error('Invalid battle roster');
     for (const a of actors) {
       if (Object.values(a.stats).some(n => !Number.isFinite(n) || n < 0) || a.stats.HP < 1 || !Number.isFinite(a.hp) || !Number.isFinite(a.mp)) throw new Error('Invalid stats');
@@ -166,16 +264,30 @@ export class BattleEngine {
     const copy = structuredClone(actors);
     for (const a of copy) { a.hp = Math.max(0, Math.min(a.stats.HP, a.hp)); a.mp = Math.max(0, Math.min(a.stats.MP, a.mp)); }
     this.data = { actors: copy, order: turnOrder(copy), cursor: 0, turn: 1, items: { ...items }, allowRun, outcome: null, pending: null, log: [], ticks: [] };
+    if (copy.some(a => a.side === 'enemy' && (a.id === 'C04' || a.lethalSurge))) this.data.meteor = { open: false, velthiaActed: false, calls: 0, holds: 0, falls: 0 };
+    if (options.revivePotion) this.data.revivePotion = true;
     this.checkOutcome();
+    this.syncIntents();
   }
   snapshot(): BattleState { return structuredClone(this.data); }
+  /** Pulihkan keadaan dari snapshot (retry dalam memori, diagnostik, tes). Snapshot fase tidak ikut berubah. */
+  restore(state: BattleState): void { this.data = structuredClone(state); this.phaseEntered = false; }
+  /** Ada snapshot awal fase meteor? (dibuat otomatis saat Varlgrim masuk fase 3). */
+  get hasPhaseSnapshot(): boolean { return this.phaseSnap !== null; }
+  /** Ulang dari awal fase meteor. false bila belum pernah mencapai fase 3. Tidak menyentuh hadiah/penyimpanan. */
+  restorePhase(): boolean {
+    if (!this.phaseSnap) return false;
+    this.data = structuredClone(this.phaseSnap); this.phaseEntered = false;
+    return true;
+  }
   get current(): BattleActor { return structuredClone(this.currentActor()); }
   private currentActor(): BattleActor { return this.data.actors.find(a => a.id === this.data.order[this.data.cursor])!; }
+  private players(): BattleActor[] { return this.data.actors.filter(t => t.side === 'player' && t.hp > 0); }
   private target(a: BattleActor, targetId?: string, ally = false): BattleActor {
     const side = ally ? a.side : a.side === 'player' ? 'enemy' : 'player';
     const chosen = targetId ? this.data.actors.find(t => t.id === targetId) : undefined;
     if (targetId && (!chosen || chosen.side !== side || chosen.hp <= 0)) throw new Error('Target tidak valid');
-    const telegraphed = a.id === 'B03' && a.intent === 'chrono_slam' && a.intentTargetId ? this.data.actors.find(t => t.id === a.intentTargetId && t.hp > 0) : undefined;
+    const telegraphed = a.intentTargetId ? this.data.actors.find(t => t.id === a.intentTargetId && t.hp > 0) : undefined;
     return chosen ?? (a.id === 'B02' && a.intent === 'knight_thrust' ? this.data.actors.find(t => t.id === 'C03' && t.hp > 0) : undefined) ?? telegraphed
       ?? this.data.actors.find(t => t.side === side && t.hp > 0)!;
   }
@@ -191,11 +303,12 @@ export class BattleEngine {
     const a = this.currentActor();
     if (command === 'stunned') return 'Pilih perintah yang tersedia.';
     if (a.side === 'enemy' && command !== enemyAI(a)) return 'Aksi tidak sesuai pola musuh.';
-    if (a.side === 'player' && (command.startsWith('boss_') || command.startsWith('knight_') || command.startsWith('chrono_') || command.startsWith('oath_'))) return 'Aksi ini hanya untuk musuh.';
+    if (a.side === 'player' && isEnemyOnlyCommand(command)) return 'Aksi ini hanya untuk musuh.';
     if (a.side === 'player' && targetId) {
       const ally = command === 'potion' || command === 'bukan_aku' || command === 'tunas_bandel' || command === 'velthia_mend' || command === 'velthia_ward' || command === 'velthia_bloom' || command === 'velthia_concord';
       const target = s.actors.find(t => t.id === targetId);
-      if (!target || target.side !== (ally ? 'player' : 'enemy') || target.hp <= 0) return 'Target tidak tersedia.';
+      const reviveOk = command === 'potion' && s.revivePotion && target?.side === 'player';
+      if (!target || target.side !== (ally ? 'player' : 'enemy') || (target.hp <= 0 && !reviveOk)) return 'Target tidak tersedia.';
     }
     if (command === 'ground_slam' && !a.skills?.includes('ground_slam')) return 'Ground Slam belum terbuka.';
     if (command === 'ground_slam' && a.mp < GROUND_SLAM.cost) return 'MP tidak cukup. Perlu 4 MP.';
@@ -215,7 +328,19 @@ export class BattleEngine {
         if (targetId && targetId !== 'C01') return 'Selaras Langkah hanya untuk Yaric.';
       }
     }
-    if (command === 'potion') { const t = targetId ? this.target(a, targetId, true) : a; return itemUseReason(s.items, 'potion', t, t.stats.HP); }
+    if (command === AEGIS_COMMAND) {
+      if (a.id !== 'C02' || !a.skills?.includes(AEGIS_COMMAND)) return 'Perlindungan belum terbuka.';
+      if (a.aegis === undefined) return 'Tidak ada ancaman besar dalam pertarungan ini.';
+      if (a.aegis < AEGIS.fullCharge) return 'Perlindungan sudah dipakai. Muatannya pulih saat ancaman besar berikutnya dipanggil.';
+      const alive = this.players();
+      if (alive.every(t => t.statuses.some(e => e.id === 'aegis'))) return 'Perlindungan sudah menaungi kalian.';
+    }
+    if (command === 'potion') {
+      const t = targetId ? s.actors.find(x => x.id === targetId)! : a;
+      if (s.revivePotion && t.hp <= 0) return (s.items.potion ?? 0) >= 1 ? null : 'Potion sudah habis.';
+      const tt = targetId ? this.target(a, targetId, true) : a;
+      return itemUseReason(s.items, 'potion', tt, tt.stats.HP);
+    }
     if (command === 'run' && !s.allowRun) return `Jalan dihalangi. Hadapi ${this.target(a).name} dulu.`;
     return null;
   }
@@ -224,11 +349,58 @@ export class BattleEngine {
     const s = this.data;
     if (turn !== s.turn || s.outcome || s.pending) return null;
     const a = this.currentActor();
-    const stunned = a.statuses.some(e => e.id === 'stun');
+    // Selama jendela ancaman besar Velthia kebal terhadap Stun: tidak ada status yang dapat menutup Perlindungan.
+    const stunned = a.statuses.some(e => e.id === 'stun') && !(a.id === 'C02' && s.meteor?.open);
     if (!stunned && this.unavailable(command, targetId)) return null;
     a.defending = false; // guard lasts until the owner's next accepted action
     s.pending = { token: turn, actorId: a.id, command: stunned ? 'stunned' : command, ...(targetId ? { targetId } : {}), impacted: false };
     return structuredClone(s.pending);
+  }
+  /** Telegraf pilih target secara berputar (deterministik). */
+  private rotPick(a: BattleActor): BattleActor {
+    const list = this.players();
+    const pick = list[(a.rot ?? 0) % list.length]!;
+    a.rot = (a.rot ?? 0) + 1;
+    return pick;
+  }
+  private openWindow(a: BattleActor): void {
+    const s = this.data, w = s.meteor!;
+    w.open = true; w.velthiaActed = false; w.calls++;
+    for (const t of this.players()) t.statuses = t.statuses.filter(e => e.id !== 'poison' && e.id !== 'stun'); // tidak ada racun/stun selama jendela
+    const v = s.actors.find(t => t.id === 'C02' && t.side === 'player' && t.hp > 0);
+    if (v) v.aegis = AEGIS.fullCharge; // Heart bergema: muatan pulih deterministik
+    void a;
+  }
+  private meteorReport(event: MeteorReport['event'], source: MeteorReport['source'], extra: Partial<MeteorReport> = {}): MeteorReport {
+    const v = this.data.actors.find(t => t.id === 'C02');
+    return { event, source, protectedIds: this.players().filter(t => t.statuses.some(e => e.id === 'aegis')).map(t => t.id), lethal: false, savedHp: 0, stressMax: 0,
+      charge: v?.aegis !== undefined && v.aegis >= 1 ? 1 : 0, ...extra };
+  }
+  /** Dampak mematikan: tanpa `aegis` tewas; dengan `aegis` tertahan (HP >= 1) dengan tekanan deterministik. Tidak dapat di-Defend/Ward/guard. */
+  private lethalFall(label: string, source: MeteorReport['source']): { effects: EffectResult[]; text: string; report: MeteorReport } {
+    const s = this.data, w = s.meteor!;
+    const effects: EffectResult[] = [];
+    let saved = 0, stressMax: 0 | 1 | 2 | 3 = 0, anyLethal = false;
+    const protectedIds: string[] = [];
+    for (const t of this.players()) {
+      if (t.statuses.some(e => e.id === 'aegis')) {
+        const before = t.hp, stress = aegisStress(t.hp, t.stats.HP);
+        t.hp -= stress;
+        const level = stressLevel(t.hp, t.stats.HP, stress);
+        stressMax = Math.max(stressMax, level) as 0 | 1 | 2 | 3; saved += before - stress; protectedIds.push(t.id);
+        effects.push({ targetId: t.id, kind: 'meteor', amount: stress, absorbed: before - stress, stress: level, status: 'aegis' });
+      } else {
+        const lost = t.hp; t.hp = 0; anyLethal = true;
+        effects.push({ targetId: t.id, kind: 'meteor', amount: lost, stress: 0, lethal: true });
+      }
+    }
+    for (const t of s.actors) if (t.side === 'player') t.statuses = t.statuses.filter(e => e.id !== 'aegis'); // perisai habis sesudah dampak
+    w.open = false; w.velthiaActed = false; w.falls++;
+    const names = effects.filter(e => !e.lethal).map(e => this.nameOf(e.targetId));
+    const text = anyLethal
+      ? `${label} menghantam tanpa perisai. Tidak ada yang bisa menahannya.`
+      : `${label} menghantam. Perisai Perlindungan menahan: ${names.join(' dan ')} bertahan, tetapi perisainya retak dan tekanannya berat.`;
+    return { effects, text, report: this.meteorReport('fall', source, { protectedIds, lethal: anyLethal, savedHp: saved, stressMax, charge: s.actors.find(t => t.id === 'C02')?.aegis === 1 ? 1 : 0 }) };
   }
   /** Only the animation contact frame calls impact. Duplicate callbacks are harmless. */
   impact(token: number): ImpactResult | null {
@@ -241,7 +413,27 @@ export class BattleEngine {
     let effects: EffectResult[] = [];
     let telegraph: ImpactResult['telegraph'];
     let order: string[] | undefined;
-    const players = () => s.actors.filter(t => t.side === 'player' && t.hp > 0);
+    let phase: VarlgrimPhase | undefined;
+    let meteor: MeteorReport | undefined;
+    let revived: string[] | undefined;
+    const players = () => this.players();
+    /** Satu serangan ke satu target; mengisi amount/targetId/effects. */
+    const single = (t: BattleActor, raw: number) => {
+      const hit = applyDamage(t, raw);
+      amount = hit.hp; targetId = t.id; effects = [{ targetId: t.id, kind: 'damage', amount, ...(hit.absorbed ? { absorbed: hit.absorbed } : {}) }];
+      return hit;
+    };
+    /** Serangan ke seluruh barisan. */
+    const sweep = (power: number) => {
+      const list = players();
+      for (const t of list) {
+        const hit = applyDamage(t, magicDamage(a, t, power));
+        effects.push({ targetId: t.id, kind: 'damage', amount: hit.hp, ...(hit.absorbed ? { absorbed: hit.absorbed } : {}) });
+      }
+      amount = effects.reduce((n, e) => n + e.amount, 0); targetId = list[0]?.id ?? a.id;
+    };
+    const dmgText = (hit: { absorbed: number }, t: BattleActor) => `${t.name} menerima ${amount} kerusakan${hit.absorbed ? ` (${hit.absorbed} terserap selubung)` : ''}.`;
+    const clearTelegraph = () => { delete a.intentTargetId; delete a.intentTargetName; };
     switch (p.command) {
       case 'attack': case 'ground_slam': case 'boss_sweep': case 'knight_thrust': case 'ranting_nakal': {
         const t = this.target(a, p.targetId);
@@ -281,6 +473,14 @@ export class BattleEngine {
         text = `${a.name}: Tunas Bandel memulihkan ${amount} HP ${t.name}.`; break;
       }
       case 'potion': {
+        const ko = !!s.revivePotion && !!p.targetId && (s.actors.find(x => x.id === p.targetId)?.hp ?? 1) <= 0;
+        if (ko) {
+          const t = s.actors.find(x => x.id === p.targetId)!;
+          s.items = changeItem(s.items, 'potion', -1)!;
+          amount = Math.min(POTION_HEAL, t.stats.HP); t.hp = amount; targetId = t.id; frameKey = 'heal';
+          effects = [{ targetId: t.id, kind: 'heal', amount, revived: true }]; revived = [t.id];
+          text = `Potion membangkitkan ${t.name} dengan ${amount} HP.`; break;
+        }
         const t = p.targetId ? this.target(a, p.targetId, true) : a;
         const effect = useConsumable(s.items, 'potion', t, t.stats.HP)!;
         s.items = effect.items; t.hp = effect.vitals.hp; amount = effect.healed; targetId = t.id; frameKey = 'heal'; effects = [{ targetId: t.id, kind: 'heal', amount }];
@@ -333,6 +533,15 @@ export class BattleEngine {
         effects = [{ targetId: y.id, kind: 'buff', amount: 0, status: 'concord' }, { targetId: y.id, kind: 'mp', amount: mp }];
         text = `${a.name}: Selaras Langkah. Serangan ${y.name} berikutnya lebih kuat${mp ? ` dan ia pulih ${mp} MP` : ''}.`; break;
       }
+      // ---- Perlindungan (Ultimate Velthia, Chapter IV) ----
+      case 'velthia_aegis': {
+        a.aegis = 0; // satu-satunya konsumsi muatan
+        const allies = this.players();
+        for (const t of allies) { t.statuses = t.statuses.filter(e => e.id !== 'aegis'); t.statuses.push({ id: 'aegis', turns: AEGIS.statusTurns }); effects.push({ targetId: t.id, kind: 'aegis', amount: 0, status: 'aegis' }); }
+        amount = 0; targetId = allies[0]?.id ?? a.id; frameKey = 'special';
+        meteor = this.meteorReport('aegis_cast', s.actors.some(t => t.id === 'M06' && t.lethalSurge) ? 'surge' : 'meteor');
+        text = `${a.name}: Perlindungan. Perisai Heart menaungi ${allies.map(t => t.name).join(' dan ')} dan tidak dapat dihapus sampai ancaman jatuh.`; break;
+      }
       // ---- Chronolith (B03) ----
       case 'chrono_charge': {
         const list = players();
@@ -344,14 +553,14 @@ export class BattleEngine {
       }
       case 'chrono_slam': {
         const t = this.target(a);
-        const hit = applyDamage(t, damage(a, t, CHRONOLITH.slamPower[a.phase ?? 1]));
+        const hit = applyDamage(t, damage(a, t, CHRONOLITH.slamPower[(a.phase === 2 ? 2 : 1)]));
         amount = hit.hp; targetId = t.id; frameKey = 'attack'; effects = [{ targetId: t.id, kind: 'damage', amount, ...(hit.absorbed ? { absorbed: hit.absorbed } : {}) }];
         text = `Chronolith: hantaman waktu. ${t.name} menerima ${amount} kerusakan${hit.absorbed ? ` (${hit.absorbed} terserap selubung)` : ''}.`; break;
       }
       case 'chrono_sweep': {
         const list = players(); frameKey = 'attack';
         for (const t of list) {
-          const hit = applyDamage(t, damage(a, t, CHRONOLITH.sweepPower[a.phase ?? 1]));
+          const hit = applyDamage(t, damage(a, t, CHRONOLITH.sweepPower[(a.phase === 2 ? 2 : 1)]));
           effects.push({ targetId: t.id, kind: 'damage', amount: hit.hp, ...(hit.absorbed ? { absorbed: hit.absorbed } : {}) });
         }
         amount = effects.reduce((n, e) => n + e.amount, 0); targetId = list[0]?.id ?? a.id;
@@ -381,13 +590,126 @@ export class BattleEngine {
         } else { text = 'Chronolith memutar waktu, tetapi tidak ada yang bisa ditunda.'; }
         break;
       }
+      // ---- Varlgrim (C04) ----
+      case 'keeper_stance': case 'fracture_mark': case 'gravorn_brace': {
+        const pick = this.rotPick(a);
+        a.intentTargetId = pick.id; a.intentTargetName = pick.name;
+        if (p.command === 'gravorn_brace') this.addStatus(a.id, 'def_up', 2);
+        targetId = pick.id; frameKey = p.command === 'keeper_stance' ? 'plant' : p.command === 'fracture_mark' ? 'cast' : 'anticipation';
+        effects = [{ targetId: pick.id, kind: 'telegraph', amount: 0 }];
+        telegraph = { targetId: pick.id, next: p.command === 'keeper_stance' ? 'keeper_strike' : p.command === 'fracture_mark' ? 'fracture_strike' : 'gravorn_crush' };
+        text = p.command === 'keeper_stance' ? `Varlgrim menegakkan tongkatnya dan membidik ${pick.name}. Hantaman berat menyusul pada giliran berikutnya!`
+          : p.command === 'fracture_mark' ? `Retakan waktu menandai ${pick.name}. Hantamannya jatuh pada giliran berikutnya!`
+          : `Gravorn mengangkat lengan batunya ke arah ${pick.name} dan mengeras. Crush menyusul!`;
+        break;
+      }
+      case 'keeper_strike': case 'fracture_strike': case 'gravorn_crush': {
+        const t = this.target(a);
+        const hit = p.command === 'keeper_strike' ? single(t, damage(a, t, VARLGRIM.power.keeperStrike))
+          : p.command === 'fracture_strike' ? single(t, magicDamage(a, t, VARLGRIM.power.fractureStrike))
+          : single(t, damage(a, t, C4_POWER.gravornCrush));
+        frameKey = 'attack'; clearTelegraph();
+        text = `${a.name}: ${p.command === 'keeper_strike' ? 'hantaman tongkat' : p.command === 'fracture_strike' ? 'hantaman retak waktu' : 'crush batu'}. ${dmgText(hit, t)}`;
+        break;
+      }
+      case 'seal_pulse': case 'distortion_wave': {
+        sweep(p.command === 'seal_pulse' ? VARLGRIM.power.sealPulse : VARLGRIM.power.distortionWave); frameKey = 'cast';
+        text = `Varlgrim: ${p.command === 'seal_pulse' ? 'denyut segel' : 'gelombang distorsi'} menyapu barisan: ${effects.map(e => `${this.nameOf(e.targetId)} ${e.amount}`).join(', ')}.`; break;
+      }
+      case 'time_bind': {
+        const t = this.rotPick(a);
+        const hit = single(t, magicDamage(a, t, VARLGRIM.power.timeBind)); frameKey = 'plant';
+        // Giliran target tertunda satu slot (seperti chrono_rewind): urutan bergeser, tidak ada yang kehilangan giliran dan Velthia tetap bertindak.
+        const seq: string[] = [];
+        for (let i = 1; i <= s.order.length; i++) seq.push(s.order[(s.cursor + i) % s.order.length]!);
+        const idx = seq.map((id, i) => ({ id, i })).filter(e => s.actors.find(x => x.id === e.id && x.side === 'player' && x.hp > 0));
+        let shifted = false;
+        if (idx.length >= 2 && idx[0]!.id === t.id) {
+          const first = idx[0]!, second = idx[1]!;
+          seq[first.i] = second.id; seq[second.i] = first.id; s.order = seq; s.cursor = seq.length - 1; order = [...seq]; shifted = true;
+        }
+        if (t.hp > 0) { t.statuses = t.statuses.filter(e => e.id !== 'atk_up' && e.id !== 'concord'); effects.push({ targetId: t.id, kind: 'shift', amount: shifted ? 1 : 0 }); }
+        text = `Varlgrim menanam tongkatnya. Waktu ${t.name} terikat: ${dmgText(hit, t)} ${shifted ? 'Gilirannya tertunda satu langkah' : 'Gilirannya sudah di belakang'} dan penguatnya terhapus.`;
+        break;
+      }
+      case 'phase_shift': {
+        const next = a.phase ?? 1; phase = next; frameKey = 'plant'; targetId = a.id;
+        a.calm = 0;
+        if (next === 3) {
+          const down = s.actors.filter(t => t.side === 'player' && t.hp <= 0);
+          for (const t of down) { t.hp = Math.max(1, Math.ceil(t.stats.HP * VARLGRIM.reviveFraction)); effects.push({ targetId: t.id, kind: 'revive', amount: t.hp }); }
+          if (down.length) revived = down.map(t => t.id);
+        }
+        text = next === 2 ? 'Varlgrim menanam tongkatnya. Waktu di sekeliling bergeser; ia melangkah ke pola yang lebih rapat. Tidak ada serangan.'
+          : `Varlgrim menanam tongkatnya dan menatap langit. Heart bergema.${revived ? ' Sekutu yang tumbang bangkit kembali.' : ''} Sesuatu yang besar akan dipanggil.`;
+        break;
+      }
+      case 'meteor_call': {
+        this.openWindow(a); frameKey = 'raise';
+        const list = this.players(); targetId = list[0]?.id ?? a.id;
+        effects = list.map(t => ({ targetId: t.id, kind: 'telegraph' as const, amount: 0 }));
+        meteor = this.meteorReport('call', 'meteor');
+        text = 'Varlgrim mengangkat tongkatnya dan menahan langit. Sebuah Meteor tergantung. Heart bergema: Perlindungan Velthia pulih. Racun dan Stun terhapus. Meteor jatuh setelah ronde ini; Bertahan atau Selubung tidak akan cukup.';
+        break;
+      }
+      case 'meteor_hold': {
+        s.meteor!.holds++; frameKey = 'raise'; meteor = this.meteorReport('hold', 'meteor');
+        text = 'Meteor tetap tergantung di langit. Varlgrim menunggu Velthia bertindak.';
+        break;
+      }
+      case 'meteor_fall': {
+        const r = this.lethalFall('Meteor', 'meteor');
+        effects = r.effects; meteor = r.report; text = r.text; frameKey = 'plant';
+        amount = effects.reduce((n, e) => n + e.amount, 0); targetId = effects[0]?.targetId ?? a.id; a.calm = 0;
+        break;
+      }
+      // ---- Riftborn (M06) ----
+      case 'rift_lash': {
+        const t = this.rotPick(a);
+        const hit = single(t, magicDamage(a, t, C4_POWER.riftLash)); frameKey = 'attack';
+        text = `Riftborn menyentak dengan cincin retak. ${dmgText(hit, t)}`; break;
+      }
+      case 'rift_gather': {
+        if (a.lethalSurge) {
+          this.openWindow(a); frameKey = 'anticipation';
+          const list = this.players(); targetId = list[0]?.id ?? a.id;
+          effects = list.map(t => ({ targetId: t.id, kind: 'telegraph' as const, amount: 0 }));
+          meteor = this.meteorReport('call', 'surge');
+          text = 'Cincin Riftborn berhenti, lalu menegang. Sentakan yang mematikan akan datang setelah ronde ini. Perlindungan Velthia pulih dan bisa menahannya.';
+        } else {
+          const pick = this.rotPick(a); a.intentTargetId = pick.id; a.intentTargetName = pick.name; frameKey = 'anticipation';
+          targetId = pick.id; effects = [{ targetId: pick.id, kind: 'telegraph', amount: 0 }]; telegraph = { targetId: pick.id, next: 'rift_surge' };
+          text = `Cincin Riftborn berhenti dan berkumpul ke arah ${pick.name}. Sentakan berat menyusul!`;
+        }
+        break;
+      }
+      case 'rift_surge': {
+        if (a.lethalSurge) {
+          const r = this.lethalFall('Sentakan Riftborn', 'surge');
+          effects = r.effects; meteor = r.report; text = r.text; frameKey = 'attack';
+          amount = effects.reduce((n, e) => n + e.amount, 0); targetId = effects[0]?.targetId ?? a.id; a.calm = 0;
+        } else {
+          const t = this.target(a);
+          const hit = single(t, magicDamage(a, t, C4_POWER.riftSurge)); frameKey = 'attack'; clearTelegraph();
+          if (t.hp > 0 && !t.defending && !t.statuses.some(e => e.id === 'def_up')) this.addStatus(t.id, 'stun', 1);
+          text = `Riftborn: sentakan berat. ${dmgText(hit, t)}${t.statuses.some(e => e.id === 'stun') ? ` ${t.name} terhenti sejenak.` : ''}`;
+        }
+        break;
+      }
+      // ---- Gravorn (M04) ----
+      case 'gravorn_heave': {
+        const t = this.rotPick(a);
+        const hit = single(t, damage(a, t, C4_POWER.gravornHeave)); frameKey = 'attack';
+        text = `Gravorn mengayunkan lengan batunya. ${dmgText(hit, t)}`; break;
+      }
     }
     s.log.push(text);
     this.checkOutcome();
-    const skillId = ['ground_slam', 'ranting_nakal', 'bukan_aku', 'tunas_bandel'].includes(p.command) || isVelthiaCommand(p.command) || p.command.startsWith('chrono_') ? p.command : undefined;
+    const skillId = ['ground_slam', 'ranting_nakal', 'bukan_aku', 'tunas_bandel'].includes(p.command) || isVelthiaCommand(p.command) || p.command === AEGIS_COMMAND || p.command.startsWith('chrono_') ? p.command : undefined;
     return { amount, targetId, text, actorId: a.id, command: p.command, ...(skillId ? { skillId } : {}), frameKey,
       targetIds: effects.length ? [...new Set(effects.map(e => e.targetId))] : [targetId], effects,
-      absorbed: effects.reduce((n, e) => n + (e.absorbed ?? 0), 0), ...(telegraph ? { telegraph } : {}), ...(order ? { order } : {}) };
+      absorbed: effects.reduce((n, e) => n + (e.absorbed ?? 0), 0), ...(telegraph ? { telegraph } : {}), ...(order ? { order } : {}),
+      ...(phase ? { phase } : {}), ...(meteor ? { meteor } : {}), ...(revived ? { revived } : {}) };
   }
   private nameOf(id: string): string { return this.data.actors.find(t => t.id === id)?.name ?? id; }
   /** Recovery must finish before the next turn becomes actionable. */
@@ -397,6 +719,7 @@ export class BattleEngine {
     s.ticks = [];
     if (!s.outcome) {
       const a = this.currentActor();
+      if (s.meteor?.open && a.id === 'C02' && a.side === 'player' && p.command !== 'stunned') s.meteor.velthiaActed = true;
       if (a.intent && p.command !== 'stunned') this.advanceIntent(a, p.command);
       const regen = regenTick(a);
       if (regen) { s.ticks.push({ actorId: a.id, kind: 'regen', amount: regen }); s.log.push(`${a.name} pulih ${regen} HP dari tunas.`); }
@@ -408,8 +731,37 @@ export class BattleEngine {
     if (!s.outcome) {
       do { s.cursor = (s.cursor + 1) % s.order.length; } while (this.currentActor().hp <= 0);
       s.turn++;
+      this.syncIntents();
+      if (this.phaseEntered) { this.phaseSnap = structuredClone(this.data); }
     }
+    this.phaseEntered = false;
     return true;
+  }
+  /**
+   * Menjaga niat boss tetap konsisten dengan keadaan (dipanggil di akhir setiap finish): (1) meteor_call/rift_gather tidak pernah
+   * berlaku bila Velthia tumbang; (2) pada giliran boss, meteor_fall menjadi meteor_hold bila Velthia belum bertindak sejak telegraf
+   * (rift_surge menjadi rift_gather); (3) meteor_hold kembali ke meteor_fall begitu syaratnya terpenuhi.
+   */
+  private syncIntents(): void {
+    const s = this.data, w = s.meteor;
+    if (!w || s.outcome) return;
+    const v = s.actors.find(t => t.id === 'C02' && t.side === 'player');
+    const vAlive = !!v && v.hp > 0;
+    const cur = this.currentActor();
+    for (const b of s.actors) {
+      if (b.side !== 'enemy' || b.hp <= 0) continue;
+      const meteorBoss = b.id === 'C04', riftBoss = b.id === 'M06' && !!b.lethalSurge;
+      if (!meteorBoss && !riftBoss) continue;
+      const needsHold = w.open && cur === b && vAlive && !w.velthiaActed;
+      if (meteorBoss) {
+        if (b.intent === 'meteor_call' && !vAlive) b.intent = varlgrimPlainFallback({ phase: b.phase ?? 3, step: b.aiStep ?? 0, calm: b.calm ?? 0, rot: b.rot ?? 0, falls: w.falls });
+        else if (b.intent === 'meteor_fall' && needsHold) b.intent = 'meteor_hold';
+        else if (b.intent === 'meteor_hold' && !needsHold) b.intent = 'meteor_fall';
+      } else {
+        if (b.intent === 'rift_gather' && !w.open && !vAlive) b.intent = 'rift_lash';
+        else if (b.intent === 'rift_surge' && needsHold) b.intent = 'rift_gather';
+      }
+    }
   }
   private advanceIntent(a: BattleActor, command: Command): void {
     if (a.id === 'B03') {
@@ -420,14 +772,44 @@ export class BattleEngine {
       a.intent = chronolithIntent(a);
     } else if (a.id === 'M05') {
       a.aiStep = (a.aiStep ?? 0) + 1; a.intent = OATHGUARD_PATTERN[a.aiStep % OATHGUARD_PATTERN.length]!;
+    } else if (a.id === 'C04') {
+      this.advanceVarlgrim(a, command as VarlgrimCommand);
+    } else if (a.id === 'M06') {
+      const cmd = command as RiftbornCommand, v = this.data.actors.find(t => t.id === 'C02' && t.hp > 0 && t.side === 'player');
+      if (cmd === 'rift_surge') a.calm = 0; else if (cmd === 'rift_lash') a.calm = (a.calm ?? 0) + 1;
+      a.intent = riftbornNext(cmd, a.aiStep ?? 0, !!a.lethalSurge, a.calm ?? 0, !!v);
+      if (!a.lethalSurge && cmd !== 'rift_gather') a.aiStep = (a.aiStep ?? 0) + 1;
+    } else if (a.id === 'M04') {
+      const cmd = command as GravornCommand;
+      a.intent = gravornNext(cmd, a.aiStep ?? 0);
+      if (cmd !== 'gravorn_brace') a.aiStep = (a.aiStep ?? 0) + 1;
     } else a.intent = a.id === 'B02'
       ? command === 'attack' ? 'knight_guard' : command === 'knight_guard' ? 'knight_thrust' : command === 'knight_thrust' ? 'knight_recover' : 'knight_strike'
       : command === 'attack' ? 'windup' : command === 'boss_windup' ? 'sweep' : command === 'boss_sweep' ? 'recover' : 'strike';
+  }
+  /**
+   * Varlgrim: fase hanya bertransisi di luar jeda telegraf (setelah aksi yang BUKAN stance/mark/call/hold). Transisi = jeda `phase_shift`
+   * tanpa kerusakan, lalu pola fase baru. Meteor tidak dipanggil bila Velthia tumbang dan tidak sebelum >= 2 aksi biasa.
+   */
+  private advanceVarlgrim(a: BattleActor, command: VarlgrimCommand): void {
+    const v = this.data.actors.find(t => t.id === 'C02' && t.side === 'player' && t.hp > 0);
+    if (command === 'meteor_fall' || command === 'phase_shift') a.calm = 0; else if (isPlainCommand(command)) a.calm = (a.calm ?? 0) + 1;
+    const target = varlgrimPhaseFor(a.hp, a.stats.HP);
+    if (!LEAD_IN[command] && a.hp > 0 && target > (a.phase ?? 1)) {
+      a.phase = target; a.aiStep = 0; a.calm = 0; a.intent = 'phase_shift';
+      if (target === 3) this.phaseEntered = true;
+      return;
+    }
+    const pick = varlgrimNext(command, { phase: a.phase ?? 1, step: a.aiStep ?? 0, calm: a.calm ?? 0, rot: a.rot ?? 0, falls: this.data.meteor?.falls ?? 0 }, !!v);
+    if (pick.use === 'step') a.aiStep = (a.aiStep ?? 0) + 1;
+    if (pick.use === 'rot') a.rot = (a.rot ?? 0) + 1;
+    a.intent = pick.next;
   }
   addStatus(actorId: string, id: StatusId, turns: number): void {
     if (!Number.isInteger(turns) || turns < 1) throw new Error('Invalid status duration');
     const a = this.data.actors.find(t => t.id === actorId);
     if (!a || a.hp <= 0) return;
+    if (id === 'stun' && a.id === 'C02' && this.data.meteor?.open) return; // Velthia kebal Stun selama jendela ancaman besar
     const existing = a.statuses.find(s => s.id === id);
     if (existing) existing.turns = Math.max(existing.turns, turns); // refresh, never stack multipliers
     else a.statuses.push({ id, turns });

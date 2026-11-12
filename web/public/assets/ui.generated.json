@@ -213,6 +213,21 @@
       ]
     },
     {
+      "id": "C02_ANGRY",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C02_Velthia/C02_EXPRESSION_ANGRY.png",
+      "out": "assets/portraits_hd/C02_ANGRY.png",
+      "status": "DRAFT",
+      "size": [
+        313,
+        352
+      ],
+      "sourceSize": [
+        537,
+        604
+      ]
+    },
+    {
       "id": "C03_NEUTRAL",
       "kind": "portrait_hd",
       "source": "assets/characters/C03_Torvan/C03_EXPRESSION_NEUTRAL.png",
@@ -330,6 +345,126 @@
       "sourceSize": [
         514,
         585
+      ]
+    },
+    {
+      "id": "C04_NEUTRAL",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_NEUTRAL.png",
+      "out": "assets/portraits_hd/C04_NEUTRAL.png",
+      "status": "DRAFT",
+      "size": [
+        354,
+        352
+      ],
+      "sourceSize": [
+        579,
+        575
+      ]
+    },
+    {
+      "id": "C04_ANGRY",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_ANGRY.png",
+      "out": "assets/portraits_hd/C04_ANGRY.png",
+      "status": "DRAFT",
+      "size": [
+        355,
+        352
+      ],
+      "sourceSize": [
+        599,
+        594
+      ]
+    },
+    {
+      "id": "C04_STERN",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_STERN.png",
+      "out": "assets/portraits_hd/C04_STERN.png",
+      "status": "DRAFT",
+      "size": [
+        355,
+        352
+      ],
+      "sourceSize": [
+        584,
+        579
+      ]
+    },
+    {
+      "id": "C04_REMORSE",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_REMORSE.png",
+      "out": "assets/portraits_hd/C04_REMORSE.png",
+      "status": "DRAFT",
+      "size": [
+        356,
+        352
+      ],
+      "sourceSize": [
+        601,
+        595
+      ]
+    },
+    {
+      "id": "C04_DETERMINED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_DETERMINED.png",
+      "out": "assets/portraits_hd/C04_DETERMINED.png",
+      "status": "DRAFT",
+      "size": [
+        377,
+        352
+      ],
+      "sourceSize": [
+        637,
+        595
+      ]
+    },
+    {
+      "id": "C04_SAD",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_SAD.png",
+      "out": "assets/portraits_hd/C04_SAD.png",
+      "status": "DRAFT",
+      "size": [
+        375,
+        352
+      ],
+      "sourceSize": [
+        612,
+        574
+      ]
+    },
+    {
+      "id": "C04_SURPRISED",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_SURPRISED.png",
+      "out": "assets/portraits_hd/C04_SURPRISED.png",
+      "status": "DRAFT",
+      "size": [
+        368,
+        352
+      ],
+      "sourceSize": [
+        620,
+        593
+      ]
+    },
+    {
+      "id": "C04_SUSPICIOUS",
+      "kind": "portrait_hd",
+      "source": "assets/characters/C04_Varlgrim/C04_EXPRESSION_SUSPICIOUS.png",
+      "out": "assets/portraits_hd/C04_SUSPICIOUS.png",
+      "status": "DRAFT",
+      "size": [
+        350,
+        352
+      ],
+      "sourceSize": [
+        596,
+        599
       ]
     },
     {

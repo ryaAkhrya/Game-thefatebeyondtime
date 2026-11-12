@@ -14,9 +14,9 @@ function batch(policy: Policy, mutate: (d: GameStateData) => void, n = 100, nois
   return { win: wins / n, avgRounds: wins ? rounds / wins : 0 };
 }
 const potions = (n: number) => (d: GameStateData) => { d.items.potion = n; };
-/** Naik ke L5 tanpa mengubah EXP/level yang tervalidasi: gunakan gainExp pada kedua anggota aktif. */
+/** Naik ke L5 (EXP 235; cap level kini 10, jadi hentikan tepat di ambang L5): gunakan gainExp pada kedua anggota aktif. */
 const level5 = (d: GameStateData) => {
-  for (const id of ['C01', 'C02']) d.rpg.characters[id] = gainExp(d.rpg.characters[id]!, 1000, PROFILES[id]);
+  for (const id of ['C01', 'C02']) d.rpg.characters[id] = gainExp(d.rpg.characters[id]!, 235 - d.rpg.characters[id]!.exp, PROFILES[id]);
   d.vitals = { hp: effectiveStats(d, 'C01').HP, mp: effectiveStats(d, 'C01').MP };
   d.partyVitals!.C02 = { hp: effectiveStats(d, 'C02').HP, mp: effectiveStats(d, 'C02').MP };
 };
