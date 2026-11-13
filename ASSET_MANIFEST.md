@@ -1,5 +1,9 @@
 # Asset manifest v3.1
 
+## Phase 9 addendum — 13 November 2026
+
+Modern, relic/fragments, cliff, clouds and silhouettes are runtime code-native DRAFT assets in `web/src/game/ending/EndingArt.ts`; seated C01/C02 are derivatives of existing exploration art. Originals are preserved; human review remains required. Font licenses are in `web/public/legal/fonts.txt`. `web/public-assets.allowlist.json` guards public static paths and SHA-256. No real private photos, identity, dates or message exist in tracked runtime content. Local inputs/output are outside Vite public; see `docs/production/PRIVATE_MEMORIES_INTEGRATION_GUIDE.md`. No new BGM or SFX files.
+
 **Runtime Phase 6:** enam atlas DRAFT C03 eksplorasi/battle, C07 eksplorasi, M02/M03/B02 battle disalin byte-identical beserta JSON, ditambah 13 portrait turunan dari PNG individual existing. Manifest import aktual `web/public/assets/chapter2.generated.json`; lingkungan Liora/Hutan 2 code-native DRAFT. Adapter empat pose bukan animasi final. Source tidak diubah, tidak ada BGM/SFX baru; lihat `ASSET_INDEX.md` dan `docs/production/PHASE6_REPORT.md`.
 
 **Runtime Phase 5:** registry kini mengimpor juga C02/C05/C06/C09 exploration DRAFT asli (empat arah × enam frame, 32×48, pivot 16/46), byte-identical PNG/JSON. Portrait individual turunan dan metadata import ada di `web/public/assets/aveloria.generated.json`. Environment/warga kota digambar kode sebagai DRAFT terpisah dari collision. Bukan desain final/redraw, tidak ada battle kit NPC atau party join. Lihat `ASSET_INDEX.md` dan `docs/production/PHASE5_REPORT.md`.

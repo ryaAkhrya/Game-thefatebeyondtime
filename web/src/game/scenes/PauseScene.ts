@@ -7,8 +7,9 @@ import { uiSfx } from '../../ui/kit/sfx';
 import { veil } from '../../ui/components/frame';
 import { Ui, TYPE, bindRelayout } from '../../ui/kit/ui';
 import { AREA_LABEL, formatPlaytime } from '../../ui/labels';
+import { continueIntoEnding } from '../ending/progress';
 
-type PauseAction = 'resume' | 'journal' | 'status' | 'inventory' | 'equipment' | 'skills' | 'save' | 'settings' | 'title';
+type PauseAction = 'resume' | 'journal' | 'status' | 'inventory' | 'equipment' | 'skills' | 'save' | 'settings' | 'title' | 'ending';
 
 /**
  * Menu Jeda (overlay di atas dunia/battle). Laci sempit di kiri, dunia tetap terlihat di kanan; di kanan bawah
@@ -94,8 +95,10 @@ export class PauseScene extends Phaser.Scene {
       { id: 'title', label: 'Kembali ke Judul' },
     ];
     const inBattle = this.returnTo === SCENE_KEYS.Battle;
+    const canEnd = !inBattle && continueIntoEnding(getServices(this).gameState.snapshot());
+    if (canEnd) items.splice(1, 0, { id: 'ending', label: 'Lanjutkan kisah' });
     this.menu = new MenuList(this, {
-      ui, x: 36, y: 124, width: 240, rowHeight: 38, depth: 4, initialId: this.focusId, size: 15,
+      ui, x: 36, y: 124, width: 240, rowHeight: canEnd ? 34 : 38, depth: 4, initialId: this.focusId, size: 15,
       items: items.map(item => ({ ...item, disabled: inBattle && ['journal', 'status', 'inventory', 'equipment', 'skills', 'save'].includes(item.id), disabledHint: 'Selesaikan pertarungan dahulu.' })),
       onFocusChange: item => this.setHint(item.disabled ? item.disabledHint ?? '' : ''),
       onDisabledConfirm: item => this.setHint(item.disabledHint ?? ''),
@@ -131,6 +134,10 @@ export class PauseScene extends Phaser.Scene {
   private act(a: PauseAction): void {
     const { router } = getServices(this);
     if (a === 'resume') this.resume();
+    else if (a === 'ending') {
+      this.closing = true; this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud);
+      router.goto(this, SCENE_KEYS.Ending);
+    }
     else if (a === 'settings') router.openOverlay(this, SCENE_KEYS.Settings);
     else if (a === 'save') router.openOverlay(this, SCENE_KEYS.SaveLoad);
     else if (a === 'journal') router.openOverlay(this, SCENE_KEYS.Journal);

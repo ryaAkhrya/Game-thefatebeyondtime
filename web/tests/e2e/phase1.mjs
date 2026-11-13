@@ -169,19 +169,38 @@ async function walkTo(page, tx, ty, { tol = 4, axisOrder = 'xy', timeout = 40000
 }
 
 async function face(page, key) {
-  await page.keyboard.down(key);
-  // Polling movement needs a real world frame, especially on a busy headless host.
-  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
-  await page.waitForFunction(dir => window.__tfbt.world()?.facing === dir, { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[key]);
-  await page.keyboard.up(key);
+  // A facing tap is frame-bounded inside the browser. Driver round trips must not
+  // turn this into a long walk through the object whose prompt is being tested.
+  // These DOM keyboard events still pass through the real InputManager; no teleport.
+  await page.evaluate(async ({ code, direction }) => {
+    if (window.__tfbt.world()?.facing === direction) return;
+    window.dispatchEvent(new KeyboardEvent('keydown', { code, key: code, bubbles: true, cancelable: true }));
+    try {
+      const deadline = performance.now() + 3000;
+      do { await new Promise(resolve => requestAnimationFrame(resolve)); }
+      while (window.__tfbt.world()?.facing !== direction && performance.now() < deadline);
+      if (window.__tfbt.world()?.facing !== direction) throw new Error(`Facing tap failed: ${direction}`);
+    } finally {
+      window.dispatchEvent(new KeyboardEvent('keyup', { code, key: code, bubbles: true }));
+    }
+  }, { code: key, direction: { ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right' }[key] });
   await sleep(page, 80);
 }
 
 async function hold(page, key, ms) {
+  await page.evaluate(code => {
+    window.__heldTiming = { code };
+    const down = ev => { if (ev.code === code) { window.__heldTiming.start = performance.now(); window.removeEventListener('keydown', down); } };
+    const up = ev => { if (ev.code === code) { window.__heldTiming.end = performance.now(); window.removeEventListener('keyup', up); } };
+    window.addEventListener('keydown', down);
+    window.addEventListener('keyup', up);
+  }, key);
   await page.keyboard.down(key);
   await sleep(page, ms);
   await page.keyboard.up(key);
+  const heldMs = await page.evaluate(() => window.__heldTiming.end - window.__heldTiming.start);
   await sleep(page, 120);
+  return heldMs;
 }
 
 const layoutOk = async (page, label) => {
@@ -258,11 +277,12 @@ async function main() {
     await hold(page, 'KeyD', 300);
     let p3 = await world(page);
     check('Gerak KANAN dengan D (x bertambah, menghadap kanan)', p3.x > p2.x && p3.facing === 'right', `${p2.x}->${p3.x} ${p3.facing}`);
-    await hold(page, 'KeyS', 300);
+    const heldMs = await hold(page, 'KeyS', 300);
     let p4 = await world(page);
     check('Gerak BAWAH dengan S (y bertambah, menghadap bawah)', p4.y > p3.y && p4.facing === 'down', `${p3.y}->${p4.y} ${p4.facing}`);
     const dist = Math.hypot(p4.x - p3.x, p4.y - p3.y);
-    check('Kecepatan wajar (~88 px/dtk): 300 ms menempuh 15-35 px', dist > 15 && dist < 35, String(dist));
+    const distancePer300ms = dist * 300 / heldMs;
+    check('Kecepatan wajar (~88 px/dtk): 300 ms menempuh 15-35 px', distancePer300ms > 15 && distancePer300ms < 35, JSON.stringify({ dist, heldMs, distancePer300ms }));
     // tidak ada diagonal: dua tombol bersamaan -> hanya satu sumbu
     await page.keyboard.down('ArrowRight');
     await page.keyboard.down('ArrowUp');
@@ -276,7 +296,7 @@ async function main() {
     check('Gerak 4 arah: dua panah bersamaan tidak menghasilkan diagonal', (q1.x === q0.x) !== (q1.y === q0.y) || (Math.abs(q1.x - q0.x) < 2 || Math.abs(q1.y - q0.y) < 2), `${q0.x},${q0.y} -> ${q1.x},${q1.y}`);
 
     // ---- collision ----
-    await walkTo(page, 40, 460, { axisOrder: 'xy', timeout: 15000 });
+    await walkTo(page, 40, 460, { axisOrder: 'yx', timeout: 15000 });
     await hold(page, 'ArrowLeft', 2500);
     w = await world(page);
     check('Collision: tepi hutan kiri menghentikan pemain (8 < x < 120)', w.x > 8 && w.x < 120, String(w.x));

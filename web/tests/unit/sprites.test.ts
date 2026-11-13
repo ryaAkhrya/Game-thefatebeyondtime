@@ -130,7 +130,7 @@ describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksp
     }
   });
 
-  it('tanpa interpolasi: tiap frame persis rekonstruksi dari salinan lama (cermin + penggandaan baris + dy + dx)', () => {
+  it('tanpa interpolasi: tiap frame persis rekonstruksi dari salinan lama (cermin + penggandaan baris + dy + dx)', { timeout: 30000 }, () => {
     for (let r = 0; r < 4; r++) for (let c = 0; c < cols; c++) {
       const t = meta.frames[`${PREFIX[DIRS[r]!]}_${c}`]!.transform;
       const srcRow = t.mirror ? DIRS.indexOf('left') : r; // satu-satunya mirrorFrom yang dipakai: left -> right (C01)

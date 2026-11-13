@@ -1,3 +1,4 @@
+import { ENDING, validateEnding, type EndingProgress } from '../ending/progress';
 import { AREA_IDS, CHAPTER_IDS, CHARACTER_IDS, type AreaId, type ChapterId, type CharacterId } from '../data/ids';
 import { STARTER_ITEMS, type RpgState } from '../rpg/definitions';
 import { changeItem } from '../rpg/inventory';
@@ -22,6 +23,7 @@ export type Facing = 'up' | 'down' | 'left' | 'right';
  */
 export interface GameStateData {
   schemaVersion: typeof GAME_STATE_VERSION;
+  ending?: EndingProgress;
   chapter: ChapterId;
   area: AreaId;
   position: { x: number; y: number; facing: Facing };
@@ -38,7 +40,7 @@ export interface GameStateData {
   partyVitals?: { C03: { hp: number; mp: number }; C02?: { hp: number; mp: number } };
   rpg: RpgState;
   storyBeat: 'C1-01' | 'C1-02' | 'C1-03' | 'C1-04' | 'C1-04-DONE' | 'C1-05' | 'C1-05-DONE' | 'SLICE-DONE' | 'C1-06' | 'C1-07' | 'C1-08' | 'C1-09' | 'C1-DONE'
-    | 'C2-01' | 'C2-02' | 'C2-03' | 'C2-04' | 'C2-05' | 'C2-06' | 'C2-07' | 'C2-08' | 'C2-09' | 'C2-DONE' | C3Beat | C4Beat;
+    | 'C2-01' | 'C2-02' | 'C2-03' | 'C2-04' | 'C2-05' | 'C2-06' | 'C2-07' | 'C2-08' | 'C2-09' | 'C2-DONE' | C3Beat | C4Beat | 'M-01' | 'M-02' | 'M-03' | 'E-01' | 'GAME-DONE';
   /** Optional extension of v2: old saves have never opened a persistent shop. */
   world: { forestWrapCount: number; shops?: Record<string, Record<string, number>>; lastChapter2EncounterSec?: number };
   playtimeSec: number;
@@ -64,6 +66,11 @@ export function createNewGameData(): GameStateData {
 const FACINGS: readonly Facing[] = ['up', 'down', 'left', 'right'];
 
 export function storyBeatFor(flags: Record<string, boolean>): GameStateData['storyBeat'] {
+  if (flags[ENDING.complete]) return 'GAME-DONE';
+  if (flags[ENDING.modernComplete]) return 'E-01';
+  if (flags[ENDING.awakened]) return 'M-03';
+  if (flags[ENDING.artefact]) return 'M-02';
+  if (flags[ENDING.started]) return 'M-01';
   // Chapter IV: flag akhir beat N -> beat N+1 (urutan dari yang paling akhir).
   if (flags[C4.complete]) return 'C4-DONE';
   if (flags[C4.returned] || flags[C4.creatorReveal]) return 'C4-07';
@@ -160,7 +167,7 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
   if (!record(r.world) || !integer(r.world.forestWrapCount, 0, 1000000)) return null;
   const lastChapter2EncounterSec = r.world.lastChapter2EncounterSec;
   if (lastChapter2EncounterSec !== undefined && ((r.chapter !== 'II' && r.chapter !== 'III') || typeof lastChapter2EncounterSec !== 'number' || !Number.isFinite(lastChapter2EncounterSec) || lastChapter2EncounterSec < 0 || lastChapter2EncounterSec > (r.playtimeSec as number))) return null;
-  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE', 'C1-05', 'C1-05-DONE', 'SLICE-DONE', 'C1-06', 'C1-07', 'C1-08', 'C1-09', 'C1-DONE', 'C2-01', 'C2-02', 'C2-03', 'C2-04', 'C2-05', 'C2-06', 'C2-07', 'C2-08', 'C2-09', 'C2-DONE', ...C3_BEATS, ...C4_BEATS].includes(String(r.storyBeat))) return null;
+  if (!['C1-01', 'C1-02', 'C1-03', 'C1-04', 'C1-04-DONE', 'C1-05', 'C1-05-DONE', 'SLICE-DONE', 'C1-06', 'C1-07', 'C1-08', 'C1-09', 'C1-DONE', 'C2-01', 'C2-02', 'C2-03', 'C2-04', 'C2-05', 'C2-06', 'C2-07', 'C2-08', 'C2-09', 'C2-DONE', ...C3_BEATS, ...C4_BEATS, 'M-01', 'M-02', 'M-03', 'E-01', 'GAME-DONE'].includes(String(r.storyBeat))) return null;
   if ((r.area === 'forest_edge' || flags[FOREST_EDGE_FLAG] || flags[BOSS_CHECKPOINT_FLAG] || flags[MOURNFANG_FLAG]) && !flags[FIRST_HOLLOWLING_FLAG]) return null;
   if (flags['reward.mournfang.rpg'] && !flags[MOURNFANG_FLAG]) return null;
   if ((flags[MOURNFANG_VICTORY_SEEN] || flags[SLICE_COMPLETE]) && !flags[MOURNFANG_FLAG]) return null;
@@ -202,6 +209,8 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
     [C4.returnSeen, C4.returned], [C4.complete, C4.returnSeen]]) {
     if (flags[next!] && !flags[previous!]) return null;
   }
+  const ending = validateEnding(r, flags);
+  if (ending === null) return null;
   const expectedParty = flags[C3.velthiaJoined] ? 'C01,C02' : flags[C2.torvan] ? 'C01,C03' : 'C01';
   if ((r.party as string[]).join() !== expectedParty) return null;
   let shops: GameStateData['world']['shops'];
@@ -244,6 +253,7 @@ export function validateGameStateData(raw: unknown): GameStateData | null {
 
   return {
     schemaVersion: GAME_STATE_VERSION,
+    ...(ending ? { ending } : {}),
     chapter: r.chapter as ChapterId,
     area: r.area as AreaId,
     position: { x: pos.x, y: pos.y, facing: pos.facing as Facing },

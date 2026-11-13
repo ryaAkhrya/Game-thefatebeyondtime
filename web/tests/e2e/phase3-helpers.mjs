@@ -1,6 +1,17 @@
 import { press, selectMenu } from './battle-helpers.mjs';
 export const state = page => page.evaluate(() => window.__tfbt.state());
-export async function waitWorld(page) { await page.waitForFunction(() => { const w = window.__tfbt?.world(); return w && !w.busy && !w.dialogue && window.__tfbt.inputLayer() === 'world'; }, null, { timeout: 15000 }); }
+export async function waitWorld(page) {
+  try {
+    await page.waitForFunction(() => { const w = window.__tfbt?.world(); return w && !w.busy && !w.dialogue && window.__tfbt.inputLayer() === 'world'; }, null, { timeout: 15000 });
+  } catch (error) {
+    const snapshot = await page.evaluate(() => {
+      const api=window.__tfbt, w=api?.world(), d=api?.state();
+      return { scenes:api?.activeScenes(), layer:api?.inputLayer(), focus:api?.focus(), router:api?.router(), transition:api?.transition()?.mode,
+        state:d&&{chapter:d.chapter,area:d.area,beat:d.storyBeat,ending:d.ending}, world:w&&{area:w.area,busy:w.busy,x:w.x,y:w.y,dialogue:w.dialogue?.line} };
+    }).catch(()=>null);
+    throw new Error(`World readiness timeout: ${JSON.stringify(snapshot)}`, {cause:error});
+  }
+}
 export async function openPause(page) { await press(page, 'Escape'); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'pause'); }
 export async function openMenu(page, id, layer = 'rpg-menu') { await selectMenu(page, id); await press(page, 'Enter'); await page.waitForFunction(layer => window.__tfbt.inputLayer() === layer, layer); }
 export async function back(page, layer) { await press(page, 'Escape'); await page.waitForFunction(layer => window.__tfbt.inputLayer() === layer, layer); }

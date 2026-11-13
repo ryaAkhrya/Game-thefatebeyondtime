@@ -89,6 +89,7 @@ export class DialogueBox {
   constructor(
     private readonly scene: Phaser.Scene,
     private readonly services: Services,
+    private readonly options: { silent?: boolean; onBack?: () => void } = {},
   ) {
     this.ui = new Ui(scene);
     this.build();
@@ -159,7 +160,7 @@ export class DialogueBox {
       if (e.intent === 'confirm') {
         const result = runner.press();
         // 'completed_text' (mempercepat ketikan) dan 'ignored' senyap; hanya kemajuan nyata/pilihan yang berbunyi.
-        if (result === 'advanced' || result === 'finished') uiSfx(this.scene, 'SFX_UI_DIALOGUE_ADVANCE');
+        if (!this.options.silent && (result === 'advanced' || result === 'finished')) uiSfx(this.scene, 'SFX_UI_DIALOGUE_ADVANCE');
         else if (result === 'chose') uiSfx(this.scene, 'SFX_UI_CONFIRM');
         if (result === 'finished') this.finish();
       } else if (e.intent === 'up' || e.intent === 'down') {
@@ -168,7 +169,8 @@ export class DialogueBox {
           runner.moveChoice(e.intent === 'up' ? -1 : 1);
         }
       } else if (e.intent === 'back') {
-        if (this.services.gameState.snapshot()?.area === 'aveloria') this.services.router.openOverlay(this.scene.scene.get(SCENE_KEYS.World), SCENE_KEYS.Pause);
+        if (this.options.onBack) this.options.onBack();
+        else if (this.services.gameState.snapshot()?.area === 'aveloria') this.services.router.openOverlay(this.scene.scene.get(SCENE_KEYS.World), SCENE_KEYS.Pause);
         else runner.fastComplete(); // existing forest control remains unchanged
       }
     });

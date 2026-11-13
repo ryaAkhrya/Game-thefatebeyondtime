@@ -51,12 +51,16 @@ export class SliceEndScene extends Phaser.Scene {
     ui.text(cx, 168, chapter4Done ? 'Menara tua runtuh. Warga selamat.\nHeart terbuka; pilihan tetap milik mereka.' : chapter3Done ? 'Nama itu akhirnya punya wajah.\nJalan menuju benteng terbuka.' : chapter2Done ? 'Dua catatan. Satu keputusan.\nAzie menelusuri lambang kuil.' : chapterDone ? 'Dua dentang. Satu waktu.\nPenyelidikan baru dimulai.' : 'Mournfang surut ke dalam hutan.\nJalan ke timur kembali terbuka.', { size: TYPE.body + 2, originX: 0.5, align: 'center', leading: 8, depth: 3 });
     ui.text(cx, 236, chapter4Done ? 'The Fate  ·  Bab IV selesai' : chapter3Done ? 'The Forgotten Promise  ·  bersambung ke The Fate' : chapter2Done ? 'Whispers of Fate  ·  bersambung' : chapterDone ? 'The Nameless Wanderer  ·  bersambung ke Whispers of Fate' : 'Gerbang kerajaan menunggu. Simpan perjalanan sebelum masuk.', { size: TYPE.small, originX: 0.5, color: COLORS.paperDim, depth: 3 });
     this.menu = new MenuList(this, { ui, x: cx, y: 274, width: 260, rowHeight: 36, align: 'center', depth: 4, size: TYPE.body + 1, initialId: focusId,
-      items: [...(!chapterDone ? [{ id: 'aveloria', label: 'Masuk Aveloria' }] : []), ...(canStartChapter2 ? [{ id: 'chapter2', label: 'Mulai Bab II' }] : []), ...(canStartChapter3 ? [{ id: 'chapter3', label: 'Mulai Bab III' }] : []), ...(canStartChapter4 ? [{ id: 'chapter4', label: 'Mulai Bab IV' }] : []), { id: 'explore', label: chapterDone ? 'Jelajahi Aveloria' : 'Jelajahi kembali' }, { id: 'save', label: 'Simpan / Muat' }, { id: 'settings', label: 'Pengaturan' }, { id: 'title', label: 'Ke Judul' }],
+      items: [...(!chapterDone ? [{ id: 'aveloria', label: 'Masuk Aveloria' }] : []), ...(canStartChapter2 ? [{ id: 'chapter2', label: 'Mulai Bab II' }] : []), ...(canStartChapter3 ? [{ id: 'chapter3', label: 'Mulai Bab III' }] : []), ...(canStartChapter4 ? [{ id: 'chapter4', label: 'Mulai Bab IV' }] : []), ...(chapter4Done ? [{ id: 'ending', label: 'Lanjutkan kisah' }] : []), { id: 'explore', label: chapterDone ? 'Jelajahi Aveloria' : 'Jelajahi kembali' }, { id: 'save', label: 'Simpan / Muat' }, { id: 'settings', label: 'Pengaturan' }, { id: 'title', label: 'Ke Judul' }],
       onConfirm: item => {
         if (this.closing) return;
         if (item.id === 'save') services.router.openOverlay(this, SCENE_KEYS.SaveLoad);
         else if (item.id === 'settings') services.router.openOverlay(this, SCENE_KEYS.Settings);
         else if (item.id === 'explore') this.resumeWorld();
+        else if (item.id === 'ending') {
+          this.closing = true; this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud);
+          services.router.goto(this, SCENE_KEYS.Ending);
+        }
         else if (item.id === 'chapter2') {
           this.closing = true;
           this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud);

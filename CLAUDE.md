@@ -1,5 +1,13 @@
 # Instruksi Claude Code — The Fate Beyond Time
 
+## Handoff terkini: Phase 9 (13 November 2026)
+
+Instruksi Game Director kini mengotorisasi Modern Interlude, Epilog, sistem kenangan privat, To Be Continued dan credits. Larangan memulai Phase 9 pada catatan Phase 8 di bawah adalah historis dan sudah digantikan instruksi ini. Implementasi di `web/src/game/ending/` dan `scenes/EndingScene.ts`; evidence/status di `docs/production/PHASE9_REPORT.md`. Cerita Revisi 02 tetap menang; dialog E-01/E-02 dipertahankan verbatim dari naskah kerja dan masih DRAFT editorial, M-01/M-02 ditandai DRAFT_IMPL. Tidak ada data hubungan nyata yang dibuat.
+
+Save tetap `save_v2`/schema 2 dengan ekstensi `ending?: {step,memoryIndex}`; kontrak di `docs/production/ENDING_SAVE_EXTENSION.md`. Public build memakai virtual private-content `null` dan allowlist path+SHA-256; data lokal hanya di `/private/anniversary/`, output privat hanya `/private-build/anniversary/`. `build:private -- --confirm-private-local` adalah tindakan eksplisit setelah data nyata tersedia; tidak dijalankan untuk anniversary nyata pada fase ini. BGM tetap AWAITING_COMPOSER; satu SFX asli existing dipakai ulang dengan pelan.
+
+Preview normal `http://127.0.0.1:5173/`; shortcut review tanpa menulis save `?qa=1&preview=ending` hanya dev. Permintaan lanjutan Game Director mengotorisasi commit dan push handoff Phase 9 ini. Deploy Vercel, unggahan data personal, release dan final polish tetap memerlukan instruksi baru. Art code-native, pose duduk, dialog kerja, audio dan emotional pacing tetap memerlukan review manusia. Baca panduan privasi sebelum menambah media.
+
 1. Baca `README.md`, `RULES.md`, `GDD.md`, `LORE_BIBLE.md`, `FULL_STORY.md`, `SCENE_DIRECTION.md`, `GAME_SYSTEMS.md`, `SKILLS_AND_BOSSES.md`, `ASSET_INDEX.md`, `AUDIO_COMPOSER_HANDOFF.md`, `TECHNICAL_DESIGN.md`, `PHASES.md`, `TASKS.md`, `QA_CHECKLIST.md`.
 2. Canon cerita ada di `docs/source/CERITA_APPROVED_REVISI_02.docx`. Jika dokumen kerja berbenturan, canon di atas menang. Detail dialog kerja belum approved.
 3. Implementasi satu phase per sesi di `web/`: desktop 16:9, keyboard, Phaser 4.2.1, TypeScript, Vite. **Phase 6 (Chapter II)**: alur C2-01..09 playable dari ending Bab I hingga laporan ke Velthia, Liora, Hutan 2, Torvan sebagai anggota kedua, tutorial duo dan boss Veyrath. QA aktual/status akhir di `docs/production/PHASE6_REPORT.md`; riwayat Bab I di `PHASE5_REPORT.md`. Save tetap envelope `save_v2`, data schema 2, key `tfbt.save.v1.*`; `partyVitals.C03` wajib hanya setelah Torvan bergabung, `world.lastChapter2EncounterSec` opsional. Jangan masuk Bab III atau membuat commit/push tanpa instruksi baru. Jangan beralih ke Godot/EXE.

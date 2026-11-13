@@ -7,7 +7,7 @@ export class SaveCoordinator {
   private pending = false;
   lastMessage = '';
   constructor(private readonly state: GameState, private readonly repository: SaveRepository) {}
-  get isSafe(): boolean { return this.stable && this.state.isActive && (this.state.snapshot()?.vitals?.hp ?? 0) > 0; }
+  get isSafe(): boolean { return this.stable && this.state.isActive && ((this.state.snapshot()?.vitals?.hp ?? 0) > 0 || !!this.state.snapshot()?.ending); }
   get hasPendingAutosave(): boolean { return this.pending; }
   reset(): void { this.stable = false; this.pending = false; this.lastMessage = ''; }
   setSafe(safe: boolean): void { this.stable = safe; }

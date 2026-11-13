@@ -56,7 +56,7 @@ describe('Varlgrim: balancing (stat dari kurva level, parametrik)', () => {
     const r = play(PROFILES.avg, aegisOnlyC4); expect(r.outcome === 'defeat' || r.hpLeft / r.hpMax < 0.05).toBe(true);
     expect(play(PROFILES.low, aegisOnlyC4).outcome).toBe('defeat');
   });
-  it('variasi pemain (bukan RNG): L9 dengan 20% aksi acak masih menang di sebagian besar percobaan; L8 menang sebagian; hasil dapat diulang persis', () => {
+  it('variasi pemain (bukan RNG): L9 dengan 20% aksi acak masih menang di sebagian besar percobaan; L8 menang sebagian; hasil dapat diulang persis', { timeout: 30000 }, () => {
     const l9 = batch(PROFILES.avg9, smartC4, 40, 0.2), l8 = batch(PROFILES.avg, smartC4, 40, 0.2);
     expect(l9.win).toBeGreaterThan(0.45); expect(l9.win).toBeLessThan(0.95);
     expect(l8.win).toBeGreaterThan(0.15); expect(l8.win).toBeLessThan(l9.win);

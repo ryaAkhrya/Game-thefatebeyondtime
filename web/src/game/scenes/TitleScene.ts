@@ -1,11 +1,12 @@
 import Phaser from 'phaser';
+import { ENDING, continueIntoEnding } from '../ending/progress';
 import { COLORS, css } from '../config/palette';
 import { SCENE_KEYS } from '../data/ids';
 import { getServices, type Services } from '../systems/Services';
 import { MenuList, type MenuItem } from '../../ui/components/MenuList';
 import { Ui, TYPE, bindRelayout } from '../../ui/kit/ui';
 
-type TitleAction = 'new' | 'continue' | 'settings' | 'controls';
+type TitleAction = 'new' | 'continue' | 'settings' | 'controls' | 'replay';
 
 const NO_SAVE_HINT = 'Belum ada data simpan.';
 
@@ -51,6 +52,15 @@ export class TitleScene extends Phaser.Scene {
       if (this.bgKey && this.textures.exists(this.bgKey)) this.textures.remove(this.bgKey);
     });
 
+    // Local review shortcut: non-saving replay of a QA Chapter IV fixture, once per page load.
+    if (import.meta.env.DEV && new URLSearchParams(location.search).get('preview') === 'ending' && new URLSearchParams(location.search).has('qa') && !this.registry.get('ending.preview.used')) {
+      this.registry.set('ending.preview.used', true);
+      this.time.delayedCall(250, () => {
+        const api = (window as unknown as { __tfbt: { qa: { chapter4(stage: string, battle: undefined, opts: { endingPreview: boolean }): void } } }).__tfbt;
+        api.qa.chapter4('complete', undefined, { endingPreview: true });
+      });
+    }
+
     // Audio dimulai hanya setelah input pemain; tanpa file komposer -> senyap, tanpa error.
     audio.playBgm('BGM_TITLE');
 
@@ -75,6 +85,7 @@ export class TitleScene extends Phaser.Scene {
     const items: (MenuItem & { action: TitleAction })[] = [
       { id: 'new', action: 'new', label: 'Mulai Baru' },
       { id: 'continue', action: 'continue', label: 'Lanjut', disabled: !hasSave, disabledHint: NO_SAVE_HINT },
+      ...(saves.latestValid()?.data.flags[ENDING.complete] || this.services.gameState.hasFlag(ENDING.complete) ? [{ id: 'replay', action: 'replay' as const, label: 'Putar Ulang Akhir' }] : []),
       { id: 'settings', action: 'settings', label: 'Pengaturan' },
       { id: 'controls', action: 'controls', label: 'Panduan Kontrol' },
     ];
@@ -98,7 +109,7 @@ export class TitleScene extends Phaser.Scene {
       },
     });
 
-    this.status = ui.text(ui.dw / 2, 436, '', { size: TYPE.small, originX: 0.5, color: COLORS.paperDim, depth: 20 });
+    this.status = ui.text(ui.dw / 2, items.length > 4 ? 472 : 436, '', { size: TYPE.small, originX: 0.5, color: COLORS.paperDim, depth: 20 });
     this.resetStatus();
     ui.text(24, ui.dh - 26, '↑ ↓  pilih        Enter  mulai', { size: TYPE.tiny, color: COLORS.plumMist, depth: 20 });
 
@@ -122,7 +133,13 @@ export class TitleScene extends Phaser.Scene {
         if (!latest) return this.setStatus(NO_SAVE_HINT, COLORS.warn, 2500);
         gameState.load(latest.data);
         this.services.checkpoints.reset();
-        router.goto(this, SCENE_KEYS.World);
+        router.goto(this, continueIntoEnding(latest.data) ? SCENE_KEYS.Ending : SCENE_KEYS.World);
+        break;
+      }
+      case 'replay': {
+        const latest = saves.latestValid();
+        if (!gameState.hasFlag(ENDING.complete) && latest?.data.flags[ENDING.complete]) gameState.load(latest.data);
+        if (gameState.hasFlag(ENDING.complete)) router.goto(this, SCENE_KEYS.Ending, { replay: true });
         break;
       }
       case 'settings':
@@ -143,6 +160,9 @@ export class TitleScene extends Phaser.Scene {
       this.status.setText('');
     }
   }
+
+  /** QA: render the real storage notice against the completed Title's five-row menu. */
+  qaStorageNotice(): void { this.setStatus('Penyimpanan browser tidak tersedia.', COLORS.warn); }
 
   private setStatus(msg: string, color: number, clearAfterMs?: number): void {
     this.statusTimer?.remove();

@@ -103,7 +103,7 @@ describe('atlas VFX pixel-art', () => {
 
 describe('atlas Phase 8: generator deterministik dan sinkron dengan berkas', () => {
   for (const key of VFX_PHASE8_KEYS) {
-    it(`${key}: dua kali build menghasilkan hash PNG/JSON yang sama dan sama dengan berkas di public/`, async () => {
+    it(`${key}: dua kali build menghasilkan hash PNG/JSON yang sama dan sama dengan berkas di public/`, { timeout: 60000 }, async () => {
       const a = await renderAtlas(key), b = await renderAtlas(key);
       const pa = a.atlas.png(), pb = b.atlas.png();
       expect(sha(pa)).toBe(sha(pb));

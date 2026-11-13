@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "typecheck": "tsc --noEmit",
-    "build": "tsc --noEmit && vite build",
+    "build": "tsc --noEmit && vite build && node scripts/audit-ending-build.mjs",
     "preview": "vite preview",
     "test": "vitest run",
     "test:e2e": "node tests/e2e/run.mjs",
@@ -16,7 +16,9 @@
     "assets:sprint2": "node scripts/gen-forest-art.mjs && node scripts/gen-forest-edge-art.mjs && node scripts/gen-forest2-art.mjs && node scripts/gen-town-art.mjs",
     "assets:vfx": "node scripts/vfx/build.mjs",
     "assets:sfx": "node scripts/sfx/generate.mjs",
-    "assets:sprites": "python -I scripts/author-mournfang.py && python -I scripts/author-yaric-sprites.py && python -I scripts/author_cast_build.py"
+    "assets:sprites": "python -I scripts/author-mournfang.py && python -I scripts/author-yaric-sprites.py && python -I scripts/author_cast_build.py",
+    "build:private": "node scripts/build-private.mjs",
+    "privacy:audit": "node scripts/audit-ending-build.mjs"
   },
   "dependencies": {
     "@fontsource/cinzel": "5.3.0",

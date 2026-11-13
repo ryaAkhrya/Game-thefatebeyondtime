@@ -1,0 +1,5 @@
+# Preserve the exact approved binary asset bytes on every platform.
+web/public/** -text
+# Public text assets use stable LF bytes so SHA-256 approvals survive Windows/Linux checkouts.
+web/public/**/*.json text eol=lf
+web/public/**/*.txt text eol=lf

@@ -18,10 +18,11 @@ export type EntityId = CharacterId | MonsterId | BossId;
 export const CHAPTER_IDS = ['I', 'II', 'III', 'IV', 'MODERN', 'EPILOGUE'] as const;
 export type ChapterId = (typeof CHAPTER_IDS)[number];
 
-export const AREA_IDS = ['none', 'forest_1', 'forest_edge', 'aveloria', 'liora', 'forest_2', 'temple', 'fortress', 'cliff'] as const;
+export const AREA_IDS = ['none', 'forest_1', 'forest_edge', 'aveloria', 'liora', 'forest_2', 'temple', 'fortress', 'cliff', 'modern'] as const;
 export type AreaId = (typeof AREA_IDS)[number];
 
 export const SCENE_KEYS = {
+  Ending: 'EndingScene',
   Boot: 'BootScene',
   Title: 'TitleScene',
   Settings: 'SettingsScene',

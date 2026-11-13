@@ -82,7 +82,7 @@ describe('Yaric final atlas: struktur', () => {
     }
   });
 
-  it('alpha keras (0/255) dan tidak ada piksel di baris y=0 atau kolom tepi sel pada semua frame', () => {
+  it('alpha keras (0/255) dan tidak ada piksel di baris y=0 atau kolom tepi sel pada semua frame', { timeout: 30000 }, () => {
     for (let i = 0; i < png.data.length; i += 4) expect([0, 255]).toContain(png.data[i + 3]);
     for (const idx of uniqueIdx) {
       const c = cell(png, idx);

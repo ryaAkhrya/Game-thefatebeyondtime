@@ -260,3 +260,8 @@ Kolom "lokasi pemicu" = pemasangan oleh lead (BattleScene/TransitionScene/WorldS
 | `meteor_fall` | `SFX_METEOR_DESCENT` (~2,0 s) -> `SFX_METEOR_IMPACT` (saat dampak) + `SFX_AEGIS_STRESS` bersamaan bila perisai menahan -> keheningan ~0,6 s -> `SFX_AEGIS_FADE` pada pemulihan. |
 | Musuh Bab IV | `SFX_RIFTBORN_ATTACK` / `SFX_GRAVORN_ATTACK` di kontak (bukan di telegraf). |
 | Dunia | `SFX_FORTRESS_DOOR_ANCIENT` (gerbang/pintasan), `SFX_SEAL_ACTIVATE` / `SFX_SEAL_ERROR` (satu kali per percobaan), `SFX_ECHO_MEMORY` (objek Ruang Gema), `SFX_HEART_LOCK` x2 -> `SFX_HEART_UNSEAL`, `SFX_TOWER_COLLAPSE_DISTANT` (C4-04). |
+
+
+## Phase 9 reuse (13 November 2026)
+
+No new SFX files or BGM. EndingScene reuses original SFX_ECHO_MEMORY once at the archive fragment (gain multiplier 0.28, rate 0.8), through AudioManager with Master/SFX/mute controls. Dialogue advancement is silent in this sequence. Existing sound file hashes remain unchanged. Listening review remains pending.

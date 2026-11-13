@@ -1,0 +1,5 @@
+# Defense in depth when web/ is selected as a future hosting root.
+private/
+private-build/
+public/assets/personal-private/
+public/memories/

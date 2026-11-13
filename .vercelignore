@@ -1,0 +1,8 @@
+# No deployment is performed in Phase 9. These exclusions protect future CLI uploads.
+private/
+private-build/
+.dev-cache/
+docs/private/
+assets/private/
+web/public/assets/personal-private/
+web/public/memories/

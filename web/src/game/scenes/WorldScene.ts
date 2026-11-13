@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { isEnding } from '../ending/progress';
 import { ENV, SPRITE_KEYS } from '../data/assetPaths';
 import { SCENE_KEYS, type AreaId } from '../data/ids';
 import { footBox, moveWithCollision, pointIn, type Facing, type Rect } from '../world/Collision';
@@ -96,6 +97,7 @@ export class WorldScene extends Phaser.Scene {
 
   create(): void {
     this.services = getServices(this);
+    if (isEnding(this.services.gameState.snapshot())) { this.leaving = true; this.services.router.arrive(this); this.services.router.goto(this, SCENE_KEYS.Ending); return; }
     this.services.checkpoints.setSafe(false);
     const { gameState, input, audio, settings } = this.services;
     if (!gameState.isActive) gameState.startNewGame();

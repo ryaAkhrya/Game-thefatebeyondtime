@@ -152,8 +152,12 @@ try {
     await page.keyboard.down('ShiftLeft'); await page.keyboard.down('KeyW'); await page.waitForTimeout(300); const wsd = await st(); await page.keyboard.up('KeyW'); await page.keyboard.up('ShiftLeft');
     check(`${tag}: Shift + WASD (W) = sprint ke atas`, wsd.sp && /sprint_up/.test(wsd.anim), JSON.stringify(wsd));
     // dua arah + Shift tidak diagonal
-    await page.evaluate(() => window.__tfbt.qa.teleport(640, 860)); await page.waitForTimeout(300); a = await st();
-    await page.keyboard.down('Shift'); await page.keyboard.down('ArrowLeft'); await page.keyboard.down('ArrowUp'); await page.waitForTimeout(300); bb = await st();
+    await page.evaluate(() => window.__tfbt.qa.teleport(640, 860)); await page.waitForTimeout(300);
+    await page.keyboard.down('Shift'); await page.keyboard.down('ArrowLeft'); await page.keyboard.down('ArrowUp');
+    // Measure only while both arrows are held. The CDP gap between keydowns is
+    // valid single-direction movement and does not demonstrate diagonal movement.
+    await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+    a = await st(); await page.waitForTimeout(300); bb = await st();
     await page.keyboard.up('ArrowLeft'); await page.keyboard.up('ArrowUp'); await page.keyboard.up('Shift');
     check(`${tag}: sprint tetap empat arah (tidak ada diagonal): hanya satu sumbu berubah`, (Math.abs(bb.x - a.x) < 1.5) !== (Math.abs(bb.y - a.y) < 1.5) || (Math.abs(bb.x - a.x) < 1.5 && Math.abs(bb.y - a.y) < 1.5), JSON.stringify({ a, bb }));
     // collision saat sprint: lari ke tepi peta ke segala arah; posisi akhir harus tetap dapat diinjak dan di dalam peta

@@ -2,6 +2,7 @@ import type { GameStateData } from '../game/systems/GameState';
 import { TRUE_NAME, UNKNOWN_LABEL, isNameKnown } from '../game/story/identity';
 
 export const AREA_LABEL: Readonly<Record<string, string>> = {
+  modern: 'Era modern',
   none: '—', forest_1: 'Hutan', forest_edge: 'Tepi Hutan', aveloria: 'Aveloria', liora: 'Liora', forest_2: 'Hutan Lama',
   temple: 'Kuil Jejak', fortress: 'Benteng Penjaga', cliff: 'Tebing',
 };
@@ -14,9 +15,14 @@ export const BEAT_LABEL: Readonly<Record<string, string>> = {
   'C2-06': 'Belajar bersama', 'C2-07': 'Jalan Veyrath', 'C2-08': 'Fragmen ramalan', 'C2-09': 'Kembali melapor', 'C2-DONE': 'Bab II selesai',
   'C3-01': 'Aveloria retak', 'C3-02': 'Menuju Kuil Jejak', 'C3-03': 'Di dalam kuil', 'C3-04': 'Teka-teki kuil', 'C3-05': 'Aula penjaga',
   'C3-06': 'Chronolith', 'C3-07': 'Janji yang dilupakan', 'C3-DONE': 'Bab III selesai',
+  'M-01': 'Berabad-abad kemudian', 'M-02': 'Gema Aveloria', 'M-03': 'Ingatan kembali', 'E-01': 'Kenangan di tebing', 'GAME-DONE': 'Perjalanan selesai',
   'C4-01': 'Benteng Penjaga', 'C4-02': 'Kesaksian dan bantahan', 'C4-03': 'Penjaga waktu', 'C4-04': 'Heart dibuka',
   'C4-05': 'Ingatan Aveloria', 'C4-06': 'Varlgrim dan Torvan', 'C4-07': 'Kembali kepada rakyat', 'C4-DONE': 'Bab IV selesai',
 };
+
+export function chapterLabel(chapter: GameStateData['chapter']): string {
+  return chapter === 'MODERN' ? 'Interlude modern' : chapter === 'EPILOGUE' ? 'Epilog' : `Bab ${chapter}`;
+}
 
 export function formatPlaytime(sec: number): string {
   const s = Math.max(0, Math.floor(sec));

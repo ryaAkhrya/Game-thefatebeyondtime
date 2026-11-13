@@ -1,5 +1,22 @@
 # Composer handoff — Game Director authored music only
 
+## Phase 9 — Modern Interlude / cliff / credits (brief only, AWAITING_COMPOSER)
+
+No BGM was made, chosen, downloaded or added. Existing cue IDs/statuses remain unchanged. These are suggestions for user-authored composition, not delivered tracks. Both public/private stories work silently.
+
+| Moment | Existing cue / approximate tempo | Mood, instrumentation and loop needs |
+|---|---|---|
+| Era card → modern walk | `BGM_MODERN`, 70–94 BPM | Ordinary warmth, spare keys/plucked support; little fantasy ornament; 50–75 s seamless loop; after first gesture |
+| Artefact discovery | Same cue, thinning pulse | Give engraving space; no sci-fi sting; tolerate arbitrary player dwell |
+| Archive / heirloom / Heart fragments | Same cue or silence | One soft mallet/string voice; player-paced 2–6 s fragments, no chapter recap or mandatory hits |
+| Awakening | `BGM_MODERN`, 70–84 BPM | Recognition, not shock; quiet fantasy interval if wanted; no portal crescendo |
+| Cliff memory / promise | `BGM_EPILOGUE`, 68–86 BPM | Warm, slightly tired; restrained strings/plucked voice, room for humour/silence; 70–100 s optional loop |
+| Clouds → To Be Continued | Epilogue tail or silence | Simplify to two voices; no triumph fanfare; title holds at least 3 s, then waits for input |
+| Credits | `BGM_CREDITS`, 70–92 BPM | Light closure, spare reprise; 60–100 s optional loop; fade safely when skipped |
+| Private P.S. | Silence by default or approved credits tail | Length unknown; no new cue or invented personal song/date; finish without forced timing |
+
+Only existing original `SFX_ECHO_MEMORY` is reused at the first fragment (multiplier 0.28/rate 0.8), through AudioManager Master/SFX/mute. No new sound file. Ending dialogue navigation is silent. Human listening review remains pending.
+
 ## Phase 8 — Chapter IV (Benteng, Varlgrim, Heart of Time): brief BGM, TIDAK dibuat
 
 Phase 8 tidak membuat atau memuat BGM apa pun (tidak ada file `BGM_*`; game berjalan senyap). Semua cue di bawah **AWAITING_COMPOSER**. Nama cue memakai registry yang sudah ada (`MUSIC_REGISTRY.json`); dua cue tambahan opsional ditandai *usulan* dan BELUM ada di registry (Game Director/komposer yang memutuskan).

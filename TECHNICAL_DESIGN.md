@@ -139,3 +139,8 @@ Urutan fokus: Modal Settings > Pause > Dialogue > Battle > World. Saat setting s
 - https://vite.dev/guide/
 
 **Kontrak output:** fase MVP menghasilkan **web local playable + static browser build**, bukan EXE atau file project.godot.
+
+
+## Phase 9 ending extension
+
+EndingScene uses the existing router/input/dialogue/audio services. Save_v2/schema 2 has an optional validated ending checkpoint. See `docs/production/ENDING_SAVE_EXTENSION.md`. Public/private build isolation is enforced in `web/scripts/ending-build.ts`; public files require path and SHA-256 approval. See `docs/production/ENDING_PRIVACY_QA.md`. No deployment is configured or executed.

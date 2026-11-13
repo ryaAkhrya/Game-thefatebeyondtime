@@ -1,9 +1,10 @@
 import Phaser from 'phaser';
+import { continueIntoEnding } from '../ending/progress';
 import { MenuList } from '../../ui/components/MenuList';
 import { uiSfx } from '../../ui/kit/sfx';
 import { bar, menuWindow, veil, windowHint, type WindowSpec } from '../../ui/components/frame';
 import { TYPE, Ui, bindRelayout } from '../../ui/kit/ui';
-import { AREA_LABEL, BEAT_LABEL, formatPlaytime, partyName } from '../../ui/labels';
+import { AREA_LABEL, BEAT_LABEL, chapterLabel, formatPlaytime, partyName } from '../../ui/labels';
 import { COLORS } from '../config/palette';
 import { SCENE_KEYS, type SceneKey } from '../data/ids';
 import { effectiveStats } from '../rpg/progression';
@@ -75,7 +76,7 @@ export class SaveLoadScene extends Phaser.Scene {
     const known = isNameKnown(d.flags);
     const local = new Date(result.savedAt).toLocaleString('id-ID', { timeZone: 'Asia/Jakarta', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit', hour12: false });
     t(x, y, slotName(slot), { family: 'display', weight: '700', size: TYPE.heading + 2 });
-    t(x, y + 34, `Bab ${d.chapter}  ·  ${AREA_LABEL[d.area] ?? d.area}`, { weight: '600', color: COLORS.bitterLime });
+    t(x, y + 34, `${chapterLabel(d.chapter)}  ·  ${AREA_LABEL[d.area] ?? d.area}`, { weight: '600', color: COLORS.bitterLime });
     t(x, y + 58, BEAT_LABEL[d.storyBeat] ?? '', { color: COLORS.paperDim });
     let py = y + 100;
     const member = (id: 'C01' | 'C02' | 'C03', hp: number, mp: number): void => {
@@ -146,7 +147,7 @@ export class SaveLoadScene extends Phaser.Scene {
     uiSfx(this, 'SFX_UI_SAVE_OK');
     services.gameState.load(result.data); services.checkpoints.reset(); this.closing = true;
     this.scene.stop(SCENE_KEYS.Pause); this.scene.stop(SCENE_KEYS.World); this.scene.stop(SCENE_KEYS.Hud);
-    this.scene.stop(SCENE_KEYS.SliceEnd);
-    services.router.goto(this, SCENE_KEYS.World);
+    this.scene.stop(SCENE_KEYS.SliceEnd); this.scene.stop(SCENE_KEYS.Ending);
+    services.router.goto(this, continueIntoEnding(result.data) ? SCENE_KEYS.Ending : SCENE_KEYS.World);
   }
 }

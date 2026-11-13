@@ -1,5 +1,18 @@
 # QA CHECKLIST — WEB DESKTOP
 
+## Phase 9 — evidence (13 November 2026)
+
+Log dan angka run aktual ada di `docs/production/PHASE9_REPORT.md`; detail boundary di `ENDING_PRIVACY_QA.md`.
+
+- [x] Alur modern → artefak → ingatan → flashback tebing → E-01/E-02 → awan/siluet → To Be Continued → credits → completion teruji browser.
+- [x] Save manual modern, refresh fragment, Continue completion, replay tanpa mutasi save utama teruji.
+- [x] Held Enter tidak melompati era; minimum hold dan halaman dialog terpisah.
+- [x] Resize jendela saat fade pergantian beat melanjutkan ke beat berikut dan menyimpan checkpoint aman; regresi produksi pada dua resolusi.
+- [x] Renderer foto portrait/landscape serta caption/message maksimum diuji dengan bidang warna dan teks QA, bukan foto/fakta hubungan buatan.
+- [ ] Foto nyata, metadata, nama/kemiripan pasangan opsional dan pesan asli direview lokal setelah tersedia.
+- [ ] Penilaian manusia untuk art DRAFT, pose duduk, pacing emosional, dialog kerja dan bunyi SFX.
+- [ ] FPS/performa GPU perangkat nyata; metrik headless bukan pengganti.
+
 ## Phase 5 — Chapter I / Aveloria
 
 Baseline diulang: **405 unit +375 produksi Edge +38 Chrome boss +38 dev Edge boss**, strict TypeScript/build PASS. Dua koreksi helper baseline dan log percobaan gagal dicatat di laporan Phase 5.

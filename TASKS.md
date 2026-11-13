@@ -1,5 +1,16 @@
 # TASKS — STATUS SEBENARNYA
 
+## Phase 9 — Modern Interlude, Epilog, Memories, Credits (13 November 2026)
+
+- [x] Implementasi modern sesudah IV, pendekatan artefak, fragmen ingatan, flashback Aveloria, janji E-01/E-02, awan/siluet, To Be Continued, credits.
+- [x] Checkpoint ending, Continue/save/load, completion dan replay eksplisit tanpa menulis save utama.
+- [x] Schema kenangan modular, renderer contain portrait/landscape, hook pesan privat sesudah credits; tanpa isi hubungan palsu.
+- [x] Pemisahan local input/private output, build eksplisit, allowlist SHA-256, pemindaian artefak publik dan upload exclusions.
+- [x] Dokumentasi implementasi, sinematik, panduan privat, kontrak save, composer handoff.
+- [x] QA otomatis fungsional: strict TS/build, 1.574 unit; regresi lama 906 + Phase 8 168; ending Edge 91/91 dan Chrome 91/91; preview 9/9; privasi 8/8 dan audit 324 file. Log, perbaikan dan percobaan gagal tercatat dalam laporan.
+- [ ] Isi asli dari Game Director: foto yang diizinkan, caption/tanggal, urutan, kata-kata anniversary sendiri; private anniversary build nyata belum dibuat.
+- [ ] Review manusia: seni/pose duduk, dialog kerja, emotional pacing, SFX, performa perangkat nyata. Hasil QA otomatis lengkap: `docs/production/PHASE9_REPORT.md`.
+
 ## Phase 8 — Chapter IV: The Fate (13 November 2026)
 
 - [x] Chapter IV playable end-to-end (Mulai Bab IV → Gerbang Luar → Aula Lonceng → Arsip (Perlindungan) → Ruang Uji → Koridor Retakan → Serambi/lentera checkpoint → Varlgrim 3 fase → Heart terbuka (dua pengunci) → menara runtuh → Ruang Gema → Torvan → pulang ke Aveloria → "Bab IV selesai"); 36 baris canon C4-01..07 verbatim.
@@ -8,7 +19,7 @@
 - [x] 23 id SFX asli Bab IV (registry 67 id); VFX 5 atlas baru; art battle B04/M04/M06 DRAFT. Tanpa BGM.
 - [x] Tes: unit 1531, tsc bersih; Edge produksi regresi 906 (identik baseline) + Phase 8 168 (1366 penuh + 1920 singkat) + Phase 8 penuh 1920 119; Chrome Phase 8 119. Lihat `PHASE8_REPORT.md`.
 - [ ] Review manusia: seni DRAFT (Varlgrim/Riftborn/Gravorn/Benteng/VFX), bunyi SFX, balance Varlgrim (margin L8 tipis menurut simulasi), pacing, performa GPU nyata.
-- [ ] Keputusan Game Director: Modern Interlude/Epilog (belum dimulai, menunggu instruksi), BGM dari komposer (AWAITING_COMPOSER).
+- [x] Modern Interlude/Epilog diotorisasi dalam Phase 9; implementasi di bagian terkini di atas. BGM tetap menunggu komposer.
 
 Lihat `docs/production/PHASE8_REPORT.md`.
 

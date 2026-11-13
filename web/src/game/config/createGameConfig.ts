@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { EndingScene } from '../scenes/EndingScene';
 import { COLORS, css } from './palette';
 import type { DisplayLayout } from '../systems/DisplayScale';
 import { BootScene } from '../scenes/BootScene';
@@ -33,6 +34,6 @@ export function createGameConfig(parent: HTMLElement, layout: DisplayLayout): Ph
     input: { keyboard: false, mouse: false, touch: false, gamepad: false },
     audio: { noAudio: false },
     disableContextMenu: true,
-    scene: [BootScene, TitleScene, SettingsScene, ControlsScene, WorldScene, HudScene, PauseScene, BattleScene, RpgMenuScene, SaveLoadScene, ShopScene, SliceEndScene, JournalScene, TransitionScene],
+    scene: [BootScene, EndingScene, TitleScene, SettingsScene, ControlsScene, WorldScene, HudScene, PauseScene, BattleScene, RpgMenuScene, SaveLoadScene, ShopScene, SliceEndScene, JournalScene, TransitionScene],
   };
 }

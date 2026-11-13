@@ -1,5 +1,18 @@
 # Asset index v3.3 — per file
 
+## Phase 9 — code-native cinematic assets (DRAFT / NEEDS_REVIEW)
+
+| Runtime asset | Source / provenance | Status |
+|---|---|---|
+| Modern scene, anonymous pair, relic | `web/src/game/ending/EndingArt.ts`, original code drawing, 640×360 | DRAFT; no real venue/likeness claimed |
+| Archive/heirloom/open Heart fragments | Same renderer; existing ring/broken-diagonal motif | DRAFT; no stock photos |
+| Cliff, valley, damaged Aveloria, clouds | Same renderer, one reused canvas texture, integer scale | DRAFT; human review pending |
+| C01/C02 seated poses | Existing final back-facing head/torso + code-native bent cloth/legs | DRAFT derivative; originals preserved; anatomy review pending |
+| Modern cloud silhouettes | Anonymous code-drawn forms, audience montage only | DRAFT; no future vision by fantasy characters |
+| Font license text | `web/public/legal/fonts.txt`, installed Fontsource licenses | Public legal text, SHA-256 allowlisted |
+
+No new raster source artwork, personal media, BGM or SFX files. Real photos, partner art and captions are absent. Public static paths and SHA-256 are recorded in `web/public-assets.allowlist.json`; review future entries individually. Private photographs are contained without cropping or generative modification.
+
 ## Polish Sprint 2 – aset final karakter, boss, dan lingkungan (semua DRAFT / NEEDS_REVIEW)
 
 Catatan rinci per bagian: `docs/production/sprint2/{yaric,cast,mournfang,forest-world,town-world}.md`. Standar teknis: `docs/production/CHAPTER12_VISUAL_QUALITY_STANDARD.md`. Sumber di `assets/` tidak diubah; semua keluaran dapat dibuat ulang (skrip deterministik, hash identik antar-run).

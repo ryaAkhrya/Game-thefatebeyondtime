@@ -1,5 +1,11 @@
 # PHASE ROADMAP — DESKTOP WEB (CLAUDE CODE)
 
+## Phase 9 — Modern Interlude / Epilog / Memories / Credits (13 November 2026)
+
+**FUNCTIONAL PASS — PERSONAL CONTENT & HUMAN REVIEW PENDING.**
+
+Diotorisasi oleh instruksi Phase 9 Game Director. Implementasi cerita modern sesudah IV, artefak dan fragmen, tebing sebagai kenangan Aveloria, janji E-02, awan/siluet, To Be Continued, credits, completion dan replay. Pondasi foto/pesan privat terpisah dari public bundle; konten asli belum tersedia. Status otomatis dan review manusia di `docs/production/PHASE9_REPORT.md`; kontrak save dan panduan privat di laporan terkait. Catatan larangan Phase 9 dalam riwayat Phase 8 kini historis. Scope berhenti sebelum final polish/release/deployment.
+
 ## Phase 8 otonom — Chapter IV: The Fate (instruksi terbaru)
 
 Instruksi Phase 8 mengotorisasikan Chapter IV (C4-01..07) dari akhir Bab III sampai Heart of Time selesai dan kembali ke Aveloria: Warden Fortress (teka-teki pengamatan, encounter, checkpoint), boss akhir Varlgrim (tiga fase), meteor + Ultimate Perlindungan Velthia, level cap 10 dengan kompatibilitas save lama, SFX asli (bukan BGM) dan pixel art DRAFT. Status **FUNCTIONAL PASS — VISUAL/AUDIO/BALANCE REVIEW PENDING**; bukti dan sisa masalah: `docs/production/PHASE8_REPORT.md`. **Modern Interlude, Epilog, kredit akhir, pesan anniversary dan data personal modern TIDAK termasuk dan tidak boleh dimulai tanpa instruksi baru.** Tidak ada commit/push/deploy otomatis.

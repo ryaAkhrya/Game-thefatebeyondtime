@@ -28,3 +28,7 @@ private/
 docs/private/
 assets/private/
 web/public/memories/
+
+# Phase 9: local anniversary inputs and outputs, outside Vite public/
+/private-build/
+/private/anniversary/
