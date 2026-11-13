@@ -1,4 +1,5 @@
-import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { mkdtempSync, mkdirSync, writeFileSync, rmSync, readFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { resolve, dirname, basename } from 'node:path';
 import { afterAll, describe, expect, it } from 'vitest';
 import { loadPrivateContent, publicFiles, validatePublicAssets, validateOutputPath, projectRoot } from '../../scripts/ending-build';
@@ -14,6 +15,14 @@ const fixture=()=>({version:1,memories:[{id:'qa-fixture',caption:'QA_CANARY_ONLY
 describe('Ending privacy build boundary',()=>{
   it('rejects a build cleanup target outside the resolved project directory',()=>{expect(()=>validateOutputPath(resolve(projectRoot,'..','escape-output'))).toThrow(/inside/);expect(()=>validateOutputPath(projectRoot)).toThrow(/root/);expect(()=>validateOutputPath(resolve(projectRoot,'web/dist'))).not.toThrow();});
   it('accepts only existing public files with their approved SHA-256, and no symlinks',()=>{expect(()=>validatePublicAssets()).not.toThrow();expect(publicFiles().length).toBeGreaterThan(100);});
+  it('pins public text approvals to LF bytes used by Git checkouts on Vercel',()=>{
+    const web=resolve(projectRoot,'web');
+    const entries=JSON.parse(readFileSync(resolve(web,'public-assets.allowlist.json'),'utf8')) as Array<{path:string;sha256:string}>;
+    for(const entry of entries.filter(e=>/\.(json|txt)$/.test(e.path))){
+      const bytes=readFileSync(resolve(web,'public',entry.path),'utf8').replace(/\r\n/g,'\n');
+      expect(createHash('sha256').update(bytes).digest('hex'),entry.path).toBe(entry.sha256);
+    }
+  });
   it('requires local private content and fails on absent input',()=>{expect(()=>loadPrivateContent(resolve(root,'absent'))).toThrow(/absent/);});
   it('validates real image bytes and rewrites only local build references without changing the source',()=>{
     const dir=resolve(root,'valid');mkdirSync(resolve(dir,'images'),{recursive:true});writeFileSync(resolve(dir,'images/qa.png'),png);const m=fixture();writeFileSync(resolve(dir,'memories.json'),JSON.stringify(m));

@@ -365,7 +365,7 @@
   },
   {
     "path": "assets/battle/B01_BATTLE_V4.json",
-    "sha256": "f3bdf92ed3c7f6383802de22ecb761261400021f6077ad50ad49de7493d31916"
+    "sha256": "ccf2522bf33fa0631275ad716b19f2531145ef0d8c46371eb718003d0cf01021"
   },
   {
     "path": "assets/battle/B01_BATTLE_V4.png",
@@ -389,7 +389,7 @@
   },
   {
     "path": "assets/battle/B03_BATTLE_V1.json",
-    "sha256": "8f4a99232ad5a75863da13cf26eeb067ddbd3d163540dbf31c3b68ee504cada1"
+    "sha256": "f3eff489425542d1b8232440ae4c263371b72d6c64175e8c52f4329f46793926"
   },
   {
     "path": "assets/battle/B03_BATTLE_V1.png",
@@ -397,7 +397,7 @@
   },
   {
     "path": "assets/battle/B04_BATTLE_V1.json",
-    "sha256": "47643caec576f7a8054d150935b364061bce48ebae5dd09b04b6b0f38d305e48"
+    "sha256": "fa01b408ef40ea2fc59c39c82a61b42b75a73c655a98aab0782efe9609b9829c"
   },
   {
     "path": "assets/battle/B04_BATTLE_V1.png",
@@ -421,7 +421,7 @@
   },
   {
     "path": "assets/battle/C02_BATTLE_V1.json",
-    "sha256": "155c5b7a6804dc614f0921b0d61ef9b79fd5d1b7ebfaa82e4cf6a4479a651010"
+    "sha256": "8364fbd94b5d26588937c314f6441f3bca49c8526583e0fe7f259100edff3d3c"
   },
   {
     "path": "assets/battle/C02_BATTLE_V1.png",
@@ -485,7 +485,7 @@
   },
   {
     "path": "assets/battle/M04_BATTLE_V1.json",
-    "sha256": "593dbbde7b83b5e0380205003052c868db85b44fef895302b18baee31090789f"
+    "sha256": "a5997a7a724ff82b971ebddfeb7c8293e4b5b19912d1dfb3e7e537bb3ce89919"
   },
   {
     "path": "assets/battle/M04_BATTLE_V1.png",
@@ -493,7 +493,7 @@
   },
   {
     "path": "assets/battle/M05_BATTLE_V1.json",
-    "sha256": "e135da908511812ae4ab3ffa03491d48ac4140082ffdd58cc582e7d9ddb294d9"
+    "sha256": "c370b5d2ece74c9027f4b5e1e18eb518cdfef25d1ec4170f759ef0a506e6f7ca"
   },
   {
     "path": "assets/battle/M05_BATTLE_V1.png",
@@ -501,7 +501,7 @@
   },
   {
     "path": "assets/battle/M06_BATTLE_V1.json",
-    "sha256": "dc0115798a8fdb9fef1804e5af94e9d9dd94e6851737bdeef24f032e57a6993a"
+    "sha256": "d2e2e4fec59c5206dbb0f42a73176a8b9e04c7f9d2059d42473243657afb00b0"
   },
   {
     "path": "assets/battle/M06_BATTLE_V1.png",
