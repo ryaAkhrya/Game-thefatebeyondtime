@@ -1,0 +1,229 @@
+{
+  "date": "2026-11-14",
+  "status": "PASS",
+  "human_art_acceptance": "OPEN — user review",
+  "unit": {
+    "passed": 1592,
+    "files": 65,
+    "failed": 0,
+    "max_workers": 1,
+    "log": ".dev-cache/logs/revision-unit-serial-final.log"
+  },
+  "chapter_regression": {
+    "phase1": {
+      "passed": 197,
+      "failed": 0,
+      "engine": "msedge",
+      "resolutions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "raw_results": ".dev-cache/test-artifacts/e2e-phase1-report.json"
+    },
+    "phase4": {
+      "passed": 38,
+      "failed": 0,
+      "engine": "msedge",
+      "resolutions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "raw_results": ".dev-cache/revision-regression-edge/e2e-phase4-report.json"
+    },
+    "phase5": {
+      "passed": 75,
+      "failed": 0,
+      "engine": "msedge",
+      "resolutions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "raw_results": ".dev-cache/revision-regression-edge/e2e-phase5-report.json"
+    },
+    "phase6": {
+      "passed": 55,
+      "failed": 0,
+      "engine": "msedge",
+      "resolutions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "raw_results": ".dev-cache/revision-regression-edge/e2e-phase6-report.json"
+    },
+    "phase7": {
+      "passed": 184,
+      "failed": 0,
+      "engine": "msedge",
+      "resolutions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "raw_results": ".dev-cache/revision-regression-edge/phase7-results.json"
+    },
+    "phase8": {
+      "passed": 166,
+      "failed": 0,
+      "engine": "msedge",
+      "resolutions": [
+        [
+          1366,
+          768
+        ],
+        [
+          1920,
+          1080
+        ]
+      ],
+      "raw_results": ".dev-cache/revision-regression-edge/phase8-results.json"
+    }
+  },
+  "chapter_regression_total": 715,
+  "edge_ending": {
+    "passed": 90,
+    "failed": 0,
+    "engine": "msedge",
+    "resolutions": [
+      [
+        1366,
+        768
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "raw_results": ".dev-cache/revision-edge/phase9-results.json"
+  },
+  "edge_art_and_automatic_flow": {
+    "passed": 52,
+    "failed": 0,
+    "engine": "msedge",
+    "resolutions": [
+      [
+        1366,
+        768
+      ],
+      [
+        1920,
+        1080
+      ]
+    ],
+    "raw_results": ".dev-cache/revision-edge/phase10-results.json"
+  },
+  "chrome_ending": {
+    "passed": 47,
+    "failed": 0,
+    "engine": "chrome",
+    "resolutions": [
+      [
+        1366,
+        768
+      ]
+    ],
+    "raw_results": ".dev-cache/revision-chrome/phase9-results.json"
+  },
+  "dev_preview": {
+    "passed": 9,
+    "failed": 0,
+    "engine": "msedge",
+    "resolutions": [
+      [
+        1366,
+        768
+      ]
+    ],
+    "raw_results": ".dev-cache/revision-preview/preview-results.json"
+  },
+  "public_build": {
+    "typecheck": true,
+    "asset_audit_files": 340,
+    "privacy_canaries": 8,
+    "bundle": "web/dist/assets/index-DylPGLD9.js",
+    "sha256": "6266aa0f69dc3e39031609956283590d6a47a7b87ff1bb7281375fd086976034"
+  },
+  "preparation": {
+    "files": 36,
+    "reviewed_bytes_unchanged": true,
+    "identical_two_runs": true,
+    "sha256": {
+      "assets/characters/final/C02_explore.png": "a5639ced919482b356ff0bf733c44eddae6b0d3d3bec0253d978682557d1161f",
+      "assets/characters/final/C02_explore.json": "4bbd72158863375eaa303e58f0c65963868e644d7f11eba5eac8d776c01d964a",
+      "assets/characters/final/C03_explore.png": "f40b59cab0dfad9cf4ca42365a9105e2aea16dee6bc74f9162bbbe9125768b91",
+      "assets/characters/final/C03_explore.json": "cdce4adb0b2085b2b9a082b49ee9bbc003b98f7954bde336f9d8f0dbfbe3632e",
+      "assets/characters/final/C04_explore.png": "aaa79b6f35b10fac3c5bf161173e92077e8b46493f90bd314fd5d8d90c438843",
+      "assets/characters/final/C04_explore.json": "aa32e4638222a28f6d04753a3f840a43607204cce938fcdbac6ba4e386c7e7d5",
+      "assets/characters/final/C05_explore.png": "ef8cc971a4cb6d0bb9ccd905bb07a09c5a258df4078cabab3051b0f91ab0912d",
+      "assets/characters/final/C05_explore.json": "8a32016d471065414a0e514586e80082ac90633fe46a4120b7f78a573f6fd211",
+      "assets/characters/final/C06_explore.png": "7b925beee0afa68268148212c8e05cad516c83077ec2bebbfc6359795b8b235e",
+      "assets/characters/final/C06_explore.json": "05fc986e5afb100b6fe97aa75373c094b83595b56410780beb170a64d46b3fff",
+      "assets/characters/final/C07_explore.png": "1372754dbc81eac193698be44a48addafdf00e944b7a7d678a39709a04db5cd7",
+      "assets/characters/final/C07_explore.json": "26e0ad9f5ccacf2a8031e07957295352e9fd7c6f5cff1b50d77477de576f8c59",
+      "assets/characters/final/C08_explore.png": "5abe5cb5ce257077308e236d86d586e35128a57d1f59070096f0544d2d40bba4",
+      "assets/characters/final/C08_explore.json": "fe4098f4735dd9b670276f15032d30c646396db5356088e03394a5c6f7b44e34",
+      "assets/characters/final/C09_explore.png": "22ce776e2199fa92877afa235359db186059ce517d03af19f739484da931c36a",
+      "assets/characters/final/C09_explore.json": "909a8236c2eb343490388a2f729152581aa30ee30922dc16071ef5fc0b66d659",
+      "assets/battle/C03_BATTLE_V2.png": "9c9b728aa875e95e292b5d07ca7742039a017286a88ea077ffaee38a68e47eeb",
+      "assets/battle/C03_BATTLE_V2.json": "b6d9a5b69e0d687cafe9848cc4c9b8d96b22c5299e3835f2f563537cf35bd800",
+      "assets/battle/M02_BATTLE_V2.png": "f0836ee830b06a6817a2ba9c6da416ac37cba493231ceca0eb5685a8a9f73780",
+      "assets/battle/M02_BATTLE_V2.json": "0761fcb23167042352ec16f09781b55dfcb824933db879e5d25263f2280a178b",
+      "assets/battle/M03_BATTLE_V2.png": "535470c60ba899999da93425517a869f1c765dfcac696f533aa70515156080eb",
+      "assets/battle/M03_BATTLE_V2.json": "bd7fb7a076cf49b8f411167dfc316ed95f8abf6e02ae16c86ef5123a712b2354",
+      "assets/battle/B02_BATTLE_V2.png": "8d00789949234ba35b4eabd5039aff65be2db61beaa5e2f1e05c752cb726e801",
+      "assets/battle/B02_BATTLE_V2.json": "ce3d52af791e822e1998775b4992f1892fb1255de25b078e4accc7cc797a9bc7",
+      "assets/ending/cliff.png": "3e3d81c74fffbdbefb733ce404f94559026cdbc5fd52561875549d50b82455d6",
+      "assets/ending/modern.png": "2efda6fe0c0e3e9527d745918c0072bfbd8e1b19a5d56ad8b1ab7f22c782c338",
+      "assets/ending/archive.png": "ded4455efff23167753a21af7e107641b315d1c2f58fc1e2f7d0d6444d6f4658",
+      "assets/ending/heirloom.png": "c949937f6c8b0f8321f29cf41bb13ca64adfa019ed6a4192d562c3f1ebeb8597",
+      "assets/ending/heart.png": "4ab9277afbe0fa3cc9d2c0c70525f85e14c6c199d811f8cca005e8c65b5de1fa",
+      "assets/ending/seated.png": "799c547ae2c17cd216dae4035ffaa4a3f739365dbd539d30ebe1da45cdc13aa0",
+      "assets/ending/seated.json": "5adacc9a0c82f49abc831a457af63c8e76ea59acf4d172051720c69cda162e6f",
+      "assets/chapter2/B02_encounter.png": "30ef9d832e65b435a871da3a15068a2e3d3a5e1f0182ee7d449a9729e58d7875",
+      "assets/environment/town/town_crisis_atlas.png": "1839bf57232b5212aa1c68f5d2775f1db1f0ad0b80381b825b715c96682f17e4",
+      "assets/environment/town/town_crisis_atlas.json": "b438aae6a010885d1e0ff7e7fedf20c5a070505e4b26b08ae2242a640e1c0435",
+      "assets/environment/town/town_c4_atlas.png": "cd0ef1e48dfc3cd2d231b8fe980925c404196ff44ef9a69dc034d8de3f9a7fd7",
+      "assets/environment/town/town_c4_atlas.json": "d1f94f64896ef2cd0c4a5edbc495611e5057c40a08548ad9c5146cb8ccbbdb55"
+    }
+  },
+  "protected_files_unchanged": [
+    "MUSIC_REGISTRY.json",
+    "web/public/assets/audio",
+    "assets/characters",
+    "docs/source",
+    "web/public/assets/characters/final/C01_explore.png",
+    "web/public/assets/characters/final/C01_explore.json"
+  ],
+  "music_created": false,
+  "real_private_media_used": false,
+  "manual_deployment": false,
+  "earlier_retry": "An earlier public-asset SHA scan timed out at 5 seconds during an overlapping build. Its isolated retry and the complete final serial run passed without changing the test timeout or guard."
+}

@@ -50,7 +50,7 @@
 
 **Velthia:** "Aku tahu. Orang-orang sudah di luar kota tua. Talric mengabariku tadi."
 
-**Yaric:** "Tidak semuanya bisa diselamatkan."
+**Yaric:** "Nggak semuanya bisa diselamatkan."
 
 **Velthia:** "Tidak. Tapi kita tidak harus membiarkan sisanya hilang juga."
 
@@ -64,7 +64,7 @@
 
 **Velthia:** "Dan waktu itu kau bilang kau tahu jalan pulang."
 
-**Yaric:** "Sepertinya itu memang kebohongan paling burukku."
+**Yaric:** "Kayaknya itu memang kebohongan paling burukku."
 
 **Velthia:** "Kau memang tidak pandai mencari jalan."
 

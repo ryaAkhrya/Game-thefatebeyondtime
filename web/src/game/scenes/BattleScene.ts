@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { BattlePanel } from '../../ui/components/BattlePanel';
 import { Ui, TYPE } from '../../ui/kit/ui';
-import { BATTLE_TEXTURE, atlasHoverPx, bossAtlas, draftPosePlayback, frameKeyFor, fullAtlas, specialFrameKey, type BattleAtlas, type PoseAtlas } from '../combat/BattleAtlas';
+import { BATTLE_TEXTURE, actorAtlas, atlasHoverPx, bossAtlas, frameKeyFor, fullAtlas, specialFrameKey, type BattleAtlas } from '../combat/BattleAtlas';
 import { aegisStatus, enemyAI, intentHint, type Command, type EffectResult, type ImpactResult, type PendingAction } from '../combat/BattleEngine';
 import { BattleSession } from '../combat/BattleSession';
 import { TIMELINES, actionClassFor, effectiveHitstop, fastTimeline, impactFxFor, presentationFor, type ActionClass, type PhaseName, type TimelineSpec } from '../combat/presentation';
@@ -91,9 +91,14 @@ export class BattleScene extends Phaser.Scene {
     this.selfName = this.known ? 'Yaric' : 'Kau';
     this.bossPlayback = this.encounter === 'mournfang' ? bossAtlas(this.cache.json.get(`${BATTLE_TEXTURE.B01}:meta`)) : undefined;
     this.draftPlayback = {};
-    for (const id of ['C03', 'M02', 'M03', 'B02'] as const) this.draftPlayback[id] = draftPosePlayback(this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`) as PoseAtlas);
-    // Atlas penuh Phase 7 (Velthia, Oathguard, Chronolith): sudah memuat durasi, pivot, dan kunci frame khusus sendiri.
     this.hover = {};
+    for (const id of ['C03', 'M02', 'M03', 'B02'] as const) {
+      const meta = this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`);
+      // Phase 10 supplies real timed poses; keep the original adapter for old art metadata.
+      this.draftPlayback[id] = actorAtlas(meta);
+      this.hover[id] = atlasHoverPx(meta);
+    }
+    // Atlas penuh Phase 7 (Velthia, Oathguard, Chronolith): sudah memuat durasi, pivot, dan kunci frame khusus sendiri.
     for (const id of ['C02', 'M05', 'B03', 'C04', 'M04', 'M06'] as const) { const meta = this.cache.json.get(`${BATTLE_TEXTURE[id]}:meta`); if (meta) { this.draftPlayback[id] = fullAtlas(meta); this.hover[id] = atlasHoverPx(meta); } }
     this.skyHold = undefined; this.aegisHold = undefined; this.markHold = undefined; this.pendingCallout = null; this.calloutLog = []; this.fastMeteor = false;
     this.partner = this.services.gameState.snapshot()!.party.find((id): id is 'C02' | 'C03' => id === 'C02' || id === 'C03') ?? null;

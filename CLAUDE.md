@@ -1,3 +1,11 @@
+## Handoff terbaru — Phase 10
+
+**Revisi user 14 November 2026 berlaku di atas catatan lama:** pasangan modern bernama Saffa; dialog modern/epilog diperpanjang dan bahasa lebih santai. C02–C09 serta pose duduk dirapikan lagi mengikuti Yaric. `SliceEndScene` kini hanya handoff otomatis, tanpa menu bab; `story/chapterFlow.ts` menangani checkpoint lama dan baru. Ending memakai pacing otomatis setelah dialog, teks penutup di kiri bawah. Detail dan QA terkini: `docs/production/phase10/REVISION_REPORT.md`. User mengotorisasi commit dan push ke origin/main; deployment tidak diminta. Pernyataan lama tentang dialog verbatim, kartu pilih bab, dan belum adanya nama pasangan merupakan riwayat yang telah digantikan.
+
+Game Director mengotorisasi perbaikan mockup/sprite sampai ending agar menyerupai concept art yang tersedia, dan meminta arahan BGM dalam Markdown saja. Delapan cast C02–C09 kini memakai redraw referensi; empat battle C03/M02/M03/B02 memakai dua belas pose penuh; ending memakai latar baru dan anatomi duduk tersendiri. Runtime, palet, pivot dan provenance: `docs/production/PHASE10_REPORT.md`. Sumber terpilih: `assets/phase10/sources/`; prompt persis: `docs/production/phase10/IMAGEGEN_PROMPTS.md`. Art tetap NEEDS_REVIEW sampai review manusia. Metadata lawas empat pose tetap dapat dibaca.
+
+Gunakan `npm --prefix web run assets:phase10` untuk mengulang persiapan; `assets:sprites` kini menerapkan Phase 10 terakhir. Persiapan tidak mengubah allowlist otomatis. Original concept/source tidak diubah. Aturan historis yang mengatakan sprite masih mockup ditimpa oleh handoff ini. BGM hanya brief `docs/production/phase10/BGM_BRIEF_UNTUK_KAMU.md`, tidak ada file musik. Story/save/private media/deployment tidak diperluas. QA aktual ada di laporan Phase 10. Phase 11 final QA/release preparation belum dimulai.
+
 # Instruksi Claude Code — The Fate Beyond Time
 
 ## Handoff terkini: Phase 9 (13 November 2026)

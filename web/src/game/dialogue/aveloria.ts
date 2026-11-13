@@ -40,7 +40,7 @@ export const BELL_SECOND: DialogueScript = { id: 'C1-09-SECOND', nodes: [
   { ...draft('C1-09-X004', 'SYSTEM', undefined, 'Tidak ada orang di atas.', 'Penjaga lain'), source: 'CHAPTER_I_SCRIPT' },
   cityScript('C1-09').nodes[1]!,
   draft('C1-09-X005', 'C02', 'WORRIED', 'Tadi juga begitu. Rasanya... aku sudah mendengar yang kedua ini.'),
-  draft('C1-09-X006', 'C01', 'CONFUSED', 'Aku juga. Tapi aku tidak tahu kapan.'),
+  draft('C1-09-X006', 'C01', 'CONFUSED', 'Aku juga. Tapi aku nggak tahu kapan.'),
   draft('C1-09-X007', 'C05', 'WORRIED', 'Dua dentang untuk jam yang sama. Akan kucocokkan dengan laporan penjaga.'),
   draft('C1-09-X008', 'C02', 'STERN', 'Talric, periksa menara. Azie, catat siapa saja yang mendengarnya. Jangan biarkan dugaan menggantikan laporan.'),
   draft('C1-09-X009', 'C06', 'ALARMED', 'Dan orang dari hutan ini?'),

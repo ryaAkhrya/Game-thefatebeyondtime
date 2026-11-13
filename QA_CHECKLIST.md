@@ -1,3 +1,9 @@
+## Phase 10 — visual
+
+Revisi 14 November menambahkan pengujian dialog Saffa, 24 baris modern/24 baris epilog, batas posisi teks kiri bawah, handoff otomatis I→II→III→IV→modern, pembukaan modern menurut waktu, serta save lama tanpa hadiah ganda. Bukti aktual terbaru: [laporan revisi](docs/production/phase10/REVISION_REPORT.md).
+
+Hasil QA otomatis beserta log aktual: [PHASE10_REPORT](docs/production/PHASE10_REPORT.md). Unit tambahan memeriksa ukuran/palet/alpha, SHA sumber, keragaman frame, pivot dan kompatibilitas metadata lama. Browser memeriksa alur/collision/battle/ending dengan aset baru. Review manusia untuk kesesuaian concept art, siklus jalan, pose duduk dan pacing tetap terbuka; lulus tes bukan persetujuan seni. Tidak ada BGM atau foto pribadi baru.
+
 # QA CHECKLIST — WEB DESKTOP
 
 ## Phase 9 — evidence (13 November 2026)

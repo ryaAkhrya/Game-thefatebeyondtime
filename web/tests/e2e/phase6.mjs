@@ -56,10 +56,9 @@ try {
     page.on('requestfailed', r => requests.push(`${r.url()} ${r.failure()?.errorText}`));
     page.on('response', r => { if (r.status() >= 400) requests.push(`${r.status()} ${r.url()}`); if (/\.(ogg|wav|mp3)(\?|$)/.test(r.url()) && !/\/audio\/sfx\//.test(r.url())) audio.push(r.url()); });
     await page.goto(BASE + '?qa=1'); await page.waitForFunction(() => window.__tfbt?.activeScenes().includes('TitleScene'));
-    await page.evaluate(() => window.__tfbt.qa.chapter1Complete()); await waitWorld(page);
-    await interact(page, 'velthia'); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-    await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot1'); await back(page, 'slice-end');
-    await selectMenu(page, 'chapter2'); await press(page, 'Enter'); await waitWorld(page);
+    await page.evaluate(() => window.__tfbt.qa.chapter1Complete());
+    await page.waitForFunction(()=>window.__tfbt.state().chapter==='II'&&window.__tfbt.inputLayer()==='world'); await waitWorld(page);
+    await openPause(page); await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot1'); await back(page, 'pause'); await back(page, 'world');
     check(`${width}: Bab II starts from completed Chapter I`, (await state(page)).chapter === 'II' && (await world(page)).area === 'aveloria');
     await shot(page, `${width}_start`);
     await interact(page, 'azie'); const azie = await finishCityDialogue(page); await waitWorld(page);
@@ -128,14 +127,15 @@ try {
     check(`${width}: both fragments commit in order`, a.length > 0 && b.length > 0 && (await state(page)).flags['story.c2_fragments']);
     await move(page, 1108, 440, 'up'); await interact(page, 'forest2_to_city'); await page.waitForFunction(() => window.__tfbt.world()?.area === 'aveloria'); await waitWorld(page);
     await move(page, 648, 552, 'right'); await interact(page, 'velthia'); const ending = await finishCityDialogue(page);
-    await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-    check(`${width}: Bab II ends after report without entering III`, ending.filter(d => d.line?.startsWith('C2-09-L')).length === 15 && (await state(page)).flags['chapter.2_complete'] && (await state(page)).chapter === 'II');
-    await shot(page, `${width}_ending`);
-    await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot3');
+    await page.waitForFunction(() => window.__tfbt.state().chapter === 'III');
+    check(`${width}: report flows into Chapter III without a confirmation card`, ending.filter(d => d.line?.startsWith('C2-09-L')).length === 15 && (await state(page)).flags['chapter.2_complete']);
+    await page.waitForFunction(()=>!!window.__tfbt.world()?.dialogue); await finishCityDialogue(page); await waitWorld(page);
+    await shot(page, `${width}_chapter3_arrival`);
+    await openPause(page); await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot3');
     await loadSlot(page, 'slot1');
-    check(`${width}: old Chapter I slot loads without Torvan or Chapter II flags`, (await state(page)).chapter === 'I' && (await state(page)).party.join() === 'C01' && !(await state(page)).flags['chapter.2_started']);
+    check(`${width}: early Chapter II slot restores solo party and its earlier branch`, (await state(page)).chapter === 'II' && (await state(page)).party.join() === 'C01' && !(await state(page)).flags['chapter.2_complete']);
     await openPause(page); await openMenu(page, 'save', 'save-load'); await loadSlot(page, 'slot3');
-    check(`${width}: completed Chapter II slot restores ending and both characters`, (await state(page)).chapter === 'II' && (await state(page)).flags['chapter.2_complete'] && (await state(page)).party.join() === 'C01,C03');
+    check(`${width}: post-report slot resumes Chapter III without duplicate rewards`, (await state(page)).chapter === 'III' && (await state(page)).flags['chapter.2_complete'] && (await state(page)).party.join() === 'C01,C03');
     await context.close();
   }
 } catch (error) {

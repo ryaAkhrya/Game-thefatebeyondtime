@@ -1,3 +1,7 @@
+## Phase 10 runtime override
+
+Manifest aktif mengarahkan eksplorasi C02–C09 ke redraw `characters/final/`, dan battle C03/M02/M03/B02 ke atlas penuh `*_BATTLE_V2`. `publicPath`/ukuran source historis tetap mencatat empat pose lama; `finalPath`/`finalFrameSize` mencatat runtime baru. Endpoint preload ending: `web/src/game/ending/artAssets.ts`. Semua aset baru NEEDS_REVIEW. Provenance dan ukuran rinci: `assets/phase10/PROVENANCE.json` dan [PHASE10_REPORT](docs/production/PHASE10_REPORT.md).
+
 # Asset manifest v3.1
 
 ## Phase 9 addendum — 13 November 2026

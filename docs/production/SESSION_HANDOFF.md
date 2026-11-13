@@ -1,3 +1,11 @@
+## Handoff terbaru — Phase 10
+
+Revisi terbaru 14 November: Yudis–Saffa, 24 baris modern dan 24 baris epilog; bahasa lebih santai; redraw cast/seated yang lebih bersih; `To Be Continued` kiri bawah. `story/chapterFlow.ts` + `SliceEndScene` menjalankan handoff otomatis termasuk save lama, tanpa menu pilih bab. [Laporan revisi dan QA](phase10/REVISION_REPORT.md) menggantikan ketentuan historis kartu bab dan dialog verbatim. Commit/push origin/main diminta user; deployment tidak diminta.
+
+Gunakan [PHASE10_REPORT](PHASE10_REPORT.md) untuk status akhir dan bukti QA. Runtime cast C02–C09 kini redraw, battle C03/M02/M03/B02 atlas penuh dengan `actorAtlas`; world Veyrath memakai `VEYRATH_ENCOUNTER` 64×64 agar tidak memakai ukuran battle. `world/residentArt.ts` merapikan warga anonim; collision/task tetap sama. `ending/artAssets.ts` mendata lima latar plus pose duduk, preload di Boot. Sumber fiksi/provenance di `assets/phase10/`, prompt persis di `phase10/IMAGEGEN_PROMPTS.md`. Jangan menimpa aset final dengan builder lama saja; gunakan `npm run assets:phase10` atau `assets:sprites` yang menerapkan Phase 10 terakhir. Approval hash hanya daftar eksplisit, bukan semua public/.
+
+[Brief BGM untuk user](phase10/BGM_BRIEF_UNTUK_KAMU.md) mencakup semua 13 cue; tidak ada musik baru. Public/private/save/story tetap kontrak Phase 9. Review seni manusia tetap terbuka; Phase 11/release/deployment belum dikerjakan. Catatan di bawah adalah riwayat.
+
 # SESSION HANDOFF — FOR CLAUDE CODE (v2.0, diperbarui setelah Phase 0)
 
 ## Polish Sprint 2 handoff terkini

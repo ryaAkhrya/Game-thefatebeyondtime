@@ -65,7 +65,11 @@ async function useId(page, id, facings = ['up', 'down', 'left', 'right']) {
   throw Error(`tidak bisa berinteraksi dengan ${id}: ${JSON.stringify(r)}`);
 }
 async function enterTrigger(page, r) { await page.evaluate(([x, y]) => window.__tfbt.qa.teleport(x, y), [r.x + r.w / 2, r.y + r.h / 2 + 4]); }
-async function talk(page) { const lines = await finishCityDialogue(page); await waitWorld(page).catch(() => undefined); return lines; }
+async function talk(page) {
+  const lines = await finishCityDialogue(page);
+  if(await page.evaluate(()=>window.__tfbt.inputLayer()==='story-transition'))return lines;
+  await waitWorld(page).catch(() => undefined);return lines;
+}
 
 // ---------- battle ----------
 async function perform(page, kind, id, target) {
@@ -211,14 +215,11 @@ try {
 
     // ================= C. Bab III penuh =================
     ({ page, context } = await openPage(browser, width, height));
-    await page.evaluate(() => window.__tfbt.qa.chapter3('c2end')); await waitWorld(page);
-    const before = await state(page);
-    check(`${tag}: Bab II selesai: party Yaric+Torvan`, before.party.join() === 'C01,C03' && before.flags['chapter.2_complete']);
-    await page.evaluate(() => window.__tfbt.qa.openSliceEnd()); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-    await shot(page, `${tag}_sliceend_ch2`);
-    await selectMenu(page, 'chapter3'); await press(page, 'Enter'); await waitWorld(page).catch(() => undefined);
+    await page.evaluate(() => window.__tfbt.qa.chapter3('c2end'));
     await page.waitForFunction(() => window.__tfbt.world()?.area === 'aveloria' && window.__tfbt.state()?.chapter === 'III', null, { timeout: 10000 });
-    check(`${tag}: "Mulai Bab III" memulai Bab III dari akhir Bab II di Aveloria`, (await state(page)).chapter === 'III' && (await state(page)).flags['chapter.3_started']);
+    const before = await state(page);
+    check(`${tag}: Bab II selesai: party Yaric+Torvan dipertahankan`, before.party.join() === 'C01,C03' && before.flags['chapter.2_complete']);
+    check(`${tag}: Bab III mengikuti akhir Bab II secara otomatis`, before.flags['chapter.3_started'] && !await page.evaluate(()=>window.__tfbt.sceneTexts('SliceEndScene').length));
     // pembukaan krisis
     await page.waitForFunction(() => window.__tfbt.world()?.dialogue || window.__tfbt.state().flags['c3.crisis_seen'], null, { timeout: 15000 });
     await shot(page, `${tag}_c3_crisis_open`);
@@ -341,15 +342,15 @@ try {
     check(`${tag}: outro Chronolith (legenda salah dibaca) diputar sekali`, (await state(page)).flags['c3.chronolith_outro_seen']);
     await useId(page, 'hall_record'); await talk(page);
     check(`${tag}: nama Varlgrim muncul pertama lewat bukti (catatan dinding)`, (await state(page)).flags['c3.varlgrim_name']);
-    await useId(page, 'hall_exit'); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end' || window.__tfbt.world()?.dialogue, null, { timeout: 10000 });
-    for (let i = 0; i < 6 && (await page.evaluate(() => window.__tfbt.inputLayer() !== 'slice-end')); i++) await talk(page);
-    await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end', null, { timeout: 10000 });
+    await useId(page, 'hall_exit'); await talk(page);
+    await page.waitForFunction(() => window.__tfbt.state().chapter==='IV', null, { timeout: 15000 });
     const done = await state(page);
-    check(`${tag}: Bab III selesai: flag, beat C3-DONE, kartu penutup tanpa Bab IV`, done.flags['chapter.3_complete'] && done.storyBeat === 'C3-DONE' && !done.flags['chapter.4_started']);
-    await shot(page, `${tag}_c3_end`);
-    check(`${tag}: layout kartu akhir Bab III rapi`, (await page.evaluate(() => window.__tfbt.layoutIssues())).length === 0);
+    check(`${tag}: janji Bab III selesai sebelum perjalanan ke Benteng`, done.flags['chapter.3_complete'] && done.flags['chapter.4_started'] && done.area==='fortress');
+    await page.waitForFunction(()=>!!window.__tfbt.world()?.dialogue); await talk(page); await waitWorld(page);
+    await shot(page, `${tag}_c4_arrival`);
+    check(`${tag}: layout kedatangan Bab IV rapi`, (await page.evaluate(() => window.__tfbt.layoutIssues())).length === 0);
     // Muat slot kuil (sebelum boss): area, posisi, party, flag dipulihkan
-    await openMenu(page, 'save', 'save-load'); await loadSlot(page, 'slot1'); await waitWorld(page).catch(() => undefined);
+    await openPause(page); await openMenu(page, 'save', 'save-load'); await loadSlot(page, 'slot1'); await waitWorld(page).catch(() => undefined);
     await page.waitForFunction(() => window.__tfbt.world()?.area === 'temple', null, { timeout: 10000 });
     const loaded = await state(page);
     check(`${tag}: muat save kuil: area, party, flag teka-teki dan Torvan cadangan pulih`, loaded.area === 'temple' && loaded.party.join() === 'C01,C02' && loaded.flags['c3.hall_gate_open'] && !loaded.flags['boss.chronolith'] && !!loaded.partyVitals.C03 && Math.abs(loaded.position.x - saved.position.x) < 2, JSON.stringify([loaded.position, saved.position]));

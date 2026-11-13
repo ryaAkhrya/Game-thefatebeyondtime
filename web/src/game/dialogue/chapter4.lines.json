@@ -129,7 +129,7 @@
     "scene_id": "C4-04",
     "line_id": "C4-04-L003",
     "speaker_id": "C01",
-    "spoken_text": "Tidak semuanya bisa diselamatkan.",
+    "spoken_text": "Nggak semuanya bisa diselamatkan.",
     "emotion_id": "SAD",
     "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_SAD.png",
     "pause_ms": 250
@@ -165,7 +165,7 @@
     "scene_id": "C4-05",
     "line_id": "C4-05-L003",
     "speaker_id": "C01",
-    "spoken_text": "Sepertinya itu memang kebohongan paling burukku.",
+    "spoken_text": "Kayaknya itu memang kebohongan paling burukku.",
     "emotion_id": "EMBARRASSED",
     "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_EMBARRASSED.png",
     "pause_ms": 250

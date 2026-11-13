@@ -70,11 +70,18 @@ describe('Cinematic timing and narrative', () => {
   it.each([[1920,1080],[1080,1920],[400,400]])('contains the entire %d×%d image without distortion', (w,h) => {
     const fit=containImage(w,h,710,306);expect(fit.width).toBeLessThanOrEqual(710);expect(fit.height).toBeLessThanOrEqual(306);expect(fit.width/fit.height).toBeCloseTo(w/h);
   });
-  it('uses E-01/E-02 working script verbatim, and labels all modern dialogue DRAFT_IMPL', () => {
+  it('uses expanded E-01/E-02 working script verbatim, and labels all modern dialogue DRAFT_IMPL', () => {
     for (const scene of ['E-01','E-02'] as const) {
       const rows=source.filter(l=>l.scene_id===scene);expect(epilogueScript(scene).nodes.map(l=>l.type==='line'?l.text:'')).toEqual(rows.map(l=>l.spoken_text));
     }
-    for(const script of [ARTEFACT_SCRIPT,AWAKENING_SCRIPT])expect(script.nodes.every(l=>l.type==='line'&&l.source==='DRAFT_IMPL')).toBe(true);
+    for(const script of [ARTEFACT_SCRIPT,AWAKENING_SCRIPT]){
+      expect(script.nodes).toHaveLength(12);
+      expect(script.nodes.every(l=>l.type==='line'&&l.source==='DRAFT_IMPL')).toBe(true);
+      const lines=script.nodes.filter(l=>l.type==='line');
+      expect(new Set(lines.map(l=>l.label))).toEqual(new Set(['Yudis','Saffa']));
+      expect(lines.some(l=>l.text.includes('nggak')||l.text.includes('Nggak'))).toBe(true);
+    }
+    expect(epilogueScript('E-01').nodes).toHaveLength(8); expect(epilogueScript('E-02').nodes).toHaveLength(16);
   });
 });
 function manifest() { return { version: 1, memories: [{ id: 'qa-only', caption: 'QA fixture, never shown in gameplay.', image: 'images/qa.png', durationMs: 6000, transition: 'fade' }], message: { paragraphs: ['QA fixture content.'], signature: 'QA' } }; }

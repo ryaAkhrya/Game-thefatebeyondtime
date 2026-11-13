@@ -257,8 +257,8 @@ describe('Varlgrim exploration atlas (C04_explore)', () => {
   };
   const final = readPng(resolve(rawDir, 'final/C04_explore.png'));
 
-  it('manifest entry points at the DRAFT source; raw copy is byte-identical; normalized + final derivatives exist', () => {
-    expect(entry.status).toBe('DRAFT');
+  it('manifest retains the DRAFT source and loads the Phase 10 redraw; raw copy is byte-identical', () => {
+    expect(entry.status).toBe('NEEDS_REVIEW');
     expect(entry.finalPath).toBe('assets/characters/final/C04_explore.png');
     expect(entry.publicPath).toBe('assets/characters/normalized/C04_explore.png');
     expect(readFileSync(resolve(rawDir, 'C04_explore.png'))).toEqual(readFileSync(resolve(ROOT, entry.sourceImage)));
@@ -268,16 +268,16 @@ describe('Varlgrim exploration atlas (C04_explore)', () => {
     expect(new AssetRegistry().get('C04_CITY_EXPLORE')).toBeDefined();
   });
 
-  it('final atlas: 9 cols x 4 directions of 32x48, binary alpha, every frame non-empty, feet on y=46, pivot 16/46', () => {
+  it('Phase 10 final atlas: 6 cols x 4 directions of 32x48, binary alpha, every frame non-empty, feet on y=46, pivot 16/46', () => {
     expect(finalMeta.entity_id).toBe('C04');
     expect(finalMeta.frame_size).toEqual([32, 48]);
-    expect(finalMeta.cols).toBe(9);
-    expect([final.width, final.height]).toEqual([288, 192]);
+    expect(finalMeta.cols).toBe(6);
+    expect([final.width, final.height]).toEqual([192, 192]);
     expect(finalMeta.pivot).toEqual([16, 46]);
     expect(finalMeta.baseline_y).toBe(46);
     for (let i = 3; i < final.data.length; i += 4) { const v = final.data[i]!; if (v !== 0 && v !== 255) throw new Error(`soft alpha ${v}`); }
     const names = Object.keys(finalMeta.frames);
-    expect(names).toHaveLength(36);
+    expect(names).toHaveLength(24);
     for (const n of names) {
       const f = finalMeta.frames[n]!;
       expect(f.pivot).toEqual([16, 46]);
@@ -294,7 +294,7 @@ describe('Varlgrim exploration atlas (C04_explore)', () => {
       const an = finalMeta.anims[d]!;
       expect(an.walk.frames).toHaveLength(4);
       expect(an.idle.frames.length).toBeGreaterThanOrEqual(2);
-      for (const i of [...an.walk.frames, ...an.idle.frames]) { expect(i).toBeGreaterThanOrEqual(0); expect(i).toBeLessThan(36); }
+      for (const i of [...an.walk.frames, ...an.idle.frames]) { expect(i).toBeGreaterThanOrEqual(0); expect(i).toBeLessThan(24); }
     }
   });
 });

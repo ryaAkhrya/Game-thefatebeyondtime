@@ -1,0 +1,102 @@
+{
+  "frame_size": [
+    40,
+    48
+  ],
+  "pivot": [
+    20,
+    36
+  ],
+  "fps": 2,
+  "source": "assets/phase10/sources/epilogue_seated.png",
+  "provenance": "Imagegen-authored seated anatomy from original C01/C02 back references; no standing-torso splice.",
+  "status": "NEEDS_REVIEW",
+  "frames": {
+    "C01_0": {
+      "rect": [
+        0,
+        0,
+        40,
+        48
+      ],
+      "pivot": [
+        20,
+        36
+      ]
+    },
+    "C01_1": {
+      "rect": [
+        40,
+        0,
+        40,
+        48
+      ],
+      "pivot": [
+        20,
+        36
+      ]
+    },
+    "C01_2": {
+      "rect": [
+        80,
+        0,
+        40,
+        48
+      ],
+      "pivot": [
+        20,
+        36
+      ]
+    },
+    "C02_0": {
+      "rect": [
+        120,
+        0,
+        40,
+        48
+      ],
+      "pivot": [
+        20,
+        36
+      ]
+    },
+    "C02_1": {
+      "rect": [
+        160,
+        0,
+        40,
+        48
+      ],
+      "pivot": [
+        20,
+        36
+      ]
+    },
+    "C02_2": {
+      "rect": [
+        200,
+        0,
+        40,
+        48
+      ],
+      "pivot": [
+        20,
+        36
+      ]
+    }
+  },
+  "idle": {
+    "C01": [
+      0,
+      1,
+      0,
+      2
+    ],
+    "C02": [
+      3,
+      4,
+      3,
+      5
+    ]
+  }
+}

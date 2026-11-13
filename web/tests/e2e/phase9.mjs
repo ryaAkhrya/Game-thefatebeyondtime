@@ -17,10 +17,11 @@ async function advance(p,next){await p.waitForFunction(()=>window.__tfbt.ending(
 async function shot(p,name){await p.screenshot({path:resolve(out,`p9_${name}.png`)});}
 async function layout(p,name){const issues=await p.evaluate(()=>window.__tfbt.layoutIssues());check(`${name}: text layout`,!issues.length,issues.join(';'));}
 async function reloadContinue(p){await p.reload();await p.waitForFunction(()=>window.__tfbt?.activeScenes().includes('TitleScene'));await selectMenu(p,'continue');await press(p,'Enter');await p.waitForFunction(()=>!!window.__tfbt.ending());}
-async function finishDialogue(p){
-  const lines=[];await p.waitForFunction(()=>!!window.__tfbt.ending()?.dialogue);
+async function finishDialogue(p,capture){
+  const lines=[];let captured=false;await p.waitForFunction(()=>!!window.__tfbt.ending()?.dialogue);
   for(let i=0;i<60;i++){
     const d=(await ending(p))?.dialogue;if(!d)return lines;
+    if(capture&&!captured&&d.label==='Saffa'){await shot(p,capture);captured=true;}
     if(!lines.some(l=>l.line===d.line&&l.page===d.page))lines.push(d);
     await p.waitForTimeout(380);await press(p,'Enter');
   }
@@ -53,25 +54,12 @@ try{
         const r=await p.evaluate(()=>window.__tfbt.world().interactables.find(i=>i.id==='velthia'));
         await p.evaluate(r=>window.__tfbt.qa.teleport(r.x+r.w/2,r.y+r.h+10),r);await faceCity(p,'up');
         await p.waitForFunction(()=>window.__tfbt.world()?.target==='velthia');await press(p,'Enter');await finishCityDialogue(p);
-        await p.waitForFunction(()=>window.__tfbt.inputLayer()==='slice-end');
-        check(`${tag}: actual C4-07 closing dialogue commits Chapter IV before ending`,(await state(p)).flags['chapter.4_complete']);
+        check(`${tag}: C4-07 closing dialogue commits Chapter IV before the automatic handoff`,(await state(p)).flags['chapter.4_complete']);
       }else{
+        // An old completed Chapter IV checkpoint follows the same automatic route.
         await p.evaluate(()=>window.__tfbt.qa.chapter4('complete'));
-        await p.waitForFunction(()=>window.__tfbt.activeScenes().includes('WorldScene'));
-        await p.waitForTimeout(350);await p.evaluate(()=>window.__tfbt.qa.openSliceEnd());await p.waitForFunction(()=>window.__tfbt.inputLayer()==='slice-end');
       }
       const before=await state(p);
-      if(width===1920){
-        await p.waitForFunction(()=>window.__tfbt.saveStatus().safe);await selectMenu(p,'save');await press(p,'Enter');await saveSlot(p,'slot2');
-        check(`${tag}: completed Chapter IV legacy slot has no ending extension`,await p.evaluate(()=>!JSON.parse(localStorage.getItem('tfbt.save.v1.slot2')).data.ending));
-        await press(p,'Escape');await selectMenu(p,'title');await press(p,'Enter');await p.waitForFunction(()=>window.__tfbt.activeScenes().includes('TitleScene'));
-        await selectMenu(p,'continue');await press(p,'Enter');
-      }else{
-        check(`${tag}: Chapter IV card exposes an explicit continuation`,await p.evaluate(()=>window.__tfbt.sceneTexts('SliceEndScene').includes('Lanjutkan kisah')));
-        await selectMenu(p,'explore');await press(p,'Enter');await p.waitForFunction(()=>window.__tfbt.inputLayer()==='world'&&!window.__tfbt.world()?.busy);
-        await press(p,'Escape');await p.waitForFunction(()=>window.__tfbt.inputLayer()==='pause');await layout(p,`${tag} completed Chapter IV pause`);
-        await selectMenu(p,'ending');await press(p,'Enter');
-      }
       await waitStep(p,'era');
       check(`${tag}: Chapter IV continuation starts the modern era, with no World/HUD left`,await p.evaluate(()=>window.__tfbt.state().flags['chapter.4_complete']&&window.__tfbt.state().chapter==='MODERN'&&!window.__tfbt.activeScenes().some(s=>s==='WorldScene'||s==='HudScene')));
       await p.keyboard.down('Enter');await p.waitForTimeout(2300);await p.keyboard.down('Enter');check(`${tag}: held Enter cannot skip the opening`,(await ending(p)).step==='era');await p.keyboard.up('Enter');
@@ -98,21 +86,23 @@ try{
       await press(p,'Escape');await selectMenu(p,'settings');await press(p,'Enter');await p.waitForFunction(()=>window.__tfbt.inputLayer()==='settings');await press(p,'Escape');await press(p,'Escape');
       check(`${tag}: dialogue pause/settings preserves the same line and committed autosave`,(await ending(p)).dialogue.line===heldLine&&autoAtDialogue===await p.evaluate(()=>localStorage.getItem('tfbt.save.v1.auto')));
 
-      const found=await finishDialogue(p);check(`${tag}: artefact dialogue is staged and interactive`,found.length===3);
+      const found=await finishDialogue(p,`${tag}_saffa`);check(`${tag}: artefact dialogue is staged and interactive`,new Set(found.map(l=>l.line)).size===12&&found.some(l=>l.text.includes('nggak'))&&found.some(l=>l.label==='Saffa'));
       await advance(p,'archive');await p.waitForTimeout(1800);await shot(p,`${tag}_memory_archive`);await layout(p,`${tag} memory`);
       check(`${tag}: artefact outcome committed only after interaction`,(await state(p)).flags['modern.artefact_discovered']);
       check(`${tag}: muted memory SFX is suppressed`,await p.evaluate(()=>window.__tfbt.audio().totalPlayed===0&&window.__tfbt.audio().suppressed.SFX_ECHO_MEMORY?.muted>=1));
       await reloadContinue(p);await waitStep(p,'archive');check(`${tag}: memory fragment reload resumes the same beat`,(await state(p)).ending.step==='archive');
       await advance(p,'heirloom');await advance(p,'heart');await p.waitForTimeout(1900);await shot(p,`${tag}_memory_heart`);
-      await advance(p,'awakening');const awakened=await finishDialogue(p);check(`${tag}: awakening uses three concise lines`,awakened.length===3&&awakened.some(l=>l.text.includes('hidup kita sekarang')));
+      await advance(p,'awakening');const awakened=await finishDialogue(p);check(`${tag}: awakening gives both Yudis and Saffa a full conversation`,new Set(awakened.map(l=>l.line)).size===12&&awakened.some(l=>l.text.includes('hidup kita sekarang')));
       await advance(p,'remember');check(`${tag}: public story bypasses unavailable personal photos`,(await state(p)).flags['modern.memory_awakened']&&(await state(p)).flags['modern.complete']);
       await p.waitForTimeout(2400);await shot(p,`${tag}_aveloria_memory_frame`);await layout(p,`${tag} memory framing`);
       await advance(p,'cliff-arrival');await p.waitForTimeout(2450);await shot(p,`${tag}_cliff_epilogue`);const arrival=await finishDialogue(p);
-      check(`${tag}: E-01 source dialogue, including the direction joke`,arrival.map(l=>l.line).join(',')==='E-01-L001,E-01-L002,E-01-L003,E-01-L004');
-      await advance(p,'promise');const promise=await finishDialogue(p);check(`${tag}: all eight E-02 promise lines play`,promise.length===8&&promise.some(l=>l.text==='Kalau ingatan kita hilang, ya... kita kenalan lagi.'));
+      check(`${tag}: E-01 source dialogue, including the direction joke`,new Set(arrival.map(l=>l.line)).size===8&&arrival.some(l=>l.text.includes('belokan')));
+      await advance(p,'promise');const promise=await finishDialogue(p);check(`${tag}: all sixteen E-02 promise lines play`,new Set(promise.map(l=>l.line)).size===16&&promise.some(l=>l.text==='Kalau ingatan kita hilang, ya... kita kenalan lagi.'));
       await advance(p,'cloud-path');await advance(p,'cloud-heart');await advance(p,'silhouettes');await p.waitForTimeout(3300);await shot(p,`${tag}_silhouettes`);await perf(p,`${tag}-silhouettes`);
       check(`${tag}: cloud montage completes the epilogue before the title`,(await state(p)).flags['ending.promise']&&!(await state(p)).flags['ending.epilogue_complete']);
       await advance(p,'continued');await p.waitForTimeout(3100);await shot(p,`${tag}_to_be_continued`);await layout(p,`${tag} final card`);
+      const tbc=await p.evaluate(()=>window.__tfbt.sceneTextBounds('EndingScene','To Be Continued'));
+      check(`${tag}: To Be Continued sits at the lower left`,tbc&&tbc.x<tbc.canvasWidth*.2&&tbc.y>tbc.canvasHeight*.7&&tbc.y+tbc.height<tbc.canvasHeight,JSON.stringify(tbc));
       await advance(p,'credits');await p.waitForTimeout(1900);await shot(p,`${tag}_credits`);await layout(p,`${tag} credits`);
       if(width===1366){await advance(p,'credits');await p.waitForTimeout(1900);await layout(p,`${tag} credits contributors`);await advance(p,'credits');await p.waitForTimeout(1900);await layout(p,`${tag} credits licenses`);await advance(p,'complete');}
       else {await press(p,'Escape');await waitStep(p,'complete');check(`${tag}: credits skip safely commits completion`,(await state(p)).flags['ending.credits']);}

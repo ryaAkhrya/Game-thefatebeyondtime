@@ -17,7 +17,7 @@ async function interact(page, id) {
 export async function finishCityDialogue(page, { check, shot, prefix = '', pauseAudience = false, choice = 0 } = {}) {
   const lines = [], keys = new Set(); let paused = false;
   for (let n = 0; n < 220; n++) {
-    if (await page.evaluate(() => window.__tfbt.inputLayer() === 'slice-end' || window.__tfbt.inputLayer() === 'shop')) return lines;
+    if (await page.evaluate(() => window.__tfbt.inputLayer() === 'story-transition' || window.__tfbt.inputLayer() === 'shop')) return lines;
     const w = await world(page); if (!w) { await page.waitForTimeout(100); continue; }
     if (!w.busy && !w.dialogue) return lines;
     const d = w.dialogue;
@@ -53,14 +53,13 @@ function sourceIds(lines, scene) { return [...new Set(lines.map(l => l.line).fil
 /** Reused by the unseeded Title journey and focused cross-browser fixtures. */
 export async function aveloriaJourney(page, check, shot, { prefix = 'chapter1', focus = false, choice = 0 } = {}) {
   await waitWorld(page);
-  await walk(page, 1312, 400); await faceCity(page, 'right'); await interact(page, 'slice_exit');
-  await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-  // Sesudah memilih Masuk Aveloria, dialog vista dapat langsung mengambil alih layer (tidak ada jendela 'world' yang dapat diandalkan).
-  await selectMenu(page, 'aveloria'); await press(page, 'Enter');
-  await page.waitForFunction(() => window.__tfbt.world()?.area === 'aveloria');
-  await page.waitForFunction(() => window.__tfbt.world()?.dialogue?.script === 'C1-06-VISTA');
+  if(await page.evaluate(()=>window.__tfbt.world()?.area==='forest_edge')) {
+    await walk(page, 1312, 400); await faceCity(page, 'right'); await interact(page, 'slice_exit');
+    await page.waitForFunction(() => window.__tfbt.world()?.area === 'aveloria');
+    await page.waitForFunction(() => window.__tfbt.world()?.dialogue?.script === 'C1-06-VISTA');
+  }
   const vista = await finishCityDialogue(page, { check, shot, prefix }); await waitWorld(page);
-  check(`${prefix}: forest checkpoint leads to first Aveloria vista and a safe city spawn`, vista.some(l => l.script === 'C1-06-VISTA') && (await state(page)).area === 'aveloria' && (await state(page)).flags['c1.aveloria_vista']);
+  check(`${prefix}: forest checkpoint leads to first Aveloria vista and a safe city spawn`, (await state(page)).area === 'aveloria' && (await state(page)).flags['c1.aveloria_vista']);
   check(`${prefix}: city is a safe zone with four original named NPC atlases and four working residents`, await page.evaluate(() => { const c = window.__tfbt.world().city; return c.safeZone && Object.keys(c.npcs).length === 4 && c.npcs.velthia.texture === 'C02_CITY_EXPLORE' && c.npcs.azie.originY === 47 / 48 && c.citizens.length === 4 && !window.__tfbt.battle(); }));
   await layout(page, check, `${prefix}: city HUD layout`); await shot(page, `${prefix}_gate`);
   const beforeWall = await world(page); await page.keyboard.down('ArrowLeft'); await page.waitForTimeout(700); await page.keyboard.up('ArrowLeft');
@@ -115,25 +114,24 @@ export async function aveloriaJourney(page, check, shot, { prefix = 'chapter1', 
     check(`${prefix}: refresh during bells resumes the committed audience checkpoint with no duplicate event`, (await state(page)).flags['story.c1_velthia'] && !(await state(page)).flags['chapter.1_complete'] && !(await world(page)).dialogue && (await world(page)).y < 400);
   }
   await walk(page, 640, 504); const bells = await finishCityDialogue(page, { check, shot, prefix });
-  await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-  check(`${prefix}: both bell signals name the same hour with unchanged clock and no audio dependency`, bells.some(l => l.line === 'C1-09-X001') && bells.some(l => l.line === 'C1-09-X002') && (await world(page)).city.bellNumber === 2 && (await world(page)).city.clock === '21:00');
-  check(`${prefix}: Velthia orders an investigation and keeps Yaric in town before Chapter I completes`, bells.some(l => l.line === 'C1-09-X008' && l.portrait === 'C02_STERN') && bells.some(l => l.line === 'C1-09-X010') && (await state(page)).flags['chapter.1_complete']);
+  check(`${prefix}: both bell signals name the same hour`, bells.some(l => l.line === 'C1-09-X001') && bells.some(l => l.line === 'C1-09-X002'));
+  check(`${prefix}: Velthia orders an investigation before Chapter I completes`, bells.some(l => l.line === 'C1-09-X008' && l.portrait === 'C02_STERN') && bells.some(l => l.line === 'C1-09-X010') && (await state(page)).flags['chapter.1_complete']);
+  await page.waitForFunction(()=>window.__tfbt.state().chapter==='II'&&window.__tfbt.inputLayer()==='world'); await waitWorld(page);
   const ending = await state(page);
-  check(`${prefix}: ending remains Chapter I, solo party, unchanged EXP and shop ledger`, ending.chapter === 'I' && ending.party.join() === 'C01' && ending.storyBeat === 'C1-DONE' && ending.rpg.characters.C01.exp === 70 && ending.world.shops.derrria.potion === 4);
-  await shot(page, `${prefix}_ending`); await layout(page, check, `${prefix}: Chapter I ending layout`);
-  await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot3');
-  check(`${prefix}: ending Save/Load is visibly above the opaque ending`, await page.evaluate(() => window.__tfbt.visibleScenes().at(-1) === 'SaveLoadScene'));
-  await shot(page, `${prefix}_ending_save`); await back(page, 'slice-end');
-  await openMenu(page, 'settings', 'settings').catch(async error => { throw Error(`${error.message} | diag ${JSON.stringify(await page.evaluate(() => ({ layer: window.__tfbt.inputLayer(), focus: window.__tfbt.focus(), active: window.__tfbt.activeScenes(), visible: window.__tfbt.visibleScenes(), router: window.__tfbt.router() })))}`); });
-  check(`${prefix}: ending Settings is visibly above the opaque ending`, await page.evaluate(() => window.__tfbt.visibleScenes().at(-1) === 'SettingsScene'));
-  await shot(page, `${prefix}_ending_settings`); await back(page, 'slice-end'); await press(page, 'Escape'); await waitWorld(page);
+  check(`${prefix}: Chapter II follows automatically with the solo party and unchanged ledger`, ending.chapter === 'II' && ending.party.join() === 'C01' && ending.rpg.characters.C01.exp === 70 && ending.world.shops.derrria.potion === 4);
+  await shot(page, `${prefix}_chapter2_arrival`); await layout(page, check, `${prefix}: chapter handoff layout`);
+  await openPause(page); await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot3');
+  check(`${prefix}: Save/Load remains available through pause`, await page.evaluate(() => window.__tfbt.visibleScenes().at(-1) === 'SaveLoadScene'));
+  await shot(page, `${prefix}_ending_save`); await back(page, 'pause');
+  await openMenu(page, 'settings', 'settings');
+  check(`${prefix}: Settings remains available through pause`, await page.evaluate(() => window.__tfbt.visibleScenes().at(-1) === 'SettingsScene'));
+  await shot(page, `${prefix}_ending_settings`); await back(page, 'pause'); await press(page, 'Escape'); await waitWorld(page);
   await refreshContinue(page);
-  check(`${prefix}: ending save/Continue restores city position, night, NPCs, all flags and stock without replay`, JSON.stringify((await state(page)).position) === JSON.stringify(ending.position) && (await world(page)).city.evening && (await state(page)).flags['chapter.1_complete'] && (await state(page)).world.shops.derrria.potion === 4 && !(await world(page)).dialogue);
+  check(`${prefix}: Continue resumes Chapter II without repeating the bells or granting rewards`, (await state(page)).chapter==='II' && (await state(page)).flags['chapter.1_complete'] && (await state(page)).world.shops.derrria.potion === 4 && !(await world(page)).dialogue);
   await openPause(page); await openMenu(page, 'save', 'save-load'); await loadSlot(page, 'slot1');
   check(`${prefix}: old gate slot restores its entire earlier branch, no city shop stock or completed events`, !(await state(page)).flags['story.c1_gate'] && !(await state(page)).world.shops && !(await state(page)).flags['chapter.1_complete']);
   await openPause(page); await openMenu(page, 'save', 'save-load'); await loadSlot(page, 'slot3');
   check(`${prefix}: manual ending load restores outcomes without granting rewards twice`, (await state(page)).rpg.gold === ending.rpg.gold && (await state(page)).rpg.characters.C01.exp === 70 && (await state(page)).flags['chapter.1_complete']);
-  await walk(page, 640, 528); await walk(page, 648, 552); await faceCity(page, 'right'); await interact(page, 'velthia');
-  await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-  check(`${prefix}: ending can be reopened and has no playable Chapter II action`, await page.evaluate(() => window.__tfbt.state().chapter === 'I' && !Object.keys(window.__tfbt.state().flags).some(f => f.startsWith('story.c2'))));
+  check(`${prefix}: no chapter continuation menu remains`, await page.evaluate(() => !window.__tfbt.sceneTexts('SliceEndScene').length && window.__tfbt.state().chapter==='II'));
+
 }

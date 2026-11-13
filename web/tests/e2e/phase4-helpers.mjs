@@ -96,10 +96,13 @@ export async function verticalSliceJourney(page, check, shot, journey) {
   await journey.walkTo(page, 1312, 400); await journey.face(page, 'ArrowRight');
   await page.waitForFunction(() => window.__tfbt.world()?.target === 'slice_exit');
   await press(page, 'Enter');
-  await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-  check('Walking beyond the defeated boss reaches an explicit Aveloria demo ending', await page.evaluate(() => window.__tfbt.activeScenes().includes('SliceEndScene') && window.__tfbt.state().flags['c1.vertical_slice_complete'] && window.__tfbt.state().chapter === 'I' && !window.__tfbt.state().flags['chapter.1_complete']));
-  await shot(page, 'phase4_slice_end'); await checkLayout(page, check, 'slice ending');
-  await openMenu(page, 'settings', 'settings'); await back(page, 'slice-end'); await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot1'); await checkLayout(page, check, 'ending save');
+  await page.waitForFunction(() => window.__tfbt.world()?.area === 'aveloria');
+  check('Walking beyond the defeated boss enters Aveloria automatically', await page.evaluate(() => window.__tfbt.state().flags['c1.vertical_slice_complete'] && window.__tfbt.state().chapter === 'I' && !window.__tfbt.sceneTexts('SliceEndScene').length));
+  await page.waitForFunction(() => window.__tfbt.world()?.dialogue?.script === 'C1-06-VISTA');
+  await journey.playDialogue(page); await waitWorld(page);
+  await shot(page, 'phase4_city_arrival'); await checkLayout(page, check, 'city arrival');
+  await openPause(page); await openMenu(page, 'settings', 'settings'); await back(page, 'pause');
+  await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot1'); await checkLayout(page, check, 'arrival save');
   await refreshContinue(page); const ending = await state(page);
   check('Ending save/refresh/Continue remains playable with no duplicate rewards or boss replay', ending.flags['c1.vertical_slice_complete'] && ending.rpg.characters.C01.exp === 70 && ending.rpg.gold === 28 && ending.items.potion === 0 && !await page.evaluate(() => window.__tfbt.battle()));
   console.log(`Phase 4 continuation browser wall time: ${((Date.now() - started) / 1000).toFixed(1)}s; active game time ${ending.playtimeSec.toFixed(1)}s (automated QA, not human pacing/FPS).`);

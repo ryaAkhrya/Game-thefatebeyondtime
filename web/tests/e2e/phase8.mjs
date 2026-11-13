@@ -64,7 +64,7 @@ async function enterTrigger(page, id) { const r = trig(id); await page.evaluate(
 async function talk(page, { choice = 0 } = {}) {
   const lines = [], seen = new Set();
   for (let n = 0; n < 400; n++) {
-    if (await page.evaluate(() => window.__tfbt.activeScenes().includes('BattleScene') || window.__tfbt.inputLayer() === 'slice-end')) return lines;
+    if (await page.evaluate(() => window.__tfbt.activeScenes().includes('BattleScene') || window.__tfbt.inputLayer() === 'story-transition')) return lines;
     const w = await world(page);
     if (!w) { await page.waitForTimeout(100); continue; }
     const d = w.dialogue;
@@ -172,17 +172,12 @@ try {
 
     // ================= A. Dari akhir Bab III ke Bab IV via kartu =================
     await step(`${tag}: A awal Bab IV`, async () => {
-      await page.evaluate(() => window.__tfbt.qa.chapter4('c3end')); await waitWorld(page);
-      let st = await state(page);
-      check(`${tag}: save Bab III selesai valid (C3-DONE, Yaric+Velthia, Torvan cadangan)`, st.chapter === 'III' && st.storyBeat === 'C3-DONE' && st.party.join() === 'C01,C02' && !!st.partyVitals?.C03 && !!st.rpg.characters.C03);
-      const lvl3 = st.rpg.characters.C01.level;
-      check(`${tag}: level akhir Bab III dalam target 5-7`, lvl3 >= 5 && lvl3 <= 7, `level ${lvl3}`);
-      await page.evaluate(() => window.__tfbt.qa.openSliceEnd()); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-      await layoutOK(page, `${tag}: kartu akhir Bab III rapi`);
-      await selectMenu(page, 'chapter4'); await press(page, 'Enter'); await waitWorld(page).catch(() => undefined);
+      await page.evaluate(() => window.__tfbt.qa.chapter4('c3end'));
       await page.waitForFunction(() => window.__tfbt.world()?.area === 'fortress' && window.__tfbt.state()?.chapter === 'IV', null, { timeout: 15000 });
-      st = await state(page);
-      check(`${tag}: "Mulai Bab IV" membuka Warden Fortress (bab IV, area fortress, flag mulai, C4-01)`, st.chapter === 'IV' && st.area === 'fortress' && flagOf(st, 'chapter.4_started') && st.storyBeat === 'C4-01');
+      let st = await state(page);
+      check(`${tag}: Bab III lengkap sebelum Bab IV; cadangan Torvan utuh`, st.flags['chapter.3_complete'] && st.party.join() === 'C01,C02' && !!st.partyVitals?.C03 && !!st.rpg.characters.C03);
+      const lvl3=st.rpg.characters.C01.level;check(`${tag}: level akhir Bab III dalam target 5-7`,lvl3>=5&&lvl3<=7,`level ${lvl3}`);
+      check(`${tag}: Benteng terbuka otomatis setelah Bab III`, st.area==='fortress'&&flagOf(st,'chapter.4_started')&&st.storyBeat==='C4-01');
       check(`${tag}: party tetap Yaric+Velthia, Torvan cadangan dengan progres utuh`, st.party.join() === 'C01,C02' && !!st.partyVitals.C03 && st.rpg.characters.C03.level >= 1);
       await page.waitForFunction(() => window.__tfbt.world()?.dialogue || window.__tfbt.state().flags['story.c4_entered'], null, { timeout: 15000 });
       const lines = await talk(page);
@@ -448,20 +443,19 @@ try {
         await layoutOK(page, `${tag}: layout dunia Aveloria pascarunyuh rapi`);
         const target = w.interactables.find(i => /velthia/i.test(i.id));
         await useId(page, target?.id ?? 'velthia'); await talk(page).catch(() => undefined);
-        await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end', null, { timeout: 15000 }).catch(() => undefined);
-        st = await state(page);
-        check(`${tag}: Bab IV selesai (chapter.4_complete, beat C4-DONE)`, flagOf(st, 'chapter.4_complete') && st.storyBeat === 'C4-DONE');
-        check(`${tag}: kartu "Bab IV selesai" tampil tanpa Bab V/Modern/Epilog`, await page.evaluate(() => window.__tfbt.inputLayer() === 'slice-end'));
-        await layoutOK(page, `${tag}: layout kartu Bab IV selesai rapi`);
-        await shot(page, 'chapter4_end');
-        const noMore = await page.evaluate(() => !['chapter5', 'modern', 'epilogue'].some(id => window.__tfbt.focus() === `menu:${id}`));
-        check(`${tag}: tidak ada transisi tidak sengaja ke Modern Interlude`, noMore && st.chapter === 'IV');
+        await page.waitForFunction(() => !!window.__tfbt.ending(), null, { timeout: 15000 });
+        st=await state(page);
+        check(`${tag}: Bab IV selesai sebelum era modern`,flagOf(st,'chapter.4_complete')&&st.chapter==='MODERN');
+        check(`${tag}: akhir Bab IV beralih otomatis tanpa kartu lanjut`,!await page.evaluate(()=>window.__tfbt.sceneTexts('SliceEndScene').length));
+        await layoutOK(page,`${tag}: layout era modern rapi`);await shot(page,'modern_arrival');
+        check(`${tag}: modern dimulai di awal adegan`,st.ending.step==='era'&&!flagOf(st,'modern.complete'));
       });
     }
 
     // ================= J. Save/load Benteng (dari checkpoint) =================
     if (full) {
       await step(`${tag}: J save/load`, async () => {
+        await page.reload();await page.waitForFunction(()=>window.__tfbt?.activeScenes().includes('TitleScene'));
         await page.evaluate(() => window.__tfbt.qa.chapter4('checkpoint')); await waitWorld(page);
         await saveSlot2(page);
         const saved = await state(page);

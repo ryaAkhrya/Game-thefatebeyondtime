@@ -84,7 +84,7 @@
     "scene_id": "C3-01",
     "line_id": "C3-01-L010",
     "speaker_id": "C01",
-    "spoken_text": "Aku tidak akan menghalangimu.",
+    "spoken_text": "Aku nggak akan menghalangimu.",
     "emotion_id": "DETERMINED",
     "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_DETERMINED.png",
     "pause_ms": 250
@@ -102,7 +102,7 @@
     "scene_id": "C3-02",
     "line_id": "C3-02-L001",
     "speaker_id": "C03",
-    "spoken_text": "Jadi sekarang aku tidak ikut bertarung?",
+    "spoken_text": "Jadi sekarang aku nggak ikut bertarung?",
     "emotion_id": "CURIOUS",
     "portrait_asset_path": "assets/characters/C03_Torvan/C03_EXPRESSION_CURIOUS.png",
     "pause_ms": 250
@@ -165,7 +165,7 @@
     "scene_id": "C3-03",
     "line_id": "C3-03-L001",
     "speaker_id": "C01",
-    "spoken_text": "Aku tidak menyangka kau bisa menyalakan api secepat itu.",
+    "spoken_text": "Aku nggak menyangka kau bisa menyalakan api secepat itu.",
     "emotion_id": "NEUTRAL",
     "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
     "pause_ms": 250
@@ -264,7 +264,7 @@
     "scene_id": "C3-03",
     "line_id": "C3-03-L012",
     "speaker_id": "C01",
-    "spoken_text": "Terutama kalau ternyata aku pernah menyakiti seseorang dan tidak bisa mengingatnya.",
+    "spoken_text": "Terutama kalau ternyata aku pernah menyakiti seseorang dan nggak bisa mengingatnya.",
     "emotion_id": "SAD",
     "portrait_asset_path": "assets/characters/C01_Yaric/C01_EXPRESSION_SAD.png",
     "pause_ms": 250

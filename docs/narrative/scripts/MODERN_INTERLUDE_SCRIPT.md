@@ -1,48 +1,65 @@
-# MODERN INTERLUDE — NASKAH KERJA (DRAFT)
+# MODERN INTERLUDE — naskah kerja revisi 2026-11-14
 
-**Letak:** setelah `C4-07`, sebelum `E-01`. **Berabad-abad setelah era Aveloria.** Naskah dialog ini placeholder dan harus diubah sesuai kebiasaan Yudis/pasangan. Jangan mengarang fakta hubungan nyata.
+Setelah C4-07 dan sebelum kenangan Aveloria. Nama publik Yudis–Saffa mengikuti instruksi user. Percakapan berikut bersifat fiksi untuk adegan game; bukan klaim pengalaman pasangan di dunia nyata.
 
-## M-01 — Kencan dan peninggalan
+## M-01 — Lambang di tepi jalan
 
-[Transisi visual: jalanan modern **tanpa menunjukkan tempat kencan spesifik**. Dua tokoh terlihat sebagai siluet/placeholder yang jelas berbeda dari sprite Aveloria. Teks waktu: 'Berabad-abad kemudian'. Pemain dapat berjalan sebentar dan memeriksa satu benda tua yang memuat lambang sudah diperkenalkan Chapter II–III.]
+**Yudis:** "Saffa, bentar. Coba lihat yang di batu itu."
 
-**Yudis:** "Eh, coba lihat ini. Lambangnya aneh, ya?"
+**Saffa:** "Yang bulat ini? Kenapa?"
 
-**Pasangan:** "Aneh gimana?"
+**Yudis:** "Iya. Garis di tengahnya putus. Kayak pernah lihat."
 
-**Yudis:** "Kayak pernah lihat. Padahal jelas belum pernah."
+**Saffa:** "Di mana?"
 
-**Pasangan:** "Kamu sering bilang begitu kalau lupa naruh barang."
+**Yudis:** "Nah, itu. Aku nggak ingat. Cuma rasanya kenal."
 
-**Yudis:** "Yang itu jangan dibahas." 
+**Saffa:** "Kirain kamu mau bilang kita salah jalan."
 
-[Contoh dialog natural **bukan pengalaman faktual**; boleh diganti setelah user review. Tindakan: interaksi benda, bukan video exposisi panjang.]
+**Yudis:** "Kalau itu, aku masih yakin jalannya benar."
 
-## M-02 — Gema Aveloria
+**Saffa:** "Masih?"
 
-[Saat benda disentuh, lambang yang sama muncul dalam kilas balik sangat singkat: arsip Azie, pusaka Velthia, dan Heart yang baru dibuka. Tidak ada portal atau perjalanan balik waktu.]
+**Yudis:** "Oke, cukup yakin. Tapi lihat dulu, deh."
 
-**Yudis:** "Sebentar... aku tahu tempat ini."
+**Saffa:** "...Bentar. Kok aku juga merasa pernah lihat?"
 
-**Pasangan:** "Aku juga. Tapi itu bukan tempat yang pernah kita datangi, kan?"
+**Yudis:** "Kamu juga?"
 
-**Yudis:** "Bukan. Rasanya... seperti mengingat sesuatu yang bukan dari hidup kita sekarang."
+**Saffa:** "Iya. Bukan batunya. Lambangnya."
 
-[Gunakan pantulan kata/gestur Yaric–Velthia dari Chapter I, bukan penjelasan supranatural panjang. Pemain memahami dua kehidupan berhubungan.]
+[Lambang memicu montase arsip, pusaka Velthia, dan dua pengunci Heart. Tanpa foto pribadi.]
 
-## M-03 — Empat objek kenangan
+## M-02 — Ingatan yang terasa dekat
 
-[Empat hotspot `MEMORY_01..04`, nama foto/teks dari user. Bila masih kosong: tampilkan label `Kenangan ini akan diisi nanti` **di build privat pra-rilis**, atau lewati galeri privat sepenuhnya di build publik. Jangan mengarang tanggal/tempat/nama yang user belum beri.]
+**Yudis:** "Tadi... kamu lihat juga?"
 
-**Yudis:** "Inget nggak sih waktu kita [KENANGAN_ASLI_01]?"
+**Saffa:** "Ada ruangan penuh buku. Terus pintu besar itu."
 
-**Pasangan:** "[BALASAN_ASLI_DARI_PASANGAN ATAU TEKS YANG DISETUJUI]."
+**Yudis:** "Dua pengunci. Aku ingat tanganku ada di salah satunya."
 
-[Semua kalimat dengan placeholder di atas hanya format, **bukan naskah siap rilis**. Setiap hotspot harus dapat dilanjutkan tanpa memaksa foto, suara atau data tidak tersedia. Setelah selesai transisi ke flashback tebing yang memiliki tempat khusus dalam sejarah Aveloria.]
+**Saffa:** "Aku di sebelahmu. Tapi bajunya beda. Semuanya beda."
 
-## QA
+**Yudis:** "Aneh, ya. Aku tahu itu kamu, padahal wajahnya nggak sama."
 
-- Modern muncul **setelah** Chapter IV, sebelum epilog. Tidak ada karakter fantasi yang melihat foto modern.
-- Mode publik tidak membundel file foto asli sama sekali. Password overlay yang hanya disimpan di JS tidak cukup untuk keamanan.
-- Dialog tidak memaksakan pengalaman hubungan palsu. Ejaan/nama pasangan menunggu input user.
-- Save/continue di modern menempatkan pemain pada checkpoint benar, bukan di benteng.
+**Saffa:** "Aku juga tahu itu kamu. Nggak perlu lihat lama-lama."
+
+**Yudis:** "Itu bukan tempat yang pernah kita datangi, kan?"
+
+**Saffa:** "Bukan. Tapi rasanya juga nggak kayak baru lihat."
+
+**Yudis:** "Kayak ingatan yang bukan dari hidup kita sekarang."
+
+**Saffa:** "Kamu pusing?"
+
+**Yudis:** "Sedikit. Kita duduk sebentar, ya?"
+
+**Saffa:** "Iya. Nggak usah buru-buru. Aku di sini."
+
+## M-03 — Kenangan pribadi opsional
+
+Hanya ditampilkan dari konten privat yang ditulis/diberikan user. Nama Saffa tidak mengizinkan pengarang mengisi tanggal, foto, atau kenangan nyata. Build publik langsung menuju kenangan Aveloria; tidak menampilkan placeholder pribadi.
+
+## Pementasan
+
+Pemain berjalan mendekati lambang dan memeriksanya. Dialog tetap bisa dibaca per baris; setelah percakapan selesai, jeda singkat mengantar adegan berikutnya secara otomatis. Adegan tanpa dialog berjalan menurut waktu dan berhenti saat menu jeda terbuka.

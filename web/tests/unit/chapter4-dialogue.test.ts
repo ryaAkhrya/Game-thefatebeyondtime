@@ -159,7 +159,7 @@ describe('Chapter IV dialogue: kualitas data', () => {
     const all = allLines.map(x => x.l.text).join('\n') + '\n' + Object.values(C4_BATTLE_CALLOUTS).map(c => c.text).join('\n');
     expect(/Yudis|modern|ponsel|telepon|foto|kamera|anniversary|pasangan|berabad|epilog|kredit|tebing|reinkarnasi/i.test(all)).toBe(false);
     expect(/hourglass|jam pasir/i.test(all)).toBe(false);
-    expect(/\b(bro|gas|red flag|wahai|literally|santuy|baper|kepo|mager|gabut|nggak|gak|banget|udah|ngambek|lemot|anjir|sih)\b/i.test(all)).toBe(false);
+    expect(/\b(bro|gas|red flag|wahai|literally|santuy|baper|kepo|mager|gabut|ngambek|lemot|anjir|sih)\b/i.test(all)).toBe(false);
     expect(/\b\d{4}\b/.test(all)).toBe(false); // tanpa tanggal/tahun
   });
   it('tidak ada tulisan "Bab V", Modern Interlude, atau kartu akhir bab di dalam naskah', () => {
@@ -225,7 +225,7 @@ describe('Chapter IV dialogue: arah cerita dan karakter', () => {
     expect(ret).toMatch(/Dewan tetap menunggu/);
     const tower = allLines.filter(x => x.name === 'C4_TOWER_FALL').map(x => x.l.text).join('\n');
     expect(tower).toMatch(/debu/);
-    expect(tower).toMatch(/Tidak semuanya bisa diselamatkan/);
+    expect(tower).toMatch(/Nggak semuanya bisa diselamatkan/);
     const reportB = allLines.filter(x => x.name === 'C4_REPORT_B').map(x => x.l.text).join('\n');
     expect(reportB).toMatch(/jangan berbalik/);
   });

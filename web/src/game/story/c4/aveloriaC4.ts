@@ -16,7 +16,7 @@ import { AVELORIA_C4_IDS } from '../../world/aveloriaC4';
  *   returned (diatur lead saat tiba) -> onStart: [c4 returnOpen, C4_RETURN_AVELORIA] -> returnSeen
  *   returnSeen -> pemain menjelajah dan bicara dengan Talric/Azie/Derrria/warga/penjaga atau memeriksa lonceng dan tanda
  *   returnSeen -> bicara dengan Velthia ATAU periksa papan daftar warga: dialog penutup -> `chapter.4_complete` (sekali; idempoten)
- * Lead menampilkan kartu "Bab IV selesai" sesudah flag complete. Tidak ada hadiah atau konten apa pun setelah Bab IV.
+ * Sesudah flag complete, renderer mengantar ke adegan berikutnya secara otomatis; tanpa hadiah tambahan.
  * Torvan tidak hadir. `returned` TIDAK diatur di sini (lead).
  */
 const RESIDENT_LINES: Readonly<Record<string, DialogueScript>> = {

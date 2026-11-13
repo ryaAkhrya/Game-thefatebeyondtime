@@ -14,7 +14,7 @@
 
 **Azie:** “Tergantung kau suka jawaban yang rapi atau tidak.”
 
-**Yaric:** “Aku mulai curiga tidak ada jawaban rapi di kota ini.”
+**Yaric:** “Aku mulai curiga nggak ada jawaban rapi di kota ini.”
 
 **Azie:** “Yang satu menyebut The Fate membawa bencana. Yang lain menyebutnya sesuatu yang hilang.”
 
@@ -22,7 +22,7 @@
 
 **Azie:** “Bagian sisanya rusak. Salinan yang lebih tua katanya disimpan di Liora.”
 
-**Yaric:** “Jadi aku harus menemui orang yang menyimpan kertas yang tidak rusak.”
+**Yaric:** “Jadi aku harus menemui orang yang menyimpan kertas yang nggak rusak.”
 
 **Azie:** “Kurang lebih. Tapi tanyakan dari mana cerita itu berasal, jangan cuma isinya.”
 
@@ -62,7 +62,7 @@
 
 **Velthia:** “Pulanglah membawa jawaban. Bukan luka baru.”
 
-**Yaric:** “Aku usahakan keduanya tidak tertukar.”
+**Yaric:** “Aku usahakan keduanya nggak tertukar.”
 
 **Velthia:** “Itu permintaan yang cukup sederhana.”
 
@@ -102,7 +102,7 @@
 
 **Zira:** “Hutan di luar desa masih punya sisa penanda lama. Kalau ada jawaban, mungkin bukan di mulutku.”
 
-**Yaric:** “Kau tidak ikut?”
+**Yaric:** “Kamu nggak ikut?”
 
 **Zira:** “Punggungku sudah cukup berperang dengan kursi ini.”
 
@@ -126,7 +126,7 @@
 
 **Yaric:** “Hei. Kau sendirian?”
 
-**Torvan:** “Sekarang tidak.”
+**Torvan:** “Sekarang nggak.”
 
 **Yaric:** “Maksudku, di hutan ini.”
 
@@ -164,7 +164,7 @@
 
 [PILIHAN FLAVOR: “Ikut, tapi jangan bikin repot.” / “Kau tahu jalannya, tunjukkan.”]
 
-**Torvan:** “Aku bisa membantu. Tapi kalau ada bekal, aku minta bagian yang tidak pedas.”
+**Torvan:** “Aku bisa membantu. Tapi kalau ada bekal, aku minta bagian yang nggak pedas.”
 
 **Yaric:** “Kau berunding seperti pedagang.”
 
@@ -180,7 +180,7 @@
 
 **Yaric:** “Kau bisa sihir?”
 
-**Torvan:** “Kalau tidak bisa, kita akan segera tahu.”
+**Torvan:** “Kalau nggak bisa, kita akan segera tahu.”
 
 [Tutorial: memilih satu skill support / magic Torvan. Setelah menang:]
 
@@ -204,13 +204,13 @@
 
 [Yaric menunggu, Veyrath tetap menutup jalan.]
 
-**Yaric:** “Kurasa tidak.”
+**Yaric:** “Kurasa nggak.”
 
 **Torvan:** “Aku sudah menduganya.”
 
 [BATTLE Veyrath; setelah kalah, ia berlutut tanpa pidato.]
 
-**Yaric:** “Seperti ia menjaga sesuatu yang bahkan tidak ia ingat.”
+**Yaric:** “Seperti ia menjaga sesuatu yang bahkan nggak ia ingat.”
 
 **Torvan:** “Orang kadang begitu.”
 
@@ -230,7 +230,7 @@
 
 **Yaric:** “Kau paham?”
 
-**Torvan:** “Aku paham kalau kau menatapnya lebih lama, tulisannya tidak akan tumbuh lagi.”
+**Torvan:** “Aku paham kalau kau menatapnya lebih lama, tulisannya nggak akan tumbuh lagi.”
 
 [Yaric tersentak oleh fragmen visual: gerakan tangan Velthia menutup sebuah buku. Jangan tampilkan foto modern.]
 
@@ -274,7 +274,7 @@
 
 **Velthia:** “Anak itu tampaknya cepat mengenalmu.”
 
-**Torvan:** “Tidak sulit.”
+**Torvan:** “Nggak sulit.”
 
 [Jeda ringan; kemudian Velthia kembali ke urusan penting.]
 

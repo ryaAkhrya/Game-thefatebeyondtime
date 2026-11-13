@@ -27,17 +27,17 @@ const script = (id: string, ...nodes: DialogueLine[]): DialogueScript => ({ id, 
 // ---------------------------------------------------------------------------------------------------------------------
 export const F_OUTER_GATE = script('C4-FORT-OUTER-GATE',
   narr('Jeruji gerbang tersangkut setengah terangkat. Rantainya tegang, seolah tertahan di antara dua detik.'),
-  think('Besinya tidak berkarat. Tapi ada goresan baru di bawahnya, seperti ia sudah jatuh dan ditarik naik berkali-kali.'),
+  think('Besinya nggak berkarat. Tapi goresan bawahnya baru. Seperti habis jatuh lalu ditarik naik lagi.'),
 );
 export const F_OUTER_STATUE = script('C4-FORT-OUTER-STATUE',
   narr('Patung penjaga berzirah. Wajahnya sudah hilang, entah dimakan waktu atau digosok tangan. Di kakinya terpahat: "Berjaga, bukan menahan."'),
   say('C02', 'NEUTRAL', 'Semboyan penjaga waktu. Mereka menjaga jalannya waktu, bukan menahannya.'),
-  say('C01', 'NEUTRAL', 'Kalimat yang bagus untuk orang yang sedang menahan sesuatu.'),
+  say('C01', 'NEUTRAL', 'Kalimat yang bagus buat orang yang lagi menahan sesuatu.'),
 );
 export const F_OUTER_CART = script('C4-FORT-OUTER-CART',
   narr('Gerobak pasokan dengan as patah. Roti di baknya masih hangat, padahal debu di atas papannya setebal jari.'),
   say('C02', 'WORRIED', 'Waktu di tempat ini tidak berjalan sama di setiap sudut. Jangan makan apa pun yang kau temukan.'),
-  say('C01', 'NEUTRAL', 'Aku tidak sedang berencana.'),
+  say('C01', 'NEUTRAL', 'Aku juga nggak berniat makan apa-apa.'),
 );
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -71,7 +71,7 @@ export const F_TRIAL_GATE = script('C4-FORT-TRIAL-GATE',
 );
 export const F_DOOR_SEAL = script('C4-FORT-DOOR-SEAL',
   narr('Pintu besi di dinding utara, berpahat empat lambang matahari yang kosong. Tidak ada gagang, hanya celah di bawahnya tempat cahaya merembes.'),
-  think('Pintu ini tidak dikunci kunci. Dikunci sesuatu yang lain.'),
+  think('Pintu ini nggak pakai kunci biasa. Ada yang lain yang menahannya.'),
 );
 export const F_DOOR_SHORTCUT = script('C4-FORT-DOOR-SHORTCUT',
   narr('Pintu besi tanpa gagang di sisi aula. Dari baliknya terdengar rantai bergemeretak pelan, seperti menunggu seseorang menariknya dari sisi lain.'),
@@ -92,7 +92,7 @@ export const F_BARRACKS_BUNK = script('C4-FORT-BARRACKS-BUNK',
 export const F_BARRACKS_TABLE = script('C4-FORT-BARRACKS-TABLE',
   narr('Dua mangkuk di meja, uapnya masih naik tipis. Tidak ada orang. Sebuah sendok bergerak setengah ketukan, lalu diam.'),
   say('C02', 'WORRIED', 'Retakan menahan potongan waktu di tempatnya. Kita tidak tahu berapa banyak yang ia bawa.'),
-  say('C01', 'NEUTRAL', 'Makan malam yang tidak pernah selesai.'),
+  say('C01', 'NEUTRAL', 'Makan malam yang nggak pernah selesai.'),
 );
 export const F_CHEST_POTION = script('C4-FORT-CHEST-POTION',
   narr('Peti jatah jaga. Di dalamnya ada ramuan dengan tutup yang masih bersegel lilin.'),

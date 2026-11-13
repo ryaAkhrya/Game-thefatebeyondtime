@@ -6,6 +6,7 @@ import type { LoadedMap } from './forest1';
 import type { Interactable } from './Interaction';
 import { drawChapter2Ground } from './chapter2Maps';
 import { Forest2Barricade, drawForest2 } from './forest2Art';
+import { drawResident, VEYRATH_ENCOUNTER } from './residentArt';
 
 /** Renderer only. All named sprites are the existing DRAFT atlases, with their original pivots. */
 export class Chapter2View {
@@ -26,19 +27,14 @@ export class Chapter2View {
       loaded.collision.setDynamic('zira', footBox(480, 320));
       for (const [x, y, coat, task] of [[428, 584, 0x667057, 'guard'], [348, 464, 0x927859, 'drying']] as const) {
         const g = scene.add.graphics().setPosition(x, y).setDepth(y);
-        g.fillStyle(0x2b2a28, 0.3); g.fillEllipse(0, 0, 18, 6);
-        g.fillStyle(0xb49372); g.fillRect(-6, -32, 12, 10);
-        g.fillStyle(coat); g.fillRect(-8, -22, 16, 16);
-        g.fillStyle(0x554b40); g.fillRect(-7, -6, 5, 6); g.fillRect(2, -6, 5, 6);
-        if (task === 'drying') { g.fillStyle(0xc1aa7b); g.fillRect(8, -20, 10, 8); }
-        else { g.fillStyle(0x888c72); g.fillRect(-8, -38, 16, 5); }
+        drawResident(g, coat, task);
         loaded.collision.setDynamic(task, footBox(x, y));
       }
     } else {
       registerCharacterAnims(scene, 'C03_CH2_EXPLORE', 'c03', scene.cache.json.get('C03_CH2_EXPLORE:meta') as CharacterAnimMeta | undefined, 6);
       this.torvan = scene.add.sprite(684, 496, 'C03_CH2_EXPLORE', 0).setOrigin(0.5, 47 / 48).setDepth(496);
       playState(this.torvan, 'c03', 'idle', 'right', true);
-      this.veyrath = scene.add.sprite(1032, 296, 'B02_CH2_BATTLE', 0).setOrigin(0.5, 92 / 96).setDepth(296);
+      this.veyrath = scene.add.sprite(1032, 296, VEYRATH_ENCOUNTER.key).setOrigin(0.5, VEYRATH_ENCOUNTER.pivotY / VEYRATH_ENCOUNTER.size).setDepth(296);
       this.barricade = new Forest2Barricade(scene); // palisade log pile, art in forest2Art.ts
     }
   }

@@ -16,7 +16,8 @@
     "assets:sprint2": "node scripts/gen-forest-art.mjs && node scripts/gen-forest-edge-art.mjs && node scripts/gen-forest2-art.mjs && node scripts/gen-town-art.mjs",
     "assets:vfx": "node scripts/vfx/build.mjs",
     "assets:sfx": "node scripts/sfx/generate.mjs",
-    "assets:sprites": "python -I scripts/author-mournfang.py && python -I scripts/author-yaric-sprites.py && python -I scripts/author_cast_build.py",
+    "assets:sprites": "python -I scripts/author-mournfang.py && python -I scripts/author-yaric-sprites.py && python -I scripts/author_cast_build.py && npm run assets:phase10",
+    "assets:phase10": "python -I scripts/phase10/import_sprites.py C02 C03 C04 C05 C06 C07 C08 C09 --ending && python -I scripts/phase10/import_battle.py C03 M02 M03 B02 && node scripts/gen-town-art.mjs crisis && node scripts/gen-town-c4-art.mjs",
     "build:private": "node scripts/build-private.mjs",
     "privacy:audit": "node scripts/audit-ending-build.mjs"
   },

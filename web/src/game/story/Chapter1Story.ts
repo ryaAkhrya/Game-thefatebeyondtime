@@ -80,7 +80,7 @@ export type StoryAction =
   | { type: 'c4'; op: string; arg?: string | number }
   /** Pulihkan HP/MP seluruh party (titik simpan aman Bab IV); flag checkpoint diset oleh story. */
   | { type: 'restParty4' }
-  /** Layar bab selesai: kartu "Bab IV selesai" (SliceEnd). Tanpa epilog/modern. */
+  /** Penutup Bab IV: checkpoint lalu handoff otomatis ke adegan berikutnya. */
   | { type: 'chapter4End' };
 
 export interface StoryContext {

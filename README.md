@@ -1,4 +1,12 @@
-# STATUS TERKINI — Phase 9 (13 November 2026)
+# STATUS TERKINI — Phase 10, revisi 14 November 2026
+
+Modern memakai **Yudis–Saffa**, dengan 24 baris percakapan modern dan 24 baris epilog tebing. Bahasa percakapan lebih santai, cast dan pose duduk dirapikan memakai Yaric sebagai patokan, `To Be Continued` berada di kiri bawah. Bab I–IV dan ending mengalir otomatis tanpa kartu pilih bab; save lama tetap dapat dilanjutkan.
+
+Delapan karakter eksplorasi C02–C09, empat atlas battle C03/M02/M03/B02, serta latar dan pose duduk ending mengikuti concept art fiksi yang tersedia. Hasil QA dan bukti terbaru: [Laporan revisi](docs/production/phase10/REVISION_REPORT.md), [laporan Phase 10](docs/production/PHASE10_REPORT.md), dan [prompt revisi](docs/production/phase10/IMAGEGEN_REVISION_PROMPTS.md). Review seni dan pacing oleh user masih terbuka.
+
+BGM tetap AWAITING_COMPOSER. Preview: **http://127.0.0.1:5173/**; ending tanpa mengubah save: **http://127.0.0.1:5173/?qa=1&preview=ending** (dev). Jalankan persiapan aset baru melalui `npm --prefix web run assets:phase10`; jangan menimpa runtime dengan builder sprite lama saja. Hasil QA aktual dan keterbatasan dicatat di laporan. Catatan fase di bawah merupakan riwayat.
+
+# Riwayat — Phase 9 (13 November 2026)
 
 **FUNCTIONAL PASS — PERSONAL CONTENT & HUMAN REVIEW PENDING.** Modern Interlude → artefak Aveloria → ingatan → epilog tebing → awan/siluet → **To Be Continued** → credits telah diimplementasikan. Sistem kenangan dan pesan anniversary privat tersedia; foto, identitas pasangan dan pesan asli belum diberikan. Status QA dan batas review manusia: [PHASE9_REPORT](docs/production/PHASE9_REPORT.md).
 

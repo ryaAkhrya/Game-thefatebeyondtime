@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { isEnding } from '../ending/progress';
+import { nextStoryChapter } from '../story/chapterFlow';
 import { ENV, SPRITE_KEYS } from '../data/assetPaths';
 import { SCENE_KEYS, type AreaId } from '../data/ids';
 import { footBox, moveWithCollision, pointIn, type Facing, type Rect } from '../world/Collision';
@@ -209,6 +210,11 @@ export class WorldScene extends Phaser.Scene {
     if (!document.hidden) this.services.gameState.tick(delta / 1000);
     if (!this.started) {
       this.started = true;
+      if (nextStoryChapter(this.services.gameState.snapshot())) {
+        this.busy = true;
+        this.services.router.openOverlay(this, SCENE_KEYS.SliceEnd);
+        return;
+      }
       this.hud.setObjective(this.story.objective());
       const actions = this.story.onStart();
       if (actions.length > 0) {
@@ -491,7 +497,7 @@ export class WorldScene extends Phaser.Scene {
       case 'setFlag':
         if (gameState.setFlag(a.flag)) this.actionLog.push(`flag:${a.flag}`);
         if (this.city || this.view3 || this.chapter2 || a.flag === FLAG.awake || a.flag === FLAG.victorySeen) this.applyFlagState();
-        if (a.flag === C4.complete) await this.runAction({ type: 'chapter4End' }); // kartu "Bab IV selesai" (tanpa epilog/modern)
+        if (a.flag === C4.complete) await this.runAction({ type: 'chapter4End' }); // handoff otomatis ke era modern
         break;
       case 'objective':
         this.hud.setObjective(this.story.objective());

@@ -28,7 +28,7 @@
 
 **Velthia:** “Aku ikut. Ini urusan Aveloria, bukan sekadar rasa penasaranku.”
 
-**Yaric:** “Aku tidak akan menghalangimu.”
+**Yaric:** “Aku nggak akan menghalangimu.”
 
 **Velthia:** “Bagus. Aku tidak sedang meminta izin.”
 
@@ -38,7 +38,7 @@
 
 [Party swap pada titik aman.]
 
-**Torvan:** “Jadi sekarang aku tidak ikut bertarung?”
+**Torvan:** “Jadi sekarang aku nggak ikut bertarung?”
 
 **Yaric:** “Kau bisa ikut sampai jalur masuk, tapi kuil ini berbahaya.”
 
@@ -58,7 +58,7 @@
 
 [Api menyala kecil, tidak ada pendar magis. Yaric sedang mengeringkan tali, Velthia memperbaiki simpul di peta.]
 
-**Yaric:** “Aku tidak menyangka kau bisa menyalakan api secepat itu.”
+**Yaric:** “Aku nggak menyangka kau bisa menyalakan api secepat itu.”
 
 **Velthia:** “Karena aku Ratu?”
 
@@ -84,7 +84,7 @@
 
 [Jeda wajar. Jangan tambahkan “semesta” atau “jiwa abadi”.]
 
-**Yaric:** “Terutama kalau ternyata aku pernah menyakiti seseorang dan tidak bisa mengingatnya.”
+**Yaric:** “Terutama kalau ternyata aku pernah menyakiti seseorang dan nggak bisa mengingatnya.”
 
 **Velthia:** “Kalau kau memang pernah, kau masih bisa memilih apa yang dilakukan setelah tahu.”
 

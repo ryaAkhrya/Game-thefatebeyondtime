@@ -1,3 +1,7 @@
+## Brief langsung untuk komposer — Phase 10
+
+Baca [BGM_BRIEF_UNTUK_KAMU.md](docs/production/phase10/BGM_BRIEF_UNTUK_KAMU.md): instruksi berbahasa Indonesia untuk seluruh 13 cue registry, suasana, BPM, instrumen, motif, struktur loop dan ekspor. Ini panduan membuat musik sendiri; tidak ada musik dibuat atau dimasukkan. Semua BGM tetap AWAITING_COMPOSER dan fallback hening. Ketentuan/cue historis di bawah tetap menjadi konteks produksi.
+
 # Composer handoff — Game Director authored music only
 
 ## Phase 9 — Modern Interlude / cliff / credits (brief only, AWAITING_COMPOSER)

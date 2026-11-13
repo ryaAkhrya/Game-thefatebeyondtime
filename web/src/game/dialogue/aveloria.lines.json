@@ -243,12 +243,12 @@
         "scene_id":  "C1-07",
         "line_id":  "C1-07-L008",
         "speaker_id":  "C01",
-        "spoken_text":  "Bagus. Jadi kita bahkan tidak tahu apa yang ditakuti.",
+        "spoken_text":  "Bagus. Jadi kita bahkan nggak tahu apa yang ditakuti.",
         "emotion_id":  "SAD",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_SAD.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_I_SCRIPT.md"
     },
     {
@@ -351,12 +351,12 @@
         "scene_id":  "C1-08",
         "line_id":  "C1-08-L006",
         "speaker_id":  "C01",
-        "spoken_text":  "Kalau punya, aku tidak ingat letaknya.",
+        "spoken_text":  "Kalau punya, aku nggak ingat letaknya.",
         "emotion_id":  "EMBARRASSED",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_EMBARRASSED.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT beat-specific editorial acting pass v3.2; review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_I_SCRIPT.md"
     },
     {
@@ -435,12 +435,12 @@
         "scene_id":  "C1-08",
         "line_id":  "C1-08-L013",
         "speaker_id":  "C01",
-        "spoken_text":  "Tidak tahu. Kau sering memperhatikan orang baru sedetail itu?",
+        "spoken_text":  "Nggak tahu. Kau sering memperhatikan orang baru sedetail itu?",
         "emotion_id":  "EMBARRASSED",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_EMBARRASSED.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT beat-specific editorial acting pass v3.2; review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_I_SCRIPT.md"
     },
     {

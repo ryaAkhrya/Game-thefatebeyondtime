@@ -92,21 +92,31 @@ function mat(name, col, seed, w = 38, h = 18) {
 /** Satu orang duduk menghadap depan, berselimut. ox,oy = sudut kiri-atas area 16x24 */
 function seatedPerson(c, ox, oy, o) {
   const skin = SKIN[o.skin], hair = HAIR[o.hair], tun = CLOTH[o.cloth], bl = o.blanket ? CLOTH[o.blanket] : null;
-  // kaki ditekuk di depan
-  box(c, ox + 1, oy + 16, 14, 6, [R(AV.slate, 0), R(AV.slate, 1), R(AV.slate, 2)]);
-  c.rect(ox + 1, oy + 21, 5, 3, R(AV.wood, 1)); c.rect(ox + 10, oy + 21, 5, 3, R(AV.wood, 1));
-  // badan
-  box(c, ox + 2, oy + 8, 12, 10, tun);
-  // kepala
-  box(c, ox + 4, oy + 1, 8, 8, skin);
+  const p = (points, color) => c.poly(points.map(([x, y]) => [ox + x, oy + y]), color);
+  // Bent knees, a tapered torso and rounded head replace the old box body.
+  p([[3,15],[8,15],[11,17],[15,18],[15,21],[12,23],[8,21],[3,23],[1,21],[1,18]], R(AV.slate, 1));
+  c.line(ox + 3, oy + 17, ox + 7, oy + 19, R(AV.slate, 2)); c.line(ox + 10, oy + 19, ox + 13, oy + 20, R(AV.slate, 0));
+  p([[2,21],[5,21],[7,23],[6,24],[1,24],[1,22]], R(AV.wood, 1));
+  p([[10,21],[13,21],[15,23],[15,24],[10,24],[9,23]], R(AV.wood, 1));
+  c.hline(ox + 2, oy + 22, 3, R(AV.wood, 2)); c.hline(ox + 11, oy + 22, 2, R(AV.wood, 2));
+  p([[5,8],[10,8],[13,10],[14,16],[12,18],[3,18],[2,15],[3,10]], tun[1]);
+  c.line(ox + 4, oy + 11, ox + 5, oy + 16, tun[2]); c.vline(ox + 12, oy + 11, 5, tun[0]);
+  p([[6,1],[10,1],[12,3],[11,7],[9,9],[6,9],[4,7],[4,3]], skin[1]);
+  c.vline(ox + 5, oy + 3, 3, skin[2]); c.vline(ox + 10, oy + 5, 3, skin[0]);
   c.set(ox + 6, oy + 5, R(AV.slate, 0)); c.set(ox + 10, oy + 5, R(AV.slate, 0));
-  c.rect(ox + 4, oy, 8, 3, hair[1]); c.hline(ox + 5, oy, 6, hair[2]); c.vline(ox + 4, oy + 1, 4, hair[2]); c.vline(ox + 11, oy + 1, 4, hair[0]);
+  p([[6,0],[10,0],[12,2],[12,4],[10,3],[9,2],[6,3],[5,5],[4,3],[4,2]], hair[1]);
+  c.hline(ox + 6, oy + 1, 4, hair[2]); c.set(ox + 5, oy + 3, hair[2]); c.set(ox + 10, oy + 3, hair[0]);
   if (o.bun) { c.rect(ox + 6, oy - 2, 4, 3, hair[1]); c.hline(ox + 6, oy - 2, 4, hair[2]); }
   // selimut di bahu: menutup bahu, miring ke bawah di depan dada
-  if (bl) { c.poly([[ox + 1, oy + 8], [ox + 15, oy + 8], [ox + 14, oy + 18], [ox + 2, oy + 18]], bl[1]); c.hline(ox + 2, oy + 8, 12, bl[2]); c.vline(ox + 1, oy + 9, 9, bl[2]); c.vline(ox + 14, oy + 9, 9, bl[0]); for (let k = 0; k < 4; k++) c.set(ox + 4 + k * 3, oy + 12 + (k % 2), bl[0]); }
+  if (bl) {
+    p([[4,8],[6,9],[9,9],[11,8],[14,10],[15,14],[13,19],[3,19],[1,15],[2,11]], bl[1]);
+    c.line(ox + 3, oy + 10, ox + 6, oy + 12, bl[2]); c.line(ox + 11, oy + 10, ox + 8, oy + 13, bl[0]);
+    c.line(ox + 4, oy + 13, ox + 5, oy + 17, bl[2]); c.line(ox + 11, oy + 13, ox + 10, oy + 17, bl[0]);
+    c.hline(ox + 4, oy + 18, 8, bl[0]);
+  }
   // tangan memegang mangkuk atau lutut
   c.rect(ox + 4, oy + 16, 3, 2, skin[1]); c.rect(ox + 10, oy + 16, 3, 2, skin[1]);
-  if (o.bowl) { c.rect(ox + 6, oy + 17, 5, 3, R(AV.earth, 2)); c.hline(ox + 6, oy + 17, 5, R(AV.earth, 3)); }
+  if (o.bowl) { p([[5,17],[12,17],[11,20],[7,20]], R(AV.earth, 2)); c.hline(ox + 6, oy + 17, 5, R(AV.earth, 3)); }
 }
 
 /** Dua orang duduk berdekatan (satu selimut), menghadap api. 38x28, kaki y=25. */

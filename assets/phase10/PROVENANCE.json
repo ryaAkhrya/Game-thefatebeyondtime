@@ -1,0 +1,437 @@
+{
+  "phase": 10,
+  "method": "Built-in imagegen with fictional concept-art references; exact prompts in docs/production/phase10/IMAGEGEN_PROMPTS.md and IMAGEGEN_REVISION_PROMPTS.md.",
+  "native_preparation": "Pillow/NumPy nearest grid, hard alpha, closed palettes, stable pivots; exploration motion derived with integer pixels. Anonymous town NPCs use the existing Node code-native generators; audit_town.py verifies unchanged prop pixels and atlas geometry.",
+  "human_review": "PENDING",
+  "private_media_used": false,
+  "music_created": false,
+  "sources": [
+    {
+      "path": "assets/phase10/sources/B02_battle.png",
+      "sha256": "57431f88ca4b6caae2275edbe059a52652e660430cbf805f2a63a7c7beab39db",
+      "size": [
+        1448,
+        1086
+      ],
+      "selected": true,
+      "crossed_cell_edges": []
+    },
+    {
+      "path": "assets/phase10/sources/C02_turnaround.png",
+      "sha256": "b9c9b737c37f1506ed1c330ca2cda7a9512f7d79a34f93c5e1a32197021cbe0e",
+      "size": [
+        1024,
+        1536
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C02_turnaround_pre_revision.png",
+      "sha256": "d0b317c9a02c15b247b562965680624e6d574133e15810dcb14e6fddc65f79b0",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/C03_battle.png",
+      "sha256": "3b0abe17413d0516eefb0d6ce458e94b6be001c98f80493173528fbebc9c783d",
+      "size": [
+        1448,
+        1086
+      ],
+      "selected": true,
+      "crossed_cell_edges": []
+    },
+    {
+      "path": "assets/phase10/sources/C03_turnaround.png",
+      "sha256": "351298670828b5379482291d59e209c374694beae13eddcf9044529bfcab547b",
+      "size": [
+        887,
+        1774
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C03_turnaround_pre_revision.png",
+      "sha256": "7a6063b48b8d155510de7e5504046350db34ec9ac7674a2955c5a9c3d9674203",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/C04_turnaround.png",
+      "sha256": "e705d4d6a233f01ac0e9d1ce6bc929776516a8d6e81e197fbb88ff5772df4f16",
+      "size": [
+        1024,
+        1536
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C04_turnaround_pre_revision.png",
+      "sha256": "f24fd80ff9f796f5969e8fa2eadfb8e37694f8aad649b68de5b745ecd817957a",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/C05_turnaround.png",
+      "sha256": "1e72fb322f7bcf860e4e18c5d9a397949f8a4f129902bae8cfcc411d3780d7e1",
+      "size": [
+        1024,
+        1536
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C05_turnaround_pre_revision.png",
+      "sha256": "01290700630ec7e005633994cac4bbacf4647766b9c48457c54285d675fd3bbf",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/C06_turnaround.png",
+      "sha256": "2478f8b1ef1b48eb586086d00ab8aba2b1e33a39921c6e2e527e7ab7079fa5b9",
+      "size": [
+        887,
+        1774
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C06_turnaround_pre_revision.png",
+      "sha256": "79645cb19cbc0c4845a47f3bad7c0fbe029a4487164a9b6fb186142f441b6003",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/C07_turnaround.png",
+      "sha256": "f379c92edfdcc2a1ccabcc39b296b6f825c061233828946e7e537517ec5a9f7a",
+      "size": [
+        887,
+        1774
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C07_turnaround_pre_revision.png",
+      "sha256": "79e1f78cd46ac7d827d4cdbfb2452a6cabba6bd0fd7b374e7a6ba23b45131ed5",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/C08_turnaround.png",
+      "sha256": "82abc9f920f5485ed549382896b09ffce3940bca6b19fb87da7d1c2cfc05725e",
+      "size": [
+        887,
+        1774
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C08_turnaround_pre_revision.png",
+      "sha256": "d9c26e9dd9e963b414a3a8d6f1edc18863fcc5586e3f03026d2d32e5cc5fe069",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/C09_turnaround.png",
+      "sha256": "b69ea0157b701ee90ae74325ec3d03c1f2dd278dcaad3c3e33d438d604d01fea",
+      "size": [
+        1024,
+        1536
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/C09_turnaround_pre_revision.png",
+      "sha256": "449f09bb6e9df2e1e7221e8cdb41ed657e60439d203de409bd4a286fee2ed117",
+      "size": [
+        1254,
+        1254
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/cliff.png",
+      "sha256": "00915801022bce2d2300b252ca4ca70abb356e39bbaade5e514cdbd204a76c66",
+      "size": [
+        1672,
+        941
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/epilogue_seated.png",
+      "sha256": "4545a6959b7717db2377f58521bd8c921ca7b30ee4272fd5936da4a2d73ff927",
+      "size": [
+        1774,
+        887
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/epilogue_seated_pre_revision.png",
+      "sha256": "85957be790a9009ae46846566cb9871165baac981518dbb2a8a2a234baa67a3f",
+      "size": [
+        1774,
+        887
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/epilogue_seated_v1.png",
+      "sha256": "14a7e528e98116a3302c4e9e78a525272c2360ca61a39f1ada2ff7d1e3fd3713",
+      "size": [
+        1774,
+        887
+      ],
+      "selected": false
+    },
+    {
+      "path": "assets/phase10/sources/M02_battle.png",
+      "sha256": "d5aec6ded099783527f6d1ee30a02fd2aa06d1a0061f92a5b03134c52e1b600f",
+      "size": [
+        1448,
+        1086
+      ],
+      "selected": true,
+      "crossed_cell_edges": []
+    },
+    {
+      "path": "assets/phase10/sources/M02_battle_v1.png",
+      "sha256": "e7eaa232bfde8dba6acd0177adee696f5ab4bb4af0aa700240ee110d0ba49fab",
+      "size": [
+        1448,
+        1086
+      ],
+      "selected": false,
+      "crossed_cell_edges": [
+        {
+          "frame": 4,
+          "edge_pixels": 29
+        },
+        {
+          "frame": 5,
+          "edge_pixels": 26
+        }
+      ]
+    },
+    {
+      "path": "assets/phase10/sources/M03_battle.png",
+      "sha256": "1d2c04f9e1c2dc9d11f0d2626f63ceb7ef3b45289c99408f8302e7ce43d19ccc",
+      "size": [
+        1448,
+        1086
+      ],
+      "selected": true,
+      "crossed_cell_edges": []
+    },
+    {
+      "path": "assets/phase10/sources/memories.png",
+      "sha256": "1337815fee0d94a72773a54b28ef3350b338e1621cce135d0a713d2b51afd28a",
+      "size": [
+        965,
+        1629
+      ],
+      "selected": true
+    },
+    {
+      "path": "assets/phase10/sources/modern.png",
+      "sha256": "69f8c8a6ee14ac90a2d798b1daa014a9dfaeaf658c764462268ea9d54cc3f46e",
+      "size": [
+        1672,
+        941
+      ],
+      "selected": true
+    }
+  ],
+  "fictional_references": [
+    {
+      "path": "assets/characters/C01_Yaric/C01_TURNAROUND_BACK.png",
+      "sha256": "aff5ea625f55f3d22b954eef247b890453b1a8834cbf84f860e2dcb53b1647ae"
+    },
+    {
+      "path": "assets/characters/C01_Yaric/C01_TURNAROUND_FRONT.png",
+      "sha256": "2eb51bca65cc26c1b377cf9e7fa8c7e0466a3dc26a5f03973780620d5508aed4"
+    },
+    {
+      "path": "assets/characters/C02_Velthia/C02_TURNAROUND_BACK.png",
+      "sha256": "58af26dc327d8760277fa0b785d8094a6910021110c74fac77eb57488b155b7c"
+    },
+    {
+      "path": "assets/characters/C02_Velthia/C02_TURNAROUND_FRONT.png",
+      "sha256": "e0e44600fa5e12469aae44dfd8ab5f841608b27e8449fd6a3aa991ed763f9538"
+    },
+    {
+      "path": "assets/characters/C03_Torvan/C03_TURNAROUND_BACK.png",
+      "sha256": "027a430498a886f59ade03568f2a64cd53e5bbf6275f5f7b0322bd15f8da2ecb"
+    },
+    {
+      "path": "assets/characters/C03_Torvan/C03_TURNAROUND_FRONT.png",
+      "sha256": "243735a6ea25ab5bd85358d4ec667e15216bcfa59869fe4aca6bc497124f5806"
+    },
+    {
+      "path": "assets/characters/C04_Varlgrim/C04_TURNAROUND_BACK.png",
+      "sha256": "7e599edeba26378bf568fad9a1cf007068ca516513b08b3ef782289d685f1459"
+    },
+    {
+      "path": "assets/characters/C04_Varlgrim/C04_TURNAROUND_FRONT.png",
+      "sha256": "ac61d71615235f80fbcb181d5f8f12b619ae27aff48c4ea45b469c77709f90b1"
+    },
+    {
+      "path": "assets/characters/C05_Azie/C05_TURNAROUND_BACK.png",
+      "sha256": "1facbd484e8392f1ba6adaae7c0f1b6a5825386e0edb8a3caf86bf57aa067439"
+    },
+    {
+      "path": "assets/characters/C05_Azie/C05_TURNAROUND_FRONT.png",
+      "sha256": "ca05accbbd81a914f1b0085c22c662b1d03ecfb34dbb20ecd86d5f116b7341be"
+    },
+    {
+      "path": "assets/characters/C06_Talric/C06_TURNAROUND_BACK.png",
+      "sha256": "b64bf4e2b853a1d75de9d17b26d06c4a69163e3d92eb4b204b49febeea090fa3"
+    },
+    {
+      "path": "assets/characters/C06_Talric/C06_TURNAROUND_FRONT.png",
+      "sha256": "1de857900f9358d39e05d0988f58c279c8af709e86e142d2b1cb055beaa49c7b"
+    },
+    {
+      "path": "assets/characters/C07_Zira/C07_TURNAROUND_BACK.png",
+      "sha256": "beab994fbc0d54c8192d9bcb79eedefae5e3819933b31537d45f762f59f9b6b1"
+    },
+    {
+      "path": "assets/characters/C07_Zira/C07_TURNAROUND_FRONT.png",
+      "sha256": "1659e90e79c4b7a3995d2b213e35af55bb1451c77639b0722966da22329499b0"
+    },
+    {
+      "path": "assets/characters/C08_Nambo/C08_TURNAROUND_BACK.png",
+      "sha256": "fcd6ae99504284c94dccd477361bdb7a489e43b500870004182fdf0823425647"
+    },
+    {
+      "path": "assets/characters/C08_Nambo/C08_TURNAROUND_FRONT.png",
+      "sha256": "3eb12494557fbeaf86eac36ae1b5bfbb72020f10dad3ec435076c088d6769fdd"
+    },
+    {
+      "path": "assets/characters/C09_Derrria/C09_TURNAROUND_BACK.png",
+      "sha256": "d8fd205cb58cf5304927c7ccbd5157f0dea8704d435a0b571155c38f2d5b16ec"
+    },
+    {
+      "path": "assets/characters/C09_Derrria/C09_TURNAROUND_FRONT.png",
+      "sha256": "eef1030aad80c23dab4dedc64984c2fcd473edbaf12efbe40505afcad3423006"
+    },
+    {
+      "path": "assets/monsters/M02_Briaroot/M02_NEW_CONCEPT_DRAFT.png",
+      "sha256": "ea427b9c41f6f2dc39642258a1e99d030fcc6c76382f634f342e3a9ab939131c"
+    },
+    {
+      "path": "assets/monsters/M03_Wisplet/M03_NEW_CONCEPT_DRAFT.png",
+      "sha256": "0bfc8a8aa105daf4e03f6cfdeb9a0419c0e3e213a7671572bf9032ce0b8974cb"
+    },
+    {
+      "path": "assets/bosses/B02_Veyrath/B02_NEW_CONCEPT_DRAFT.png",
+      "sha256": "b2999a9ce32d12fec045cf8f0735e5af57878d4e8dac715f5a8c3e154b523727"
+    }
+  ],
+  "generation_reference_boards": [
+    {
+      "path": "assets/phase10/references/C02_revision_costume.png",
+      "sha256": "d5e327e8eeec064b359464c5e7340f64070b2b379c2fd20dd17288d211b9903b"
+    },
+    {
+      "path": "assets/phase10/references/C03_revision_costume.png",
+      "sha256": "780f18bdfae585fe7d8e9ccfc4e6c84f9e9a9e53c4734ecf7ca6d5b5516b5978"
+    },
+    {
+      "path": "assets/phase10/references/C04_revision_costume.png",
+      "sha256": "318513f78d1ebab0b35e6844a5360e351e6af874fa44d7d884d4bd7779e86747"
+    },
+    {
+      "path": "assets/phase10/references/C05_revision_costume.png",
+      "sha256": "77fed1d954fd3ba0b40abc21e41c25ddeebb94b8c849bda0de3fb81fa5e27026"
+    },
+    {
+      "path": "assets/phase10/references/C06_revision_costume.png",
+      "sha256": "22b1ca2682ef3f77226d6a6e73c1c21b1b5589a513007a57a762ae455860f98b"
+    },
+    {
+      "path": "assets/phase10/references/C07_revision_costume.png",
+      "sha256": "0bb3cd51369082f5a85aee5ad9e3280762abde098a32e11ce77be8516e3f8fdd"
+    },
+    {
+      "path": "assets/phase10/references/C09_revision_costume.png",
+      "sha256": "974418e3fab601c3e8150fd4171029538059f8f4ad32a01fa5e1d717fe55c64c"
+    },
+    {
+      "path": "assets/phase10/references/Yaric_revision_style.png",
+      "sha256": "1a5fd1fd53e04f5672970e7e0f6f0aaa75ba25f11e340886d44a8822dba89c79"
+    }
+  ],
+  "baseline_composition_and_sprites": [
+    {
+      "path": "assets/phase10/references/C02_explore_before.png",
+      "sha256": "f4e484d68ac34914e14be3697b8ecc878b29ade12ae753cdbd6cf97b9caa7d86"
+    },
+    {
+      "path": "assets/phase10/references/C03_explore_before.png",
+      "sha256": "f1ecdc7b8c6f7334d5fb97fd162464c1af5405d873a19c44172fe3e1a4d791cb"
+    },
+    {
+      "path": "assets/phase10/references/C04_explore_before.png",
+      "sha256": "854fc493b755912b406f37d3ed4668249657a5b6f9135bcc845e24013541ef7a"
+    },
+    {
+      "path": "assets/phase10/references/C05_explore_before.png",
+      "sha256": "900f1459d875f3d0d90ddb227bfc35d0f4b65490648c692e870caf885e5641af"
+    },
+    {
+      "path": "assets/phase10/references/C06_explore_before.png",
+      "sha256": "61f2f26a9a02707c92a037169253730fe834c37461cff80eb9bf2a25488a2b50"
+    },
+    {
+      "path": "assets/phase10/references/C07_explore_before.png",
+      "sha256": "8bdb1d3f42b8f5fcf0ccd9b8fd88674d4e4bc2456e36167cc1a377793132312a"
+    },
+    {
+      "path": "assets/phase10/references/C08_explore_before.png",
+      "sha256": "6cee46c49f2fad6a87bbcaf94bab566b821152aba00307c2d4b692b9b78f19cc"
+    },
+    {
+      "path": "assets/phase10/references/C09_explore_before.png",
+      "sha256": "15bf436a442c2187670b4ae28ed65e41bf841ca62d9211e132245ffc89c0dafc"
+    },
+    {
+      "path": "assets/phase10/references/cliff_phase9.png",
+      "sha256": "26c12975f8a25ac03a8a75619c123cfb0a5d8f49d5b6d148bdd2da7c2099961b"
+    },
+    {
+      "path": "assets/phase10/references/modern_phase9.png",
+      "sha256": "d638debac56207b707b2c470ed72aa9a83225afb69782fbe4bbd942831e1456d"
+    },
+    {
+      "path": "assets/phase10/references/town_c4_before.png",
+      "sha256": "2f758d7c03520444b77a0f58f6497afa5953f5307cd695313755f4cf368f4429"
+    },
+    {
+      "path": "assets/phase10/references/town_crisis_before.png",
+      "sha256": "83c8161a38f7d7067856e78e18ab25dc06f2671b0ae3db02f8cd9df6a33a6161"
+    }
+  ]
+}

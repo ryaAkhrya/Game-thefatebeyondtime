@@ -44,13 +44,13 @@ export const C1_01_INTRO: DialogueScript = {
 export const C1_01_EXAMINE_GROUND: DialogueScript = {
   id: 'C1-01-EXAMINE-GROUND',
   nodes: [
-    yaric('C1-01-X001', 'CONFUSED', 'Ada bekas langkah. Salah satunya mungkin milikku. Arah datangnya malah tidak jelas.', 'thought', 250, 'CHAPTER_I_SCRIPT'),
+    yaric('C1-01-X001', 'CONFUSED', 'Ada bekas langkah. Salah satunya mungkin milikku. Arah datangnya malah nggak jelas.', 'thought', 250, 'CHAPTER_I_SCRIPT'),
   ],
 };
 
 export const C1_01_EXAMINE_SWORD: DialogueScript = {
   id: 'C1-01-EXAMINE-SWORD',
-  nodes: [yaric('C1-01-X002', 'CONFUSED', 'Tanganku tahu cara memegang ini. Kepalaku tidak tahu kenapa.', 'thought', 250, 'CHAPTER_I_SCRIPT')],
+  nodes: [yaric('C1-01-X002', 'CONFUSED', 'Tanganku tahu cara memegang ini. Kepalaku nggak tahu kenapa.', 'thought', 250, 'CHAPTER_I_SCRIPT')],
 };
 
 export const C1_01_JOURNAL: DialogueScript = {
@@ -63,15 +63,15 @@ export const C1_02_MEET: DialogueScript = {
   id: 'C1-02-MEET',
   nodes: [
     nambo('C1-02-L001', 'SURPRISED', 'Hei. Kau dari arah sana?'),
-    yaric('C1-02-L002', 'NEUTRAL', 'Sepertinya.', 'speech', 250),
-    nambo('C1-02-L003', 'SURPRISED', 'Sepertinya?'),
-    yaric('C1-02-L004', 'CONFUSED', 'Aku baru bangun. Tidak ingat bagaimana sampai di sini.', 'speech', 250),
+    yaric('C1-02-L002', 'NEUTRAL', 'Kayaknya.', 'speech', 250),
+    nambo('C1-02-L003', 'SURPRISED', 'Kayaknya?'),
+    yaric('C1-02-L004', 'CONFUSED', 'Aku baru bangun. Nggak ingat gimana bisa sampai di sini.', 'speech', 250),
     nambo('C1-02-L005', 'SURPRISED', 'Ada yang sakit?'),
-    yaric('C1-02-L006', 'NEUTRAL', 'Hanya kepalaku. Itu pun bukan karena luka, kurasa.', 'speech', 250),
+    yaric('C1-02-L006', 'NEUTRAL', 'Cuma kepalaku. Tapi bukan karena luka, kayaknya.', 'speech', 250),
     nambo('C1-02-L007', 'SURPRISED', 'Namamu siapa?'),
-    yaric('C1-02-L008', 'NEUTRAL', 'Itu juga yang sedang kucari.', 'speech', 250),
-    nambo('C1-02-L009', 'NEUTRAL', 'Wah. Kau memang sedang punya hari yang buruk.'),
-    yaric('C1-02-L010', 'CONFUSED', 'Kau selalu menenangkan orang seperti itu?', 'speech', 250),
+    yaric('C1-02-L008', 'NEUTRAL', 'Nah, itu juga yang lagi kucari.', 'speech', 250),
+    nambo('C1-02-L009', 'NEUTRAL', 'Wah. Harimu lagi berat, ya.'),
+    yaric('C1-02-L010', 'CONFUSED', 'Kamu selalu nenangin orang kayak gitu?', 'speech', 250),
     nambo('C1-02-L011', 'HAPPY', 'Biasanya berhasil.'),
     {
       type: 'choice',
@@ -83,10 +83,10 @@ export const C1_02_MEET: DialogueScript = {
       ],
     },
     nambo('C1-02-L012', 'NEUTRAL', 'Ikuti jalan sampai gerbang batu. Namanya Aveloria. Di sana ada tabib, penjaga, dan lebih banyak orang yang mungkin bisa membantu.'),
-    yaric('C1-02-L013', 'CONFUSED', 'Kau tidak ikut?', 'speech', 250),
-    nambo('C1-02-L014', 'SURPRISED', 'Aku sedang mencari jalan yang tadi kulalui. Entah kenapa pohon yang sama muncul dua kali.'),
-    yaric('C1-02-L015', 'NEUTRAL', 'Mungkin kau tersesat.', 'speech', 250),
-    nambo('C1-02-L016', 'NEUTRAL', 'Mungkin. Tapi aku cukup yakin pohonnya yang berpindah.'),
+    yaric('C1-02-L013', 'CONFUSED', 'Kamu nggak ikut?', 'speech', 250),
+    nambo('C1-02-L014', 'SURPRISED', 'Aku lagi nyari jalan yang tadi kulewati. Tapi kok pohon yang sama muncul dua kali, ya?'),
+    yaric('C1-02-L015', 'NEUTRAL', 'Jangan-jangan kamu nyasar.', 'speech', 250),
+    nambo('C1-02-L016', 'NEUTRAL', 'Bisa jadi. Tapi aku cukup yakin tadi pohonnya yang pindah.'),
   ],
 };
 
@@ -94,8 +94,8 @@ export const C1_02_MEET: DialogueScript = {
 export const C1_02_REPEAT: DialogueScript = {
   id: 'C1-02-REPEAT',
   nodes: [
-    nambo('C1-02-L014', 'SURPRISED', 'Aku sedang mencari jalan yang tadi kulalui. Entah kenapa pohon yang sama muncul dua kali.', 250, 'REUSE'),
-    nambo('C1-02-L016', 'NEUTRAL', 'Mungkin. Tapi aku cukup yakin pohonnya yang berpindah.', 250, 'REUSE'),
+    nambo('C1-02-L014', 'SURPRISED', 'Aku lagi nyari jalan yang tadi kulewati. Tapi kok pohon yang sama muncul dua kali, ya?', 250, 'REUSE'),
+    nambo('C1-02-L016', 'NEUTRAL', 'Bisa jadi. Tapi aku cukup yakin tadi pohonnya yang pindah.', 250, 'REUSE'),
   ],
 };
 

@@ -54,6 +54,12 @@ export function fullAtlas(meta: unknown): BattleAtlas {
   for (const k of REQUIRED_BATTLE_FRAMES) if (!(k in m.frames)) throw new Error(`Battle atlas missing frame ${k}`);
   return m as BattleAtlas;
 }
+
+/** Phase 10 actors use full pose atlases; historical four-pose metadata stays readable. */
+export function actorAtlas(meta: unknown): BattleAtlas {
+  const m = meta as Partial<BattleAtlas> | null;
+  return m?.frame_size && m.frames?.idle_a ? fullAtlas(m) : draftPosePlayback(meta as PoseAtlas);
+}
 /** Frame untuk kunci khusus (cast/heal/shield/summon/guard/special/charge): jatuh ke fallback bila atlas tidak punya. */
 export function frameKeyFor(atlas: BattleAtlas, key: string, fallback = 'attack'): string {
   return key in atlas.frames ? key : fallback in atlas.frames ? fallback : 'idle_a';

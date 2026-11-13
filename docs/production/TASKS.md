@@ -1,3 +1,17 @@
+## Phase 10 — status terbaru
+
+- [x] QA akhir lulus: unit, build/privasi, render Edge, ending Edge/Chrome, dan preview aktif; bukti di laporan.
+
+- [x] C02–C09 empat arah mengikuti concept art; atlas dan animasi native dipasang.
+- [x] C03/M02/M03/B02 battle dua belas pose; Veyrath peta berukuran khusus.
+- [x] Warga Aveloria/Liora berprofil piksel; modern, kilasan dan tebing mendapat latar baru; duduk Yaric–Velthia digambar tersendiri.
+- [x] Source, provenance, perbandingan dan prompt persis dicatat.
+- [x] Brief 13 cue BGM untuk user; tidak membuat musik.
+- [ ] Review manusia: likeness, walk/idle, pose duduk, komposisi battle/ending dan audio.
+- [ ] Musik/konten privat asli bila tersedia, lalu Phase 11 final QA/release preparation.
+
+QA aktual: [PHASE10_REPORT](PHASE10_REPORT.md).
+
 # TASKS — STATUS SEBENARNYA
 
 ## Polish Sprint 2 — dunia, karakter, animasi, sprint (12 November 2026)

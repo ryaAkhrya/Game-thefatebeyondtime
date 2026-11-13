@@ -34,27 +34,27 @@ Catatan: bila O-15 tidak disetujui, jangan tampilkan nama melalui benda. Gunakan
 
 **Nambo:** “Hei. Kau dari arah sana?”
 
-**Yaric:** “Sepertinya.”
+**Yaric:** “Kayaknya.”
 
-**Nambo:** “Sepertinya?”
+**Nambo:** “Kayaknya?”
 
-**Yaric:** “Aku baru bangun. Tidak ingat bagaimana sampai di sini.”
+**Yaric:** “Aku baru bangun. Nggak ingat gimana bisa sampai di sini.”
 
 [Nambo memperhatikan lutut dan kepala Yaric, bukan langsung menginterogasi.]
 
 **Nambo:** “Ada yang sakit?”
 
-**Yaric:** “Hanya kepalaku. Itu pun bukan karena luka, kurasa.”
+**Yaric:** “Cuma kepalaku. Tapi bukan karena luka, kayaknya.”
 
 **Nambo:** “Namamu siapa?”
 
 [Jeda pendek; tidak ada close-up dramatis.]
 
-**Yaric:** “Itu juga yang sedang kucari.”
+**Yaric:** “Nah, itu juga yang lagi kucari.”
 
-**Nambo:** “Wah. Kau memang sedang punya hari yang buruk.”
+**Nambo:** “Wah. Harimu lagi berat, ya.”
 
-**Yaric:** “Kau selalu menenangkan orang seperti itu?”
+**Yaric:** “Kamu selalu nenangin orang kayak gitu?”
 
 **Nambo:** “Biasanya berhasil.”
 
@@ -62,13 +62,13 @@ Catatan: bila O-15 tidak disetujui, jangan tampilkan nama melalui benda. Gunakan
 
 **Nambo:** “Ikuti jalan sampai gerbang batu. Namanya Aveloria. Di sana ada tabib, penjaga, dan lebih banyak orang yang mungkin bisa membantu.”
 
-**Yaric:** “Kau tidak ikut?”
+**Yaric:** “Kamu nggak ikut?”
 
-**Nambo:** “Aku sedang mencari jalan yang tadi kulalui. Entah kenapa pohon yang sama muncul dua kali.”
+**Nambo:** “Aku lagi nyari jalan yang tadi kulewati. Tapi kok pohon yang sama muncul dua kali, ya?”
 
-**Yaric:** “Mungkin kau tersesat.”
+**Yaric:** “Jangan-jangan kamu nyasar.”
 
-**Nambo:** “Mungkin. Tapi aku cukup yakin pohonnya yang berpindah.”
+**Nambo:** “Bisa jadi. Tapi aku cukup yakin tadi pohonnya yang pindah.”
 
 [Percakapan selesai, Nambo menepi memberi jalan.]
 
@@ -120,7 +120,7 @@ Catatan: bila O-15 tidak disetujui, jangan tampilkan nama melalui benda. Gunakan
 
 [Mournfang keluar dari rerimbunan. Kakinya seolah tersandung sesuatu yang tidak terlihat.]
 
-**Yaric:** “Aku tidak mau berkelahi denganmu.”
+**Yaric:** “Aku nggak mau berkelahi denganmu.”
 
 [Makhluk itu mendengus, ragu satu langkah, lalu menyerang.]
 
@@ -188,7 +188,7 @@ Catatan: bila O-15 tidak disetujui, jangan tampilkan nama melalui benda. Gunakan
 
 **Azie:** “Menurut sebagian orang, kutukan. Menurut yang lain, makhluk. Tidak ada laporan yang sepakat.”
 
-**Yaric:** “Bagus. Jadi kita bahkan tidak tahu apa yang ditakuti.”
+**Yaric:** “Bagus. Jadi kita bahkan nggak tahu apa yang ditakuti.”
 
 **Azie:** “Kita tahu ada yang berubah. Itu cukup untuk mulai mencari.”
 
@@ -216,7 +216,7 @@ Catatan: bila O-15 tidak disetujui, jangan tampilkan nama melalui benda. Gunakan
 
 **Velthia:** “Kau punya tempat tinggal?”
 
-**Yaric:** “Kalau punya, aku tidak ingat letaknya.”
+**Yaric:** “Kalau punya, aku nggak ingat letaknya.”
 
 **Velthia:** “Masalahmu ternyata menyulitkan hampir setiap pertanyaan.”
 
@@ -232,7 +232,7 @@ Catatan: bila O-15 tidak disetujui, jangan tampilkan nama melalui benda. Gunakan
 
 **Velthia:** “Memegang gagang pedang saat sedang mencari jawaban.”
 
-**Yaric:** “Tidak tahu. Kau sering memperhatikan orang baru sedetail itu?”
+**Yaric:** “Nggak tahu. Kau sering memperhatikan orang baru sedetail itu?”
 
 **Velthia:** “Hanya yang jawabannya mencurigakan.”
 

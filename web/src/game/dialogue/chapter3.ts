@@ -86,7 +86,7 @@ export const C3_VELTHIA_REFUSES = script('C3-01-REFUSE',
   say(aveloria, 'C02', 'STERN', 'Maka mereka akan menyebutku keras kepala. Itu bisa kutanggung. Kota yang menunggu jawaban sementara warganya lupa jalan pulang, tidak.'),
   say(aveloria, 'C05', 'SKEPTICAL', 'Aku akan mencatat bahwa aku keberatan.'),
   say(aveloria, 'C02', 'NEUTRAL', 'Catat. Dan catat juga bahwa keberatanmu beralasan.'),
-  say(aveloria, 'C01', 'DETERMINED', 'Aku tidak akan lari. Kalau ada yang bisa kukerjakan, katakan saja.'),
+  say(aveloria, 'C01', 'DETERMINED', 'Aku nggak akan lari. Kalau ada yang bisa kubantu, bilang saja.'),
   say(aveloria, 'C02', 'NEUTRAL', 'Tetap di kota dan bantu Talric. Bukan sebagai tahanan.'),
 );
 
@@ -127,7 +127,7 @@ export const C3_DECISION = script('C3-01-DECISION',
   ...chapter3Canon('C3-01'),
   say(aveloria, 'C05', 'NEUTRAL', 'Kutulis di jurnal istana: lambang pada pintu kuil cocok dengan lambang pusaka kerajaan di arsip. Itu alasannya.'),
   say(aveloria, 'C02', 'NEUTRAL', 'Itu alasannya.'),
-  say(aveloria, 'C01', 'CONFUSED', 'Aku tidak bilang apa-apa.'),
+  say(aveloria, 'C01', 'CONFUSED', 'Aku nggak bilang apa-apa.'),
   say(aveloria, 'C05', 'NEUTRAL', 'Bagus. Tetap begitu.'),
   say(aveloria, 'C06', 'NEUTRAL', 'Jalur timur sampai pos tua masih aman. Setelah itu kalian sendiri. Selama Yang Mulia pergi, kota saya jaga.'),
   say(aveloria, 'C02', 'STERN', 'Teruskan evakuasinya. Perintah itu tetap berlaku sampai aku kembali.'),
@@ -184,11 +184,11 @@ export const C3_NPC_EVAC_DONE = script('C3-NPC-EVACDONE',
 export const C3_TEMPLE_ENTRANCE = script('C3-03-ENTRANCE',
   narr(entranceCamp, 'Kuil Jejak berdiri di ujung lembah, separuh tenggelam dalam akar dan lumut. Pada pintunya terukir lambang yang sama dengan segel di arsip.'),
   say(entranceCamp, 'C02', 'NEUTRAL', 'Cocok. Sampai ke garis patahnya.'),
-  say(entranceCamp, 'C01', 'CONFUSED', 'Tidak ada tuas, tidak ada gagang. Pintunya hanya... tertutup.'),
+  say(entranceCamp, 'C01', 'CONFUSED', 'Nggak ada tuas, nggak ada gagang. Pintunya cuma... tertutup.'),
   say(entranceCamp, 'C02', 'STERN', 'Kita menunggu fajar. Pintu seperti ini tidak kita baca dalam gelap.'),
   say(entranceCamp, 'C01', 'DETERMINED', 'Setiap jam yang kita tunggu, ada orang yang lupa jalan pulang. Dan mereka menyalahkanku.'),
   say(entranceCamp, 'C02', 'WORRIED', 'Aku tahu. Aku juga memikirkannya. Tapi satu salah baca di sini bisa menutup satu-satunya jawaban kita.'),
-  say(entranceCamp, 'C01', 'SAD', 'Maaf. Aku tidak marah padamu.'),
+  say(entranceCamp, 'C01', 'SAD', 'Maaf. Aku nggak marah sama kamu.'),
   say(entranceCamp, 'C02', 'NEUTRAL', 'Kau boleh marah. Jangan pakai itu untuk membuka pintunya.'),
 );
 
@@ -237,7 +237,7 @@ export const C3_PUZZLE_SOLVED_C = script('C3-04-SOLVED-C',
 export const C3_PUZZLE_NOTE = script('C3-04-NOTE',
   read(puzzle, '"Tiga garis, satu lingkaran. Yang ditutup belakangan bukan berarti yang dilupakan."', 'Catatan di dinding'),
   say(puzzle, 'C02', 'NEUTRAL', 'Tulisan ini bukan bagian dari salinan istana.'),
-  say(puzzle, 'C01', 'NEUTRAL', 'Berarti tidak ada yang sempat memotongnya.'));
+  say(puzzle, 'C01', 'NEUTRAL', 'Berarti belum ada yang sempat memotongnya.'));
 
 /** DRAFT_IMPL dari naskah kerja ("Nah. Pintu ini rupanya masih mau mendengar alasan." / "Aku lebih suka pintu biasa."). */
 export const C3_GATE_OPEN = script('C3-04-GATE',
@@ -258,7 +258,7 @@ export const C3_TEMPLE_INSPECT_2 = script('C3-04-INSPECT-2',
 export const C3_TEMPLE_INSPECT_3 = script('C3-04-INSPECT-3',
   narr(puzzle, 'Tiga alas batu berjajar menghadap lingkaran di lantai. Satu alas diratakan; bekas pahatnya masih tajam.'),
   say(puzzle, 'C02', 'NEUTRAL', 'Yang ketiga dihapus belakangan. Yang lain sudah berlumut.'),
-  say(puzzle, 'C01', 'NEUTRAL', 'Berarti dulu ada tiga, dan ada yang tidak ingin kita tahu.'));
+  say(puzzle, 'C01', 'NEUTRAL', 'Berarti dulu ada tiga, dan ada yang nggak ingin kita tahu.'));
 export const C3_TEMPLE_INSPECT_4 = script('C3-04-INSPECT-4',
   narr(puzzle, 'Di ambang aula, sebuah cincin logam retak terpasang pada dinding. Pengikatnya jelas bukan bagian bangunan asli.'),
   say(puzzle, 'C02', 'NEUTRAL', 'Pengikat ini dipasang jauh sesudah kuil dibangun. Seseorang menambahkannya.'),

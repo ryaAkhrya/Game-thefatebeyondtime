@@ -33,6 +33,7 @@ export class EndingScene extends Phaser.Scene {
   private pendingStep: EndingStep | null = null;
   private dialogueStarted = false;
   private dialogueFinished = false;
+  private dialogueEndedAt = 0;
   private fade!: Phaser.GameObjects.Rectangle;
   private hint!: Phaser.GameObjects.Text;
   private revealObjects: Phaser.GameObjects.Components.Alpha[] = [];
@@ -85,7 +86,8 @@ export class EndingScene extends Phaser.Scene {
     const memory = privateContent?.memories[this.memoryIndex];
     const base = ENDING_DIRECTION[this.step];
     return this.step === 'memories' && memory ? { ...base, minMs: Math.max(2000, Math.round(memory.durationMs * 0.65)), autoMs: memory.durationMs, transition: memory.transition }
-      : { ...base, transition: 'fade' as const };
+      : { ...base, ...(!this.hasDialogue() && this.step !== 'walk' && this.step !== 'message' && this.step !== 'complete'
+          ? { autoMs: this.step === 'credits' ? 9000 : this.step === 'era' ? 5000 : 7500 } : {}), transition: 'fade' as const };
   }
   private enter(step: EndingStep): void {
     this.step = step; this.changing = false; this.pendingStep = null; this.dialogueStarted = false; this.dialogueFinished = false;
@@ -114,7 +116,10 @@ export class EndingScene extends Phaser.Scene {
       const t=ui.text(ui.dw/2,440,PUBLIC_ECHO_FRAGMENTS[this.step].caption,{size:TYPE.dialogue,originX:0.5,depth:10});this.revealObjects.push(t);
     }
     if(this.step==='remember'){title(85,'Aveloria',20);const t=ui.text(ui.dw/2,121,ENDING_NARRATION.remember.text,{size:TYPE.body,originX:0.5,depth:10});this.revealObjects.push(t);}
-    if(this.step==='continued'){const t=title(244,'To Be Continued',27);t.setLetterSpacing(ui.u(3));ui.motif(ui.dw/2,305,100,12,10);}
+    if(this.step==='continued'){
+      const t=ui.text(48,ui.dh-100,'To Be Continued',{family:'display',size:18,color:COLORS.paper,depth:10});
+      t.setLetterSpacing(ui.u(1));this.revealObjects.push(t);
+    }
     if(this.step==='credits') {
       const page=CREDITS[this.creditIndex]!;title(121,page.heading,27,COLORS.bitterLime);if(page.subheading)title(164,page.subheading,15);
       page.lines.forEach((line,i)=>{const t=ui.text(ui.dw/2,241+i*37,line,{size:i===0?TYPE.small:TYPE.heading,originX:0.5,depth:10,align:'center',width:700});this.revealObjects.push(t);});
@@ -207,13 +212,14 @@ export class EndingScene extends Phaser.Scene {
     if(this.hasDialogue()&&!this.dialogueStarted&&ms>(this.step==='cliff-arrival'?2300:1300)&&!this.changing){
       this.dialogueStarted=true;
       const script=this.step==='artefact'?ARTEFACT_SCRIPT:this.step==='awakening'?AWAKENING_SCRIPT:epilogueScript(this.step==='promise'?'E-02':'E-01');
-      void this.dialogue.play(script).then(()=>{if(!this.leaving)this.dialogueFinished=true;});
+      void this.dialogue.play(script).then(()=>{if(!this.leaving){this.dialogueFinished=true;this.dialogueEndedAt=this.sequence.time;}});
     }
     this.hint.setVisible(!this.dialogue.active&&!this.changing&&this.loadingMemory===null);
-    this.hint.setText(this.step==='walk'?(this.playerX>=398?'Enter  periksa lambang      Esc  jeda':'←  →  berjalan      Esc  jeda'):this.step==='credits'?'Enter  lanjut      Esc  lewati kredit':this.step==='complete'?'Enter  kembali ke judul':this.sequence.canAdvance?'Enter  lanjut      Esc  jeda':'');
+    this.hint.setText(this.step==='walk'?(this.playerX>=398?'Enter  periksa lambang      Esc  jeda':'←  →  berjalan      Esc  jeda'):this.step==='credits'?'Esc  lewati kredit':this.step==='complete'?'Enter  kembali ke judul':this.step==='message'?'Enter  lanjut      Esc  jeda':'Esc  jeda');
     if(!this.replay&&!this.services.saves.isAvailable)this.status.setText('Penyimpanan browser tidak tersedia.');
     else if(!this.replay&&this.services.checkpoints.lastMessage.startsWith('Gagal'))this.status.setText(this.services.checkpoints.lastMessage);
     if(auto&&!this.dialogue.active&&!this.changing&&this.loadingMemory===null)this.advance();
+    if(this.hasDialogue()&&this.dialogueFinished&&ms-this.dialogueEndedAt>=1200&&!this.changing)this.advance();
   }
   /** QA supplies synthetic pixels/text in its isolated context; this never loads local private data. */
   qaPersonalFrame(memory: PersonalMemory, size: { width: number; height: number }, message?: AnniversaryContent['message']): object {

@@ -1,3 +1,15 @@
+## 14 November 2026 — Revisi Phase 10 sesuai review user
+
+Pasangan modern menjadi Saffa; percakapan modern/epilog diperpanjang dan dilunakkan. Cast dan pose duduk digambar ulang dengan kelompok warna lebih bersih, memakai Yaric sebagai patokan. Teks penutup pindah ke kiri bawah. Kartu pilih bab diganti handoff otomatis, termasuk saat melanjutkan save lama; adegan tanpa dialog dan kredit berjalan menurut waktu. Brief BGM disesuaikan dengan tempo kredit otomatis. Detail dan validasi: [laporan revisi](phase10/REVISION_REPORT.md).
+
+## Phase 10 — 13 November 2026
+
+- Redraw referensi eksplorasi C02–C09, empat arah independen, native 32×48, palet 32 warna; motion walk/idle deterministik.
+- Dua belas pose baru Torvan/Briaroot/Wisplet/Veyrath, kompatibilitas metadata lama; sprite khusus Veyrath di peta dan warga anonim diperinci.
+- Latar modern/arsip/pusaka/Heart/tebing baru; pose duduk tersendiri dan siluet modern berkontur.
+- Sumber asli dipertahankan; perbandingan, SHA/provenance, iterasi dan prompt lengkap disimpan. Allowlist tetap path+SHA eksplisit.
+- Panduan BGM Indonesia untuk seluruh 13 cue ditulis tanpa membuat musik. QA otomatis dan keterbatasan manusia: [PHASE10_REPORT](PHASE10_REPORT.md).
+
 # CHANGELOG — DOKUMENTASI & KODE
 
 ## Phase 6 — 10 November 2026

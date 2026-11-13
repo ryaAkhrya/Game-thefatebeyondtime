@@ -4,7 +4,7 @@ const line = (id: string, expression: ExpressionId, text: string, pauseMs: numbe
   portrait: `assets/characters/C01_Yaric/C01_EXPRESSION_${expression}.png`,
 });
 // Verbatim working C1-05 text and expression choices from DIALOGUE_EVENTS.json. Still DRAFT dialogue.
-export const MOURNFANG_INTRO: DialogueScript = { id: 'C1-05-INTRO', nodes: [line('C1-05-L001', 'NEUTRAL', 'Aku tidak mau berkelahi denganmu.', 250)] };
+export const MOURNFANG_INTRO: DialogueScript = { id: 'C1-05-INTRO', nodes: [line('C1-05-L001', 'NEUTRAL', 'Aku nggak mau berkelahi denganmu.', 250)] };
 export const MOURNFANG_RESPONSE: DialogueScript = { id: 'C1-05-RESPONSE', nodes: [line('C1-05-L002', 'NEUTRAL', 'Baiklah. Aku sudah mencoba.', 250)] };
 export const MOURNFANG_VICTORY: DialogueScript = { id: 'C1-05-VICTORY', nodes: [
   line('C1-05-L003', 'NEUTRAL', 'Ia terlihat... kesakitan.', 550),

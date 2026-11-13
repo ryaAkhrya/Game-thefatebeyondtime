@@ -1,3 +1,9 @@
+## Aset aktif Phase 10
+
+Warga krisis/penampungan: `town_crisis_atlas` memperbarui 162 frame warga dan `town_c4_atlas` tiga kelompok duduk. Delapan puluh frame properti dan seluruh geometri/pivot atlas tetap identik dengan baseline; audit: `web/scripts/phase10/audit_town.py`. Perbandingan di `docs/production/phase10/{citizens,camp}_comparison.png`.
+
+C02–C09 eksplorasi: `web/public/assets/characters/final/Cxx_explore.{png,json}` kini redraw dari concept art, 32×48 / 24 frame / empat arah / 32 warna. Battle C03/M02/M03/B02: `web/public/assets/battle/*_BATTLE_V2.{png,json}`, dua belas pose / 48 warna. Ending: `web/public/assets/ending/{cliff,modern,seated}.png` + `seated.json`. Status NEEDS_REVIEW; source asli tidak diubah. Sumber imagegen, SHA, referensi dan iterasi: `assets/phase10/PROVENANCE.json`; perbandingan di `docs/production/phase10/`. [Laporan](docs/production/PHASE10_REPORT.md). Gunakan `assets:phase10` sesudah builder historis, atau `assets:sprites` yang sudah mengurutkannya.
+
 # Asset index v3.3 — per file
 
 ## Phase 9 — code-native cinematic assets (DRAFT / NEEDS_REVIEW)

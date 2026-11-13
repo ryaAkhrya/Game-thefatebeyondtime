@@ -1,9 +1,12 @@
 {
   "entity_id": "C02",
-  "status": "DRAFT",
-  "review": "NEEDS_REVIEW",
-  "generated_by": "web/scripts/author_cast_build.py (+ web/scripts/author_cast_sprites.py, sprite-data/C02_maps.txt)",
-  "sprint": "Polish Sprint 2",
+  "status": "NEEDS_REVIEW",
+  "review": "HUMAN_REVIEW_PENDING",
+  "generated_by": "web/scripts/phase10/import_sprites.py",
+  "phase": "Phase 10",
+  "source": "assets/phase10/sources/C02_turnaround.png",
+  "source_sha256": "b9c9b737c37f1506ed1c330ca2cda7a9512f7d79a34f93c5e1a32197021cbe0e",
+  "provenance": "Imagegen redraw from existing fictional character turnarounds; original references preserved.",
   "frame_size": [
     32,
     48
@@ -13,24 +16,6 @@
     192
   ],
   "cols": 6,
-  "grid": {
-    "cols": 6,
-    "rows": 4,
-    "row_order": [
-      "front(down)",
-      "left",
-      "right",
-      "back(up)"
-    ],
-    "col_order": [
-      "stand",
-      "walk_A",
-      "walk_B",
-      "idle_1",
-      "idle_2",
-      "idle_3"
-    ]
-  },
   "pivot": [
     16,
     46
@@ -49,13 +34,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 3,
         "y0": 1,
-        "x1": 29,
+        "x1": 27,
         "y1": 46,
-        "w": 28,
-        "h": 46,
-        "foot_cx": 16.0
+        "w": 25,
+        "h": 46
       }
     },
     "front_1": {
@@ -70,13 +54,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 4,
         "y0": 2,
-        "x1": 30,
+        "x1": 28,
         "y1": 46,
-        "w": 29,
-        "h": 45,
-        "foot_cx": 17.03
+        "w": 25,
+        "h": 45
       }
     },
     "front_2": {
@@ -91,13 +74,12 @@
         46
       ],
       "bbox": {
-        "x0": 1,
+        "x0": 2,
         "y0": 2,
-        "x1": 29,
+        "x1": 26,
         "y1": 46,
-        "w": 29,
-        "h": 45,
-        "foot_cx": 14.97
+        "w": 25,
+        "h": 45
       }
     },
     "front_3": {
@@ -112,13 +94,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 3,
         "y0": 2,
-        "x1": 29,
+        "x1": 27,
         "y1": 46,
-        "w": 28,
-        "h": 45,
-        "foot_cx": 16.0
+        "w": 25,
+        "h": 45
       }
     },
     "front_4": {
@@ -133,13 +114,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 4,
         "y0": 1,
-        "x1": 30,
+        "x1": 28,
         "y1": 46,
-        "w": 29,
-        "h": 46,
-        "foot_cx": 16.96
+        "w": 25,
+        "h": 46
       }
     },
     "front_5": {
@@ -154,13 +134,12 @@
         46
       ],
       "bbox": {
-        "x0": 1,
+        "x0": 2,
         "y0": 2,
-        "x1": 29,
+        "x1": 26,
         "y1": 46,
-        "w": 29,
-        "h": 45,
-        "foot_cx": 15.04
+        "w": 25,
+        "h": 45
       }
     },
     "left_0": {
@@ -175,13 +154,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 7,
         "y0": 1,
-        "x1": 27,
+        "x1": 24,
         "y1": 46,
-        "w": 24,
-        "h": 46,
-        "foot_cx": 15.9
+        "w": 18,
+        "h": 46
       }
     },
     "left_1": {
@@ -196,13 +174,12 @@
         46
       ],
       "bbox": {
-        "x0": 3,
+        "x0": 7,
         "y0": 2,
-        "x1": 27,
+        "x1": 25,
         "y1": 46,
-        "w": 25,
-        "h": 45,
-        "foot_cx": 14.85
+        "w": 19,
+        "h": 45
       }
     },
     "left_2": {
@@ -217,13 +194,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 7,
         "y0": 2,
-        "x1": 28,
+        "x1": 23,
         "y1": 46,
-        "w": 25,
-        "h": 45,
-        "foot_cx": 16.95
+        "w": 17,
+        "h": 45
       }
     },
     "left_3": {
@@ -238,13 +214,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 7,
         "y0": 2,
-        "x1": 27,
+        "x1": 24,
         "y1": 46,
-        "w": 24,
-        "h": 45,
-        "foot_cx": 15.9
+        "w": 18,
+        "h": 45
       }
     },
     "left_4": {
@@ -259,13 +234,12 @@
         46
       ],
       "bbox": {
-        "x0": 3,
+        "x0": 7,
         "y0": 1,
-        "x1": 27,
+        "x1": 25,
         "y1": 46,
-        "w": 25,
-        "h": 46,
-        "foot_cx": 14.95
+        "w": 19,
+        "h": 46
       }
     },
     "left_5": {
@@ -280,13 +254,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 7,
         "y0": 2,
-        "x1": 28,
+        "x1": 23,
         "y1": 46,
-        "w": 25,
-        "h": 45,
-        "foot_cx": 16.85
+        "w": 17,
+        "h": 45
       }
     },
     "right_0": {
@@ -301,13 +274,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 7,
         "y0": 1,
-        "x1": 27,
+        "x1": 24,
         "y1": 46,
-        "w": 24,
-        "h": 46,
-        "foot_cx": 16.1
+        "w": 18,
+        "h": 46
       }
     },
     "right_1": {
@@ -322,13 +294,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 8,
         "y0": 2,
-        "x1": 28,
+        "x1": 24,
         "y1": 46,
-        "w": 25,
-        "h": 45,
-        "foot_cx": 17.15
+        "w": 17,
+        "h": 45
       }
     },
     "right_2": {
@@ -343,13 +314,12 @@
         46
       ],
       "bbox": {
-        "x0": 3,
+        "x0": 6,
         "y0": 2,
-        "x1": 27,
+        "x1": 24,
         "y1": 46,
-        "w": 25,
-        "h": 45,
-        "foot_cx": 15.05
+        "w": 19,
+        "h": 45
       }
     },
     "right_3": {
@@ -364,13 +334,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 7,
         "y0": 2,
-        "x1": 27,
+        "x1": 24,
         "y1": 46,
-        "w": 24,
-        "h": 45,
-        "foot_cx": 16.1
+        "w": 18,
+        "h": 45
       }
     },
     "right_4": {
@@ -385,13 +354,12 @@
         46
       ],
       "bbox": {
-        "x0": 4,
+        "x0": 8,
         "y0": 1,
-        "x1": 28,
+        "x1": 24,
         "y1": 46,
-        "w": 25,
-        "h": 46,
-        "foot_cx": 17.05
+        "w": 17,
+        "h": 46
       }
     },
     "right_5": {
@@ -406,13 +374,12 @@
         46
       ],
       "bbox": {
-        "x0": 3,
+        "x0": 6,
         "y0": 2,
-        "x1": 27,
+        "x1": 24,
         "y1": 46,
-        "w": 25,
-        "h": 45,
-        "foot_cx": 15.15
+        "w": 19,
+        "h": 45
       }
     },
     "back_0": {
@@ -427,13 +394,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 4,
         "y0": 1,
-        "x1": 29,
+        "x1": 27,
         "y1": 46,
-        "w": 28,
-        "h": 46,
-        "foot_cx": 16.0
+        "w": 24,
+        "h": 46
       }
     },
     "back_1": {
@@ -448,13 +414,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 5,
         "y0": 2,
-        "x1": 30,
+        "x1": 28,
         "y1": 46,
-        "w": 29,
-        "h": 45,
-        "foot_cx": 17.03
+        "w": 24,
+        "h": 45
       }
     },
     "back_2": {
@@ -469,13 +434,12 @@
         46
       ],
       "bbox": {
-        "x0": 1,
+        "x0": 3,
         "y0": 2,
-        "x1": 29,
+        "x1": 26,
         "y1": 46,
-        "w": 29,
-        "h": 45,
-        "foot_cx": 14.97
+        "w": 24,
+        "h": 45
       }
     },
     "back_3": {
@@ -490,13 +454,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 4,
         "y0": 2,
-        "x1": 29,
+        "x1": 27,
         "y1": 46,
-        "w": 28,
-        "h": 45,
-        "foot_cx": 16.0
+        "w": 24,
+        "h": 45
       }
     },
     "back_4": {
@@ -511,13 +474,12 @@
         46
       ],
       "bbox": {
-        "x0": 2,
+        "x0": 5,
         "y0": 1,
-        "x1": 30,
+        "x1": 28,
         "y1": 46,
-        "w": 29,
-        "h": 46,
-        "foot_cx": 16.96
+        "w": 24,
+        "h": 46
       }
     },
     "back_5": {
@@ -532,13 +494,12 @@
         46
       ],
       "bbox": {
-        "x0": 1,
+        "x0": 3,
         "y0": 2,
-        "x1": 29,
+        "x1": 26,
         "y1": 46,
-        "w": 29,
-        "h": 45,
-        "foot_cx": 15.04
+        "w": 24,
+        "h": 45
       }
     }
   },
@@ -625,13 +586,8 @@
     }
   },
   "notes": [
-    "Polish Sprint 2: atlas eksplorasi Velthia baru. Berdiri down/up/right dilukis tangan (web/scripts/sprite-data/C02_maps.txt) dari C02_TURNAROUND_FRONT/SIDE/BACK (bob coklat-tembaga, anting emas, kerah tinggi plum, jubah berlis emas, gaun plum+panel krem, hem emas).",
-    "left = cermin right. Proporsi chibi-dewasa: kepala 12 baris, gaun sampai lantai; sepatu hanya ujungnya mengintip.",
-    "Jalan: badan bob 1 px, hem rok bergoyang 1 px bergantian, ujung sepatu bergantian (depan/belakang: satu ujung disembunyikan; samping: ujung maju/mundur 2 px). Tidak ada ayunan lengan (lengan tertutup jubah).",
-    "Idle sangat tertahan: kepala+kerah turun 1 px (napas), hem bergoyang 1 px; tidak ada gerak lain. Outline 1 px otomatis, alpha keras."
-  ],
-  "frames_needing_artist_redraw": [
-    "Semua frame DRAFT turunan tangan + algoritma. Lengan/tangan hampir tak terlihat (tangan kanan viewer saja); belahan rok/kaki tidak terlihat sehingga langkah hanya tersirat lewat hem/ujung sepatu.",
-    "Tampak samping disederhanakan (bahu terbuka, jubah belakang sebagai satu massa plum)."
+    "Four independently drawn views; left/right are not mirrored.",
+    "Nearest-neighbor grid preparation, hard alpha and shared 32-color palette.",
+    "Walk/idle are deterministic integer-pixel limb/cloth derivatives, not separately generated poses."
   ]
 }

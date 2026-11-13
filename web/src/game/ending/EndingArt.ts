@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { getDisplay } from '../systems/DisplayController';
 import type { EndingStep } from './progress';
-import { resolveAnims, type CharacterAnimMeta } from '../world/CharacterAnims';
+import { ENDING_ART, SEATED_FRAME } from './artAssets';
+import { DIRS, resolveAnims, type CharacterAnimMeta } from '../world/CharacterAnims';
 
 const W = 640, H = 360;
 let nextArt = 0;
@@ -31,10 +32,16 @@ function emblem(c: Ctx, x: number, y: number, radius: number, color: string): vo
   for (let t = -radius; t <= radius; t++) if (Math.abs(t) > 2) rect(c, color, x + t, y + Math.round(t / 2), 1, 1);
 }
 function cloud(c: Ctx, x: number, y: number, size: number, color: string): void {
-  for (const [dx, dy, w, h] of [[0, 10, 90, 6], [8, 5, 67, 7], [21, 0, 31, 9], [49, 3, 16, 10], [-8, 14, 112, 3]]) rect(c, color, x + dx! * size, y + dy! * size, Math.round(w! * size), Math.round(h! * size));
+  // Small symbolic overlay, formed from rounded native-pixel lobes rather than bars.
+  for (const [cx, cy, rx, ry] of [[11,13,21,5],[33,9,24,10],[57,11,23,7],[79,14,23,4]]) {
+    for(let row=-ry!;row<=ry!;row++){
+      const half=Math.round(rx!*Math.sqrt(Math.max(0,1-row*row/(ry!*ry!))));
+      rect(c,color,x+(cx!-half)*size,y+(cy!+row)*size,Math.max(1,Math.round((half*2+1)*size)),Math.max(1,Math.round(size)));
+    }
+  }
 }
 
-/** Original code-native DRAFT art; 640×360, integer scale, hard pixel edges. No real-person likeness. */
+/** Reference-led Phase 10 backgrounds/poses with native pixel compositing; no real-person likeness. */
 export class EndingArt {
   readonly key = `ending-art-${nextArt++}`;
   private texture: Phaser.Textures.CanvasTexture;
@@ -60,20 +67,20 @@ export class EndingArt {
     c.clearRect(0, 0, W, H); c.drawImage(this.base, 0, 0);
     const t = reduced ? ms * 0.5 : ms;
     if (['walk', 'artefact', 'awakening', 'memories'].includes(step)) {
-      this.modernFigure(c, playerX, 265, 0, moving ? Math.floor(ms / 180) : Math.floor(ms / 1100));
-      this.modernFigure(c, playerX - 32, 262, 1, moving ? Math.floor(ms / 210) : Math.floor(ms / 1400));
-      if (step === 'artefact' || step === 'awakening') emblem(c, 442, 218, 8, '#b2bc71');
-      // one fabric edge, not a particle field
-      rect(c, '#a08072', 88 + (Math.floor(t / 1300) % 2), 174, 13, 2);
+      this.modernFigure(c, playerX, 265, 0, moving ? Math.floor(ms / 180) : 0);
+      this.modernFigure(c, playerX - 32, 262, 1, moving ? Math.floor(ms / 210) : 0);
+      if (step === 'artefact' || step === 'awakening') emblem(c, 442, 233, 8, '#b2bc71');
     }
     if (['remember', 'cliff-arrival', 'promise', 'cloud-path', 'cloud-heart', 'silhouettes'].includes(step)) {
       const drift = Math.floor((t / 1500) % 38);
-      cloud(c, 45 + drift, 74, 1.2, '#c7b5b5'); cloud(c, 320 - drift, 110, 0.8, '#e0bda8');
-      cloud(c, 472 + Math.floor(drift / 2), 45, 1, '#ada3b4');
-      this.seated(c, 'C02_CITY_EXPLORE', 477, 250, ms, '#5f4a62');
+      if(!this.scene.textures.exists(ENDING_ART.cliff.key)) {
+        cloud(c, 45 + drift, 74, 1.2, '#c7b5b5'); cloud(c, 320 - drift, 110, 0.8, '#e0bda8');
+        cloud(c, 472 + Math.floor(drift / 2), 45, 1, '#ada3b4');
+      }
+      this.seated(c, 'C02', 477, 256, ms);
       const walk = step === 'cliff-arrival' && ms < 1900;
-      if (walk) this.sourceFrame(c, 'C01_YARIC_EXPLORE', 2, Math.floor(ms / 160) % 4, 574 - Math.min(123, Math.round(ms / 15)), 252);
-      else if (step !== 'remember') this.seated(c, 'C01_YARIC_EXPLORE', 450, 252, ms + 500, '#504b3f');
+      if (walk) this.sourceFrame(c, 'C01_YARIC_EXPLORE', 1, ms, 574 - Math.min(123, Math.round(ms / 15)), 252);
+      else if (step !== 'remember') this.seated(c, 'C01', 450, 254, ms + 500);
       // Two grass tufts move by a single pixel at deliberately different times.
       for (const [x, y] of [[409, 244], [556, 262], [598, 274]]) {
         const bend = Math.floor(t / (x! + 800)) % 2;
@@ -95,7 +102,7 @@ export class EndingArt {
         c.globalAlpha = 1;
       }
     }
-    if (['archive', 'heirloom', 'heart'].includes(step)) {
+    if ((step === 'archive' || step === 'heirloom' || step === 'heart') && !this.scene.textures.exists(ENDING_ART[step].key)) {
       c.globalAlpha = 0.14 + Math.min(0.28, ms / 12000);
       emblem(c, 318, 151, step === 'heart' ? 39 : 23, '#d9d69a'); c.globalAlpha = 1;
     }
@@ -113,6 +120,7 @@ export class EndingArt {
     this.cliff(c);
   }
   private modern(c: Ctx): void {
+    if (this.background(c, 'modern')) { this.relic(c); return; }
     // Unnamed pedestrian space. No dates, maps, real venue names or invented relationship facts.
     const sky = ['#53545f','#6b6570','#897a7e','#ab9189','#c9aa94'];
     sky.forEach((color, i) => rect(c, color, 0, i * 36, W, 38));
@@ -126,12 +134,7 @@ export class EndingArt {
     rect(c, '#33313e', 0, 239, W, 121); rect(c, '#57515a', 0, 244, W, 50);
     rect(c, '#68606a', 0, 245, W, 2);
     for (let y = 261; y < 293; y += 16) { rect(c, '#4b4651', 0, y, W, 1); for (let x = (y%2)*13; x < W; x += 54) rect(c, '#4b4651', x, y-15, 1, 15); }
-    // Low historic fragment set into the existing wall; the only lime accent is the familiar engraving.
-    rect(c, '#3a3942', 416, 231, 55, 17); rect(c, '#8d8780', 423, 192, 38, 46);
-    rect(c, '#b0a393', 423, 192, 38, 3); rect(c, '#696568', 457, 195, 4, 42);
-    polygon(c, '#998f84', [[428,190],[429,184],[438,180],[451,183],[456,190]]);
-    rect(c, '#6f6865', 431, 202, 3, 14); rect(c, '#78716c', 446, 226, 8, 2);
-    emblem(c, 442, 218, 8, '#c1bb8b');
+    this.relic(c);
     // Bench, planter and a single unlit street fixture establish an ordinary modern place.
     for (let y=231;y<242;y+=4) rect(c,'#8e7767',65,y,85,2);
     rect(c,'#292c36',72,243,3,16);rect(c,'#292c36',140,243,3,16);
@@ -140,6 +143,7 @@ export class EndingArt {
     polygon(c,'#211e2a',[[0,314],[96,306],[181,319],[259,310],[367,321],[482,309],[640,323],[640,360],[0,360]]);
   }
   private cliff(c: Ctx): void {
+    if (this.background(c, 'cliff')) return;
     const sky = ['#6b627e','#84768b','#9e8997','#b19aa0','#c6aaa5','#d8b8a8','#e4c6ad'];
     sky.forEach((color, i) => rect(c, color, 0, i * 24, W, 25));
     rect(c,'#e9cdb0',0,165,W,25);
@@ -174,6 +178,7 @@ export class EndingArt {
     polygon(c,'#8a7b65',[[640,252],[593,249],[563,241],[527,240],[504,244],[507,248],[545,246],[578,258],[640,260]]);
   }
   private echo(c: Ctx, step: EndingStep): void {
+    if ((step === 'archive' || step === 'heirloom' || step === 'heart') && this.background(c, step)) return;
     rect(c,'#211d2c',0,0,W,H);
     if (step === 'archive') {
       rect(c,'#393341',144,60,352,230);rect(c,'#51434c',161,78,318,190);
@@ -196,31 +201,77 @@ export class EndingArt {
     rect(c,'#17131f',0,0,W,32);rect(c,'#17131f',0,303,W,57);
   }
   private modernFigure(c: Ctx, x: number, y: number, variant: number, frame: number, color = '#252632'): void {
-    const xx=Math.round(x), stride=frame%2;
-    rect(c,color,xx-6,y-39,12,10);rect(c,color,xx-8,y-29,16,18);
-    rect(c,color,xx-11,y-27,3,17);rect(c,color,xx+8,y-26,3,17);
-    rect(c,color,xx-6,y-11,5,11);rect(c,color,xx+2,y-11,5,11);
-    rect(c,'#191c27',xx-7,y-2,6,2);rect(c,'#191c27',xx+2,y-2,7,2);
-    if(variant){rect(c,color,xx-8,y-36,3,16);rect(c,'#666174',xx-5,y-26,11,2);}
-    else {rect(c,'#4b4d5d',xx-6,y-27,3,17);rect(c,'#343643',xx+4,y-27,3,15);}
-    rect(c,'#43404e',xx-5,y-38+stride,7,1);
+    // Anonymous fictional backs: contoured hair, shoulders, arms and a small gait.
+    // No face, skin tone, partner likeness or real wardrobe is inferred.
+    const xx=Math.round(x), stride=[0,1,0,-1][frame%4]!, cloudTint=color!=='#252632';
+    const shade=cloudTint?'#898690':'#252631', light=cloudTint?'#aba4ac':'#4b4855';
+    polygon(c,color,[[xx-3,y-41],[xx+3,y-41],[xx+6,y-38],[xx+6,y-32],[xx+3,y-29],[xx-3,y-29],[xx-6,y-32],[xx-6,y-37]]);
+    rect(c,light,xx-3,y-40,5,1);rect(c,shade,xx-5,y-34,2,5);
+    rect(c,color,xx-3,y-30,6,4);
+    polygon(c,color,[[xx-4,y-28],[xx+4,y-28],[xx+8,y-24],[xx+7,y-14],[xx+6,y-10],[xx-6,y-10],[xx-7,y-15],[xx-8,y-24]]);
+    polygon(c,light,[[xx-4,y-27],[xx+3,y-27],[xx+5,y-24],[xx+3,y-24],[xx-3,y-25],[xx-5,y-22]]);
+    rect(c,shade,xx+3,y-23,3,12);rect(c,light,xx-5,y-21,1,9);
+    polygon(c,color,[[xx-7,y-25],[xx-9,y-22],[xx-10,y-15+stride],[xx-8,y-12+stride],[xx-7,y-16]]);
+    polygon(c,color,[[xx+7,y-25],[xx+9,y-22],[xx+10,y-15-stride],[xx+8,y-12-stride],[xx+7,y-16]]);
+    rect(c,shade,xx-6,y-11,5,9+stride);rect(c,color,xx+1,y-11,5,9-stride);
+    rect(c,color,xx-7,y-3+stride,7,3);rect(c,color,xx+1,y-3-stride,7,3);
+    rect(c,light,xx-6,y-2+stride,5,1);rect(c,shade,xx+2,y-2-stride,5,1);
+    if(variant)rect(c,light,xx-4,y-26,8,1);
   }
-  private sourceFrame(c: Ctx, key: string, row: number, frame: number, x: number, y: number, topOnly = false): void {
+  private sourceFrame(c: Ctx, key: string, row: number, ms: number, x: number, y: number): void {
     if (!this.scene.textures.exists(key)) return;
     const tex=this.scene.textures.get(key), src=tex.getSourceImage() as HTMLImageElement;
-    const cols=Math.round(src.width/32), f=tex.get(row*cols+frame);
+    const cols=Math.round(src.width/32);
+    const meta=this.scene.cache.json.get(`${key}:meta`) as CharacterAnimMeta | undefined;
+    const walk=resolveAnims(meta,cols,DIRS[row]!).walk;
+    const frame=walk.frames[Math.floor(ms*walk.fps/1000)%walk.frames.length]!;
+    const f=tex.get(frame);
     if (!f) return;
-    c.drawImage(src,f.cutX,f.cutY,32,topOnly?29:48,Math.round(x-16),Math.round(y-(topOnly?35:47)),32,topOnly?29:48);
+    c.drawImage(src,f.cutX,f.cutY,32,48,Math.round(x-16),Math.round(y-47),32,48);
   }
-  private seated(c: Ctx, key: string, x: number, y: number, ms: number, cloth: string): void {
-    // Existing back-facing head/torso, with original code-native seated legs and cloth. DRAFT pose for review.
-    const meta = this.scene.cache.json.get(`${key}:meta`) as CharacterAnimMeta | undefined;
-    const idle = resolveAnims(meta, key === 'C01_YARIC_EXPLORE' ? 4 : 6, 'up').idle;
-    this.sourceFrame(c,key,0,idle.frames[Math.floor(ms / (1000 / idle.fps)) % idle.frames.length]!,x,y,true);
-    polygon(c,cloth,[[x-10,y-8],[x+9,y-8],[x+12,y+2],[x+5,y+5],[x-12,y+3]]);
-    // Bent thighs reach toward the drop; calves hang past the ledge, offset from the torso.
-    rect(c,cloth,x-17,y,13,5);rect(c,cloth,x-13,y+4,13,4);
-    rect(c,'#302a36',x-18,y+4,5,11);rect(c,'#302a36',x-12,y+8,5,9);
-    rect(c,'#51414b',x-20,y+14,7,3);rect(c,'#51414b',x-14,y+16,7,3);
+  private background(c: Ctx, name: Exclude<keyof typeof ENDING_ART, 'seated'>): boolean {
+    const key = ENDING_ART[name].key;
+    if (!this.scene.textures.exists(key)) return false;
+    c.drawImage(this.scene.textures.get(key).getSourceImage() as HTMLImageElement, 0, 0, W, H);
+    return true;
+  }
+  private relic(c: Ctx): void {
+    // The same inspectable engraving stays at the existing gameplay coordinate.
+    polygon(c,'#39363f',[[415,259],[460,259],[475,264],[430,268]]);
+    polygon(c,'#77716c',[[419,255],[458,255],[458,263],[419,262]]);
+    polygon(c,'#555157',[[458,255],[466,255],[466,261],[458,263]]);
+    polygon(c,'#aca08c',[[423,252],[461,252],[466,255],[419,255]]);
+    polygon(c,'#9b907f',[[423,209],[427,207],[455,207],[457,211],[457,252],[451,255],[425,253],[423,249]]);
+    polygon(c,'#716b65',[[455,207],[461,210],[461,253],[453,255],[456,246],[456,215]]);
+    polygon(c,'#b5a68e',[[423,209],[427,207],[455,207],[457,210],[427,211],[425,247],[423,249]]);
+    polygon(c,'#a69a86',[[428,214],[435,212],[440,214],[438,220],[428,222]]);
+    polygon(c,'#8b8276',[[447,241],[455,237],[455,249],[449,252],[443,248]]);
+    polygon(c,'#afa18a',[[425,241],[432,245],[437,251],[428,251],[425,248]]);
+    // A chipped stone fragment, not a smooth block cap.
+    polygon(c,'#aa9a83',[[427,205],[430,200],[434,201],[437,195],[443,196],[446,199],[451,198],[456,205]]);
+    polygon(c,'#c3b196',[[431,200],[437,195],[443,196],[445,199],[438,198],[435,202]]);
+    polygon(c,'#81796e',[[446,200],[451,198],[456,205],[444,205]]);
+    rect(c,'#c5b499',426,208,27,1);rect(c,'#71675f',429,203,3,1);
+    // Recessed bronze medallion, with a dark cut for the familiar broken ring.
+    polygon(c,'#6c6259',[[431,220],[450,220],[453,224],[453,243],[449,247],[432,247],[429,243],[429,224]]);
+    polygon(c,'#b2a089',[[430,220],[450,220],[452,222],[432,222],[431,243],[429,243],[429,224]]);
+    for(let y=-10;y<=10;y++)for(let x=-10;x<=10;x++){
+      const r=x*x+y*y;
+      if(r<=100)rect(c,r>81?'#6b5746':x+y<-4?'#a88d60':x+y>6?'#80674e':'#937b56',442+x,233+y,1,1);
+    }
+    emblem(c,442,233,7,'#4f4b44');
+    // Sparse stone chips and seams stay grouped around weathered edges.
+    for(const [x,y] of [[425,216],[426,228],[425,239],[428,250],[452,214],[454,244],[445,251]]){
+      rect(c,'#82786c',x!,y!,2,1);rect(c,'#b8a98e',x!,y!+1,1,1);
+    }
+    rect(c,'#c0ae91',420,256,34,1);rect(c,'#5b5553',422,260,9,1);rect(c,'#8a8072',441,259,9,1);
+  }
+  private seated(c: Ctx, actor: 'C01' | 'C02', x: number, y: number, ms: number): void {
+    if (!this.scene.textures.exists(ENDING_ART.seated.key)) return;
+    const source = this.scene.textures.get(ENDING_ART.seated.key).getSourceImage() as HTMLImageElement;
+    const idle = [0, 1, 0, 2][Math.floor(ms / (1000 / SEATED_FRAME.fps)) % 4]!;
+    const frame = (actor === 'C01' ? 0 : 3) + idle;
+    c.drawImage(source, frame * SEATED_FRAME.width, 0, SEATED_FRAME.width, SEATED_FRAME.height,
+      Math.round(x - SEATED_FRAME.pivotX), Math.round(y - SEATED_FRAME.pivotY), SEATED_FRAME.width, SEATED_FRAME.height);
   }
 }

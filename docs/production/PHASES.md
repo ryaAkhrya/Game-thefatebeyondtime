@@ -1,3 +1,7 @@
+## Phase 10 — visual concept art dan brief BGM
+
+Delapan cast eksplorasi, empat battle, warga pendukung dan ending diperbarui; BGM hanya arahan komposisi. Hasil dan sisa review: [PHASE10_REPORT](PHASE10_REPORT.md). Phase 11 final QA/release preparation belum dimulai. Riwayat di bawah tetap konteks historis.
+
 # PHASE ROADMAP — DESKTOP WEB (CLAUDE CODE)
 
 ## Phase 6 otonom — Chapter II: Whispers of Fate

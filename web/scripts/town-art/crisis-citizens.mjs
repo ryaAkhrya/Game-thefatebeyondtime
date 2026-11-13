@@ -79,16 +79,27 @@ function drawFrame(v, dir, state, i) {
   };
   const torso = () => {
     const x0 = side ? 12 : 10, w = side ? 9 : 12;
-    box(c, x0, 14 + bob, w, 15, tun);
+    const yy = 14 + bob;
+    c.poly([[x0 + 3, yy], [x0 + w - 3, yy], [x0 + w, yy + 3], [x0 + w - 1, yy + 10], [x0 + w, yy + 15], [x0, yy + 15], [x0 + 1, yy + 10], [x0, yy + 3]], tun[1]);
+    c.line(x0 + 1, yy + 3, x0 + 2, yy + 11, tun[2]);
+    c.line(x0 + w - 2, yy + 3, x0 + w - 3, yy + 12, tun[0]);
+    c.hline(x0 + 3, yy + 1, w - 6, tun[2]);
+    c.line(x0 + 3, yy + 7, x0 + 4, yy + 12, tun[0]);
+    c.set(x0 + 4, yy + 5, tun[2]);
     c.hline(x0, 28 + bob, w, v.robe ? tun[1] : BOOT[0]); // sabuk
     if (v.apron) box(c, x0 + 2, 20 + bob, w - 4, 10, CLOTH[v.apron]);
     if (v.trim) { c.vline(side ? x0 + w - 3 : 16, 14 + bob, 15, GOLD[2]); if (!side) c.vline(15, 14 + bob, 15, GOLD[1]); }
-    if (!back && !side) { c.hline(14, 14 + bob, 4, skin[1]); } // leher/kerah
+    if (!back && !side) {
+      c.rect(14, 13 + bob, 4, 2, skin[1]);
+      c.line(12, 15 + bob, 15, 17 + bob, tun[2]); c.line(19, 15 + bob, 16, 17 + bob, tun[0]);
+      c.set(16, 20 + bob, tun[2]); c.set(16, 24 + bob, tun[2]);
+    }
   };
   const head = () => {
     const x0 = side ? 11 : 11, w = side ? 10 : 10;
     // kulit
-    box(c, x0, hy + 3, w, 8, skin);
+    c.poly([[x0 + 2, hy + 2], [x0 + w - 2, hy + 2], [x0 + w, hy + 5], [x0 + w - 1, hy + 9], [x0 + w - 3, hy + 11], [x0 + 3, hy + 11], [x0 + 1, hy + 9], [x0, hy + 5]], skin[1]);
+    c.vline(x0 + 1, hy + 5, 4, skin[2]); c.vline(x0 + w - 2, hy + 6, 3, skin[0]);
     if (!back) { // wajah
       if (!side) { c.set(14, hy + 6, INK0()); c.set(18, hy + 6, INK0()); c.hline(15, hy + 9, 2, skin[0]); }
       else { c.set(x0 + w - 3, hy + 6, INK0()); c.set(x0 + w, hy + 7, skin[1]); c.hline(x0 + w - 3, hy + 9, 2, skin[0]); }
@@ -105,6 +116,16 @@ function drawFrame(v, dir, state, i) {
       if (v.style === 'cap') { c.rect(x0 - 1, hy + 4, w + 2, 2, CLOTH.stone[1]); c.hline(x0 - 1, hy + 4, w + 2, CLOTH.stone[2]); }
       if (v.style === 'helm') { c.hline(x0 - 1, hy + 4, w + 2, hr[0]); c.vline(x0 + (side ? w - 2 : 4), hy + 4, 4, hr[0]); c.set(x0 + (w >> 1), hy - 2, R(AV.bronze, 2)); }
     }
+    // Break the old square cap into a rounded crown, sideburns and a few locks.
+    if (v.style !== 'bald' && v.style !== 'helm' && v.style !== 'cap') {
+      // Clear only the two square cap corners; keep the native hard-alpha edge.
+      for (const xx of [x0, x0 + w - 1]) c.d.fill(0, (hy * c.w + xx) * 4, (hy * c.w + xx) * 4 + 4);
+      c.hline(x0 + 3, hy - 1, 4, hair[2]);
+      c.set(x0 + 2, hy + 2, hair[2]); c.set(x0 + 6, hy + 1, hair[0]);
+      if (!back) { c.set(x0 + 3, hy + 5, hair[0]); c.set(x0 + (side ? 5 : 7), hy + 4, hair[1]); }
+      else { c.vline(x0 + 2, hy + 5, 3, hair[0]); c.vline(x0 + 6, hy + 4, 4, hair[2]); }
+    }
+    if (!back && v.style === 'bald') { c.hline(x0 + 3, hy + 10, 4, hair[1]); c.set(x0 + 1, hy + 9, hair[1]); }
   };
   const arms = () => {
     const sk = skin;

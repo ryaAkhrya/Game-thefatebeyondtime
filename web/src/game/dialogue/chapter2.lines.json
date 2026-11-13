@@ -39,12 +39,12 @@
         "scene_id":  "C2-01",
         "line_id":  "C2-01-L004",
         "speaker_id":  "C01",
-        "spoken_text":  "Aku mulai curiga tidak ada jawaban rapi di kota ini.",
+        "spoken_text":  "Aku mulai curiga nggak ada jawaban rapi di kota ini.",
         "emotion_id":  "NEUTRAL",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -87,12 +87,12 @@
         "scene_id":  "C2-01",
         "line_id":  "C2-01-L008",
         "speaker_id":  "C01",
-        "spoken_text":  "Jadi aku harus menemui orang yang menyimpan kertas yang tidak rusak.",
+        "spoken_text":  "Jadi aku harus menemui orang yang menyimpan kertas yang nggak rusak.",
         "emotion_id":  "DETERMINED",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_DETERMINED.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -243,12 +243,12 @@
         "scene_id":  "C2-02",
         "line_id":  "C2-02-L011",
         "speaker_id":  "C01",
-        "spoken_text":  "Aku usahakan keduanya tidak tertukar.",
+        "spoken_text":  "Aku usahakan keduanya nggak tertukar.",
         "emotion_id":  "NEUTRAL",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -435,12 +435,12 @@
         "scene_id":  "C2-03",
         "line_id":  "C2-03-L015",
         "speaker_id":  "C01",
-        "spoken_text":  "Kau tidak ikut?",
+        "spoken_text":  "Kau nggak ikut?",
         "emotion_id":  "CONFUSED",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_CONFUSED.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -483,12 +483,12 @@
         "scene_id":  "C2-05",
         "line_id":  "C2-05-L002",
         "speaker_id":  "C03",
-        "spoken_text":  "Sekarang tidak.",
+        "spoken_text":  "Sekarang nggak.",
         "emotion_id":  "DETERMINED",
         "portrait_asset_path":  "assets/characters/C03_Torvan/C03_EXPRESSION_DETERMINED.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -675,12 +675,12 @@
         "scene_id":  "C2-05",
         "line_id":  "C2-05-L018",
         "speaker_id":  "C03",
-        "spoken_text":  "Aku bisa membantu. Tapi kalau ada bekal, aku minta bagian yang tidak pedas.",
+        "spoken_text":  "Aku bisa membantu. Tapi kalau ada bekal, aku minta bagian yang nggak pedas.",
         "emotion_id":  "NEUTRAL",
         "portrait_asset_path":  "assets/characters/C03_Torvan/C03_EXPRESSION_NEUTRAL.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -735,12 +735,12 @@
         "scene_id":  "C2-06",
         "line_id":  "C2-06-L003",
         "speaker_id":  "C03",
-        "spoken_text":  "Kalau tidak bisa, kita akan segera tahu.",
+        "spoken_text":  "Kalau nggak bisa, kita akan segera tahu.",
         "emotion_id":  "SAD",
         "portrait_asset_path":  "assets/characters/C03_Torvan/C03_EXPRESSION_SAD.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -819,12 +819,12 @@
         "scene_id":  "C2-07",
         "line_id":  "C2-07-L003",
         "speaker_id":  "C01",
-        "spoken_text":  "Kurasa tidak.",
+        "spoken_text":  "Kurasa nggak.",
         "emotion_id":  "NEUTRAL",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -843,12 +843,12 @@
         "scene_id":  "C2-07",
         "line_id":  "C2-07-L005",
         "speaker_id":  "C01",
-        "spoken_text":  "Seperti ia menjaga sesuatu yang bahkan tidak ia ingat.",
+        "spoken_text":  "Seperti ia menjaga sesuatu yang bahkan nggak ia ingat.",
         "emotion_id":  "NEUTRAL",
         "portrait_asset_path":  "assets/characters/C01_Yaric/C01_EXPRESSION_NEUTRAL.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -927,12 +927,12 @@
         "scene_id":  "C2-08",
         "line_id":  "C2-08-L004",
         "speaker_id":  "C03",
-        "spoken_text":  "Aku paham kalau kau menatapnya lebih lama, tulisannya tidak akan tumbuh lagi.",
+        "spoken_text":  "Aku paham kalau kau menatapnya lebih lama, tulisannya nggak akan tumbuh lagi.",
         "emotion_id":  "DETERMINED",
         "portrait_asset_path":  "assets/characters/C03_Torvan/C03_EXPRESSION_DETERMINED.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {
@@ -1131,12 +1131,12 @@
         "scene_id":  "C2-09",
         "line_id":  "C2-09-L013",
         "speaker_id":  "C03",
-        "spoken_text":  "Tidak sulit.",
+        "spoken_text":  "Nggak sulit.",
         "emotion_id":  "NEUTRAL",
         "portrait_asset_path":  "assets/characters/C03_Torvan/C03_EXPRESSION_NEUTRAL.png",
         "sprite_pose":  "idle",
         "pause_ms":  250,
-        "note":  "DRAFT dialogue; expression choice editorial, review in context",
+        "note":  "Conversational wording revision requested by user, 2026-11-14; story events unchanged.",
         "source_script":  "CHAPTER_II_SCRIPT.md"
     },
     {

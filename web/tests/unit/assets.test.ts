@@ -35,10 +35,10 @@ describe('AssetRegistry', () => {
     expect(registry.loadable()).toHaveLength(23);
   });
 
-  it('memakai versi TERBARU yang ada: eksplorasi Yaric v3.2 (v3.3 tidak punya eksplorasi), Nambo masih DRAFT', () => {
+  it('memakai eksplorasi Yaric v3.2 dan redraw Nambo yang menunggu review visual', () => {
     expect(registry.get('C01_YARIC_EXPLORE')?.version).toBe('v3.2');
     expect(registry.get('C01_YARIC_EXPLORE')?.status).toBe('NEEDS_REVIEW');
-    expect(registry.get('C08_NAMBO_EXPLORE')?.status).toBe('DRAFT');
+    expect(registry.get('C08_NAMBO_EXPLORE')?.status).toBe('NEEDS_REVIEW');
     expect(existsSync(resolve(ROOT, 'assets/characters/C01_Yaric/v3_3/C01_EXPLORATION_PIXEL_PASS_V3_3.png'))).toBe(false); // memang tidak ada
   });
 

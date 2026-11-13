@@ -31,6 +31,10 @@ export interface AtlasAsset {
   notes: string;
 }
 
+const PHASE10_BATTLE_SIZE: Readonly<Record<string, readonly [number, number]>> = {
+  C03: [112, 96], M02: [128, 112], M03: [112, 112], B02: [160, 128],
+};
+
 export const ASSET_MANIFEST: readonly AtlasAsset[] = [
   ...[
     ['C03', 'characters/C03_Torvan', 'exploration_atlas', [32, 48], [192, 192], 24, 'characters/normalized/C03_explore.png'],
@@ -41,22 +45,23 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     ['B02', 'bosses/B02_Veyrath', 'battle_atlas', [96, 96], [384, 96], 4, 'battle/B02_battle.png'],
   ].map(([id, folder, kind, frameSize, atlasSize, frameCount, out]): AtlasAsset => ({
     id: `${id}_${kind === 'exploration_atlas' ? 'CH2_EXPLORE' : 'CH2_BATTLE'}`, entity: id as string,
-    kind: kind as AtlasAsset['kind'], version: 'draft', status: 'DRAFT',
+    kind: kind as AtlasAsset['kind'], version: 'draft', status: 'NEEDS_REVIEW',
     sourceImage: `assets/${folder}/${id}_${kind === 'exploration_atlas' ? 'EXPLORATION' : 'BATTLE'}_ATLAS_DRAFT.png`,
     sourceJson: `assets/${folder}/${id}_${kind === 'exploration_atlas' ? 'EXPLORATION' : 'BATTLE'}_ATLAS_DRAFT.json`,
     frameSize: frameSize as [number, number], atlasSize: atlasSize as [number, number], frameCount: frameCount as number,
     publicPath: `assets/${out}`, ...(kind === 'exploration_atlas' ? { rawPublicPath: `assets/${(out as string).replace('/normalized/', '/')}`, finalPath: `assets/characters/final/${id}_explore.png` } : {}), imported: true,
+    ...(kind === 'battle_atlas' ? { finalPath: `assets/battle/${id}_BATTLE_V2.png`, finalFrameSize: PHASE10_BATTLE_SIZE[id as string]! } : {}),
     notes: kind === 'exploration_atlas'
-      ? 'Runtime = normalized derivative (feet baseline y=46, one x offset per direction); raw copy stays byte-identical to the DRAFT source. Crude prototype, not final art.'
-      : 'Original DRAFT grid atlas copied byte-identically. Battle has four authored key poses, not a finished animation.',
+      ? 'Phase 10: reference-led imagegen redraw with four independently drawn directions, native 32x48 preparation and integer limb/cloth animation. Human art review pending. Raw source copy preserved.'
+      : 'Phase 10: twelve individually generated concept-led battle poses in a full timed atlas; native shared-scale preparation. Human animation review pending. Original four-pose source copy preserved.',
   })),
   ...[['C02', 'Velthia'], ['C04', 'Varlgrim'], ['C05', 'Azie'], ['C06', 'Talric'], ['C09', 'Derrria']].map(([id, name]): AtlasAsset => ({
-    id: `${id}_CITY_EXPLORE`, entity: id!, kind: 'exploration_atlas', version: 'draft', status: 'DRAFT',
+    id: `${id}_CITY_EXPLORE`, entity: id!, kind: 'exploration_atlas', version: 'draft', status: 'NEEDS_REVIEW',
     sourceImage: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.png`,
     sourceJson: `assets/characters/${id}_${name}/${id}_EXPLORATION_ATLAS_DRAFT.json`,
     frameSize: [32, 48], atlasSize: [192, 192], frameCount: 24,
     publicPath: `assets/characters/normalized/${id}_explore.png`, rawPublicPath: `assets/characters/${id}_explore.png`, finalPath: `assets/characters/final/${id}_explore.png`, imported: true,
-    notes: 'Runtime = normalized derivative (scripts/normalize-exploration-sprites.mjs: feet baseline y=46, one x offset per direction); raw copy stays byte-identical to the DRAFT source. No new face/costume, no combat kit. Not final art.',
+    notes: 'Phase 10: imagegen redraw from the existing fictional front/back costume references, independently drawn directions and native 32x48 animation preparation. Human review pending. Original source and normalized/raw copies remain preserved.',
   })),
   {
     id: 'B01_MOURNFANG_BATTLE', entity: 'B01', kind: 'battle_atlas', version: 'draft', status: 'NEEDS_REVIEW',
@@ -168,7 +173,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     entity: 'C08',
     kind: 'exploration_atlas',
     version: 'draft',
-    status: 'DRAFT',
+    status: 'NEEDS_REVIEW',
     sourceImage: 'assets/characters/C08_Nambo/C08_EXPLORATION_ATLAS_DRAFT.png',
     sourceJson: 'assets/characters/C08_Nambo/C08_EXPLORATION_ATLAS_DRAFT.json',
     frameSize: [32, 48],
@@ -178,7 +183,7 @@ export const ASSET_MANIFEST: readonly AtlasAsset[] = [
     finalPath: 'assets/characters/final/C08_explore.png',
     rawPublicPath: 'assets/characters/C08_explore.png',
     imported: true,
-    notes: 'Runtime = turunan ternormalisasi (kaki y=46). Prototipe DRAFT berkualitas rendah (belum ada versi lebih baru). Baris: depan, kiri, kanan, belakang x 6 frame. Wajah/kostum belum diverifikasi terhadap potret; jangan digambar ulang tanpa persetujuan.',
+    notes: 'Phase 10: redraw imagegen berpedoman turnaround resmi Nambo (goggle, syal, kantong), empat arah independen; native 32x48, kaki y46, animasi lapisan piksel. Review manusia tetap diperlukan; sumber asli dipertahankan.',
   },
 ];
 

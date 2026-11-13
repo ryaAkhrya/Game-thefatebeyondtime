@@ -55,7 +55,10 @@ describe.each(explore.map((a) => [a.id, a] as [string, AtlasAsset]))('Atlas eksp
     expect(meta.frame_size).toEqual([FW, FH]);
     expect(meta.atlas_size).toEqual([...a.atlasSize]);
     expect(['DRAFT', 'NEEDS_REVIEW']).toContain(meta.status);
-    expect(meta.status).toBe(a.status);
+    // This historical normalized copy retains its source status; Phase 10 final redraws have their own review status.
+    const sourceMeta = JSON.parse(readFileSync(resolve(ROOT, a.sourceJson), 'utf8'));
+    expect(meta.status).toBe(sourceMeta.status);
+    expect(['DRAFT', 'NEEDS_REVIEW']).toContain(a.status);
     expect(Object.keys(meta.frames)).toHaveLength(cols * 4);
   });
 

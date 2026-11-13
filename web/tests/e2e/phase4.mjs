@@ -89,11 +89,12 @@ try {
       await press(page, 'Enter'); await page.waitForFunction(() => window.__tfbt.world()?.dialogue); await finishAftermath(page);
       await walk(page, 1312, 400); await press(page, 'ArrowRight');
       await page.waitForFunction(() => window.__tfbt.world()?.target === 'slice_exit');
-      await press(page, 'Enter'); await page.waitForFunction(() => window.__tfbt.inputLayer() === 'slice-end');
-      await shot(page, 'ending_1920'); await layout(page, 'ending 1920');
-      const fixed = await page.evaluate(() => window.__tfbt.world().x); await press(page, 'ArrowRight', 3);
-      check('Ending input cannot move the paused world', await page.evaluate(x => window.__tfbt.world().x === x, fixed));
-      await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot2'); await shot(page, 'ending_save_1920'); await layout(page, 'ending save 1920');
+      await press(page, 'Enter'); await page.waitForFunction(() => window.__tfbt.world()?.area === 'aveloria');
+      await page.waitForFunction(() => !!window.__tfbt.world()?.dialogue);
+      await finishAftermath(page); await waitWorld(page);
+      await shot(page, 'arrival_1920'); await layout(page, 'arrival 1920');
+      check('Forest exit enters the city without a chapter menu', await page.evaluate(() => window.__tfbt.state().area === 'aveloria' && !window.__tfbt.sceneTexts('SliceEndScene').length));
+      await openPause(page); await openMenu(page, 'save', 'save-load'); await saveSlot(page, 'slot2'); await shot(page, 'arrival_save_1920'); await layout(page, 'arrival save 1920');
       await refreshContinue(page); check('Ending load preserves boss and slice flags without completing Chapter I', await page.evaluate(() => { const d = window.__tfbt.state(); return d.flags['boss.mournfang'] && d.flags['c1.vertical_slice_complete'] && !d.flags['chapter.1_complete'] && d.chapter === 'I'; }));
     }
     await context.close();

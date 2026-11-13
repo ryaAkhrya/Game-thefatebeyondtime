@@ -11,6 +11,8 @@ import { MUSIC_REGISTRY } from '../data/musicRegistry';
 import { BATTLE_SFX } from '../data/battleSfxRegistry';
 import { getServices } from '../systems/Services';
 import { FONT_LOAD_SPECS } from '../../ui/kit/ui';
+import { ENDING_ART } from '../ending/artAssets';
+import { VEYRATH_ENCOUNTER } from '../world/residentArt';
 
 /**
  * Boot: memuat font, lalu hanya aset yang benar-benar tersedia.
@@ -49,6 +51,8 @@ export class BootScene extends Phaser.Scene {
     // Aset lingkungan Sprint 2 (hutan, kota): daftar ada di data/environmentAssets.ts. Atlas JSON (rect+pivot) juga dimuat sebagai meta.
     for (const a of ENV_ATLASES) { this.load.atlas(a.key, a.image, a.json); this.load.json(`${a.key}:meta`, a.json); }
     for (const i of ENV_IMAGES) this.load.image(i.key, i.url);
+    for (const art of Object.values(ENDING_ART)) this.load.image(art.key, art.path);
+    this.load.image(VEYRATH_ENCOUNTER.key, VEYRATH_ENCOUNTER.path);
     // Portrait resolusi tinggi (tinggi 352 px, diturunkan dari PNG ekspresi) untuk dialog yang digambar 1:1 pada resolusi perangkat.
     for (const [speaker, list] of Object.entries(PORTRAIT_EXPRESSIONS)) {
       for (const ex of list) this.load.image(`${speaker}_${ex}`, portraitUrl(`${speaker}_${ex}`));

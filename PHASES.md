@@ -1,3 +1,7 @@
+## Phase 10 — perbaikan visual berdasarkan concept art
+
+Implementasi: cast eksplorasi C02–C09, empat battle yang masih primitif, dan latar/pose ending. Panduan komposisi 13 cue BGM ditulis; musik tidak dibuat. Laporan hasil otomatis dan review manusia: [PHASE10_REPORT](docs/production/PHASE10_REPORT.md). Phase 11 tersisa untuk final QA/release preparation setelah review seni, musik dan konten pribadi. Tidak ada deployment otomatis.
+
 # PHASE ROADMAP — DESKTOP WEB (CLAUDE CODE)
 
 ## Phase 9 — Modern Interlude / Epilog / Memories / Credits (13 November 2026)

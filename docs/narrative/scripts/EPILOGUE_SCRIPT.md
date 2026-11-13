@@ -1,38 +1,60 @@
-# EPILOG — BEYOND TIME · NASKAH KERJA v2
+# EPILOG — BEYOND TIME · NASKAH KERJA v3 — revisi percakapan 2026-11-14
 
 **Posisi kronologi:** setelah interlude modern, cerita menampilkan **kenangan masa lalu** di tebing setelah Aveloria diselamatkan. Itu flashback untuk penonton. Karakter Yaric–Velthia tidak mengetahui kehidupan modern.
 
 ## E-01 — Duduk di tebing
 
-[Hening; kamera memperlihatkan tebing dan awan. Velthia duduk lebih dulu; Yaric datang agak terlambat. Jangan buat kamera berputar, glow atau confetti.]
+[Velthia duduk lebih dulu. Yaric datang dari jalur kanan. Percakapan santai; tidak mengetahui kehidupan modern.]
 
-**Velthia:** "Kau lama sekali."
+**Velthia:** "Lama juga. Aku sudah mulai hafal bentuk awan di sana."
 
-**Yaric:** "Jalannya berbelok dua kali."
+**Yaric:** "Jalannya belok dua kali. Aku ambil yang satunya."
 
-**Velthia:** "Satu kali."
+**Velthia:** "Cuma satu belokan, Yaric."
 
-**Yaric:** "Oh. Pantas." 
+**Yaric:** "Oh. Pantas muter jauh."
+
+**Velthia:** "Sini. Masih ada tempat."
+
+**Yaric:** "Dari sini kotanya kelihatan kecil, ya."
+
+**Velthia:** "Iya. Tadi pagi rasanya semua orang bicara bersamaan."
+
+**Yaric:** "Sekarang yang kedengaran cuma angin. Enak juga."
 
 ## E-02 — Kalau ingatan hilang lagi
 
-**Velthia:** "Kau diam sekali hari ini."
+**Velthia:** "Tumben diam. Biasanya ada saja yang kamu tanyakan."
 
 **Yaric:** "Lagi lihat langit. Biasanya aku terlalu sibuk nyari jalan."
 
-**Velthia:** "Aku takut nanti semuanya hilang lagi."
+**Velthia:** "Kakimu masih sakit?"
+
+**Yaric:** "Sedikit. Tapi besok sudah bisa bantu angkat kayu."
+
+**Velthia:** "Besok saja dipikirkan. Duduk dulu."
+
+**Yaric:** "Kamu sendiri? Dari tadi belum berhenti ngurus orang."
+
+**Velthia:** "Kalau berhenti, malah kepikiran macam-macam."
+
+**Yaric:** "Tentang apa?"
+
+**Velthia:** "Aku takut nanti semuanya hilang lagi. Termasuk ini."
 
 **Yaric:** "Kalau ingatan kita hilang, ya... kita kenalan lagi."
 
-**Velthia:** "Kau yakin bisa menemukanku?"
+**Velthia:** "Kamu yakin bisa nemuin aku?"
 
 **Yaric:** "Mungkin aku bakal tersesat dulu. Tapi aku cari terus."
 
+**Velthia:** "Aku juga nggak akan diam saja nunggu."
+
+**Yaric:** "Bagus. Berarti nanti kita ketemu di tengah jalan."
+
 **Velthia:** "Kali ini jangan terlalu lama."
 
-**Yaric:** "Aku usahakan." 
-
-[Biarkan keheningan. Jika ada kontak tangan, buat sederhana dan dapat dibaca pada ukuran sprite kecil.]
+**Yaric:** "Aku usahakan. Tapi kalau salah belok, panggil saja."
 
 ## E-03 — Awan dan ingatan
 

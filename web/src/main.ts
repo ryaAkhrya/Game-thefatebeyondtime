@@ -197,7 +197,7 @@ function boot(): void {
           game.scene.getScene('TitleScene').scene.start('BattleScene', { encounter: 'mournfang' });
         },
         /** Bab II: 'liora' | 'forest2' | 'duo' (Torvan bergabung). Hanya QA. */
-        chapter2: (stage: 'liora' | 'forest2' | 'duo', battle?: 'duo_tutorial' | 'veyrath') => {
+        chapter2: (stage: 'liora' | 'forest2' | 'duo', battle?: 'duo_tutorial' | 'veyrath' | 'forest2_patrol') => {
           services.checkpoints.reset();
           const data = applyReward(applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data, MOURNFANG_REWARD).data;
           for (const flag of ['c1.intro_seen', 'story.c1_awake', 'story.c1_nambo', 'story.c1_loop', 'c1.loop_noticed', 'c1.hollowling_victory_seen', FIRST_HOLLOWLING_FLAG, FOREST_EDGE_FLAG, BOSS_CHECKPOINT_FLAG, MOURNFANG_FLAG, MOURNFANG_VICTORY_SEEN, ...Object.values(CITY_FLAG), C2.start, C2.depart, C2.farewell]) data.flags[flag] = true;
@@ -250,7 +250,7 @@ function boot(): void {
          * Bab IV (hanya QA, build produksi publik tidak memuat hook ini): menyusun save Bab III selesai dengan hadiah nyata lalu maju ke tahap.
          * start | trial | checkpoint | boss | heart | echo | return. `battle` langsung membuka battle; `opts.hp/mp` mengubah vitals.
          */
-        chapter4: (stage: 'c3end' | 'start' | 'trial' | 'checkpoint' | 'boss' | 'heart' | 'echo' | 'return' | 'complete', battle?: EncounterId, opts?: { hp?: Partial<Record<'C01' | 'C02', number>>; mp?: Partial<Record<'C01' | 'C02', number>>; endingPreview?: boolean }) => {
+        chapter4: (stage: 'c3end' | 'start' | 'trial' | 'checkpoint' | 'boss' | 'heart' | 'echo' | 'return' | 'camp' | 'complete', battle?: EncounterId, opts?: { hp?: Partial<Record<'C01' | 'C02', number>>; mp?: Partial<Record<'C01' | 'C02', number>>; endingPreview?: boolean }) => {
           services.checkpoints.reset();
           let d: GameStateData = applyReward(applyReward(services.gameState.startNewGame(), HOLLOWLING_REWARD).data, MOURNFANG_REWARD).data;
           d.chapter = 'II'; d.area = 'forest_2';
@@ -267,7 +267,7 @@ function boot(): void {
           d.area = 'temple'; d.position = { ...TEMPLE_BATTLE_RETURN.chronolith };
           if (stage === 'c3end') { services.gameState.load(d); game.scene.getScene('TitleScene').scene.start('WorldScene'); return; }
           d = enterChapter4(d); d.position = { ...FORTRESS_SPAWN };
-          const order = ['c3end', 'start', 'trial', 'checkpoint', 'boss', 'heart', 'echo', 'return', 'complete'] as const;
+          const order = ['c3end', 'start', 'trial', 'checkpoint', 'boss', 'heart', 'echo', 'return', 'camp', 'complete'] as const;
           const at = (name: (typeof order)[number]): boolean => order.indexOf(stage) >= order.indexOf(name);
           if (at('trial')) { d.flags[C4.entered] = true; d.flags[C4.aegisLearned] = true; d.position = { ...FORTRESS_BATTLE_RETURN.fortress_aegis_trial }; }
           if (at('checkpoint')) {
@@ -285,7 +285,8 @@ function boot(): void {
             for (const f of [C4.memoryA, C4.memoryB, C4.oldMemory, C4.varlgrimTruth, C4.creatorReveal, C4.varlgrimStays, FORT.torvanLeft]) d.flags[f] = true;
             d = returnToAveloria(d, { ...AVELORIA_C4_SPAWN });
           }
-          if (stage === 'complete') { d.flags[C4.returnSeen] = true; d.flags[C4.complete] = true; }
+          if (at('camp')) d.flags[C4.returnSeen] = true;
+          if (stage === 'complete') d.flags[C4.complete] = true;
           if (opts?.hp?.C01 !== undefined) d.vitals = { ...d.vitals, hp: opts.hp.C01 };
           if (opts?.mp?.C01 !== undefined) d.vitals = { ...d.vitals, mp: opts.mp.C01 };
           if (d.partyVitals?.C02) d.partyVitals = { ...d.partyVitals, C02: { hp: opts?.hp?.C02 ?? d.partyVitals.C02.hp, mp: opts?.mp?.C02 ?? d.partyVitals.C02.mp } };
@@ -380,6 +381,11 @@ function boot(): void {
       };
       if (game.scene.isActive(key) || game.scene.isPaused(key)) game.scene.getScene(key).children.list.forEach(visit);
       return out;
+    },
+    sceneTextBounds: (key: string, value: string): object | null => {
+      const scene=game.scene.getScene(key);
+      const text=scene.children.list.find(o=>o instanceof Phaser.GameObjects.Text&&o.text===value) as Phaser.GameObjects.Text|undefined;
+      return text ? { ...text.getBounds(), canvasWidth:game.canvas.width, canvasHeight:game.canvas.height } : null;
     },
     canvasCss: () => ({ w: game.canvas.clientWidth, h: game.canvas.clientHeight }),
   };
